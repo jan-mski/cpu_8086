@@ -2,31 +2,10 @@
 
 #include "decoder.h"
 
-uint8_t GetAsmStrLen(const OpDecodeData *decode_data)
+void GetAsmString(char *dest, const OpDecodeData *decode_data)
 {
-    uint8_t len = 0;
-    for (len = 0; len < ASM_STR_MAX_LEN; ++len)
-    {
-        if (decode_data->asm_str[len] == '\0')
-        {
-            break;
-        }
-    }
-
-    return len;
-}
-
-void CopyAsmStr(char *dest, const OpDecodeData *decode_data)
-{
-    for (uint8_t i = 0; i < ASM_STR_MAX_LEN; ++i)
-    {
-        const char current_char = decode_data->asm_str[i];
-        dest[i] = current_char;
-        if (current_char == '\0')
-        {
-            break;
-        }
-    }
+    snprintf(dest, ASM_STR_MAX_LEN, "%s %s, %s", decode_data->mnemonic, decode_data->left_operand,
+        decode_data->right_operand);
 }
 
 void DecodeOps(char **output_buffer, FILE *input_stream)
@@ -38,18 +17,16 @@ void DecodeOps(char **output_buffer, FILE *input_stream)
     {
         DecodeOp(&decode_data);
 
-        const uint8_t asm_str_len = GetAsmStrLen(&decode_data);
-        if (asm_str_len == 0)
+        if (decode_data.mnemonic == 0)
         {
             continue;  // unsupported
         }
 
-        char *output_buffer_slot = new char[ASM_STR_MAX_LEN];
-        CopyAsmStr(output_buffer_slot, &decode_data);
-        output_buffer[op_index++] = output_buffer_slot;
+        GetAsmString(output_buffer[op_index++], &decode_data);
 
         decode_data = {input_stream};
     }
+    output_buffer[op_index] = 0;
 }
 
 size_t ReadNextByte(OpDecodeData *decode_data)

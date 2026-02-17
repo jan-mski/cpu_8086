@@ -20,6 +20,11 @@ void DecodeD(const uint8_t d_shift, OpDecodeData *decode_data)
     decode_data->d = (decode_data->bytes[0] >> d_shift) & 0b1;
 }
 
+void DecodeS(const uint8_t s_shift, OpDecodeData *decode_data)
+{
+    decode_data->s = (decode_data->bytes[0] >> s_shift) & 0b1;
+}
+
 void DecodeModRM(const uint8_t mod_shift, const uint8_t r_m_shift, OpDecodeData *decode_data)
 {
     ReadNextBytesToIndex(1, decode_data);
@@ -35,11 +40,11 @@ void DecodeReg(const uint8_t reg_byte_index, const uint8_t reg_shift, OpDecodeDa
 
 void DecodeData(const uint8_t data_byte_1_index, OpDecodeData *decode_data)
 {
-    ReadNextBytesToIndex(data_byte_1_index, decode_data);
-    if (decode_data->w == 0)
+    if (decode_data->w == 0 || decode_data->s == 1)
     {
+        ReadNextBytesToIndex(data_byte_1_index, decode_data);
         decode_data->data = decode_data->bytes[data_byte_1_index];
-    } else
+    } else if (decode_data->s == 0)
     {
         const uint8_t data_byte_2_index = data_byte_1_index + 1;
         ReadNextBytesToIndex(data_byte_2_index, decode_data);
@@ -90,20 +95,65 @@ uint8_t DecodeDisplacement16Bit(OpDecodeData *decode_data)
     return 2;
 }
 
-// index: (mod << 3 | r_m), where mod is 2-bit long, r_m is 3-bit long, which makes a 5-bit long index
-displacement_decoder_t DISPLACEMENT_DECODERS[32] = {
-    REPEAT_6(DecodeDisplacementNone),   // 0b00000 - 0b00101
-    DecodeDisplacement16Bit,            // 0b00110
-    DecodeDisplacementNone,             // 0b00111
-    REPEAT_8(DecodeDisplacement8Bit),   // 0b01000 - 0b01111
-    REPEAT_8(DecodeDisplacement16Bit),  // 0b10000 - 0b10111
-    REPEAT_8(DecodeDisplacementNone)    // 0b11000 - 0b11111
-};
-
 uint8_t DecodeDisplacement(OpDecodeData *decode_data)
 {
-    const uint8_t index = (decode_data->mod << 3) | decode_data->r_m;
-    const displacement_decoder_t displacement_decoder = DISPLACEMENT_DECODERS[index];
+    switch (decode_data->mod)
+    {
+        case 0b00:
+        {
+            if (decode_data->r_m == 0b110)
+            {
+                return DecodeDisplacement16Bit(decode_data);
+            }
+            return DecodeDisplacementNone(decode_data);
+        } break;
+        case 0b01:
+        {
+            return DecodeDisplacement8Bit(decode_data);
+        } break;
+        case 0b10:
+        {
+            return DecodeDisplacement16Bit(decode_data);
+        } break;
+        default:
+        {
+            return DecodeDisplacementNone(decode_data);
+        } break;
+    }
+}
 
-    return displacement_decoder(decode_data);
+void DecodeFieldsRegisterOrMemoryAndEither(OpDecodeData *decode_data)
+{
+    DecodeD(1, decode_data);
+    DecodeW(0, decode_data);
+    DecodeModRM(6, 0, decode_data);
+    DecodeReg(1, 3, decode_data);
+    DecodeDisplacement(decode_data);
+}
+
+void DecodeFieldsRegisterOrMemoryAndImmediate(OpDecodeData *decode_data)
+{
+    DecodeW(0, decode_data);
+    DecodeModRM(6, 0, decode_data);
+    const uint8_t num_bytes_read = DecodeDisplacement(decode_data);
+    DecodeData(2 + num_bytes_read, decode_data);
+}
+
+void DecodeFieldsRegisterAndImmediate(OpDecodeData *decode_data)
+{
+    DecodeW(3, decode_data);
+    DecodeReg(0, 0, decode_data);
+    DecodeData(1, decode_data);
+}
+
+void DecodeFieldsMemoryAndAccumulator(OpDecodeData *decode_data)
+{
+    DecodeW(0, decode_data);
+    DecodeAddr(decode_data);
+}
+
+void DecodeFieldsAccumulatorAndImmediate(OpDecodeData *decode_data)
+{
+    DecodeW(0, decode_data);
+    DecodeData(1, decode_data);
 }

@@ -11,9 +11,10 @@ extern void DecodeOps(char **output_buffer, FILE *input_stream);
 TEST_CASE("Instructions are decoded correctly")
 {
     const char* file_name = GENERATE("listing_0037_single_register_mov",
-                                      "listing_0038_many_register_mov",
-                                      "listing_0039_more_movs",
-                                      "listing_0040_challenge_movs");
+                                     "listing_0038_many_register_mov",
+                                     "listing_0039_more_movs",
+                                     "listing_0040_challenge_movs",
+                                     "listing_0041_add_sub_cmp_jnz");
 
     char input_path[256], nasm_cmd[512];
     sprintf(input_path, "data/%s", file_name);
@@ -23,6 +24,10 @@ TEST_CASE("Instructions are decoded correctly")
     fprintf(asm_file, "bits 16\n");
 
     char *output_buffer[128] = {};
+    for (uint8_t i = 0; i < 128; ++i)
+    {
+        output_buffer[i] = new char[64];
+    }
     DecodeOps(output_buffer, input);
 
     for (int i = 0; i < 128; ++i)

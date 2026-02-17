@@ -20,7 +20,8 @@ add_executable(cpu_impl_tests tests/test.cpp
         src/types.h
         src/op_decoder/subdecoders/field_decoders.cpp
         src/op_decoder/subdecoders/subdecoders.h
-        src/op_decoder/subdecoders/asm_translators.cpp)
+        src/op_decoder/subdecoders/reg_mem_decoders.cpp
+        src/op_decoder/subdecoders/operand_decoders.cpp)
 target_link_libraries(cpu_impl_tests PRIVATE Catch2::Catch2WithMain)
 
 add_executable(cpu_impl src/main.cpp
@@ -30,5 +31,6 @@ add_executable(cpu_impl src/main.cpp
         src/types.h
         src/op_decoder/subdecoders/field_decoders.cpp
         src/op_decoder/subdecoders/subdecoders.h
-        src/op_decoder/subdecoders/asm_translators.cpp
+        src/op_decoder/subdecoders/reg_mem_decoders.cpp
+        src/op_decoder/subdecoders/operand_decoders.cpp
 )

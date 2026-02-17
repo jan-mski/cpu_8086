@@ -2,86 +2,78 @@
 #include "subdecoders.h"
 
 typedef void (*op_decoder_t)(OpDecodeData *decode_data);
+const char *mnemonic_mov = "mov";
+const char *mnemonic_add = "add";
 
-void DecodeUnsupported(OpDecodeData *decode_data)
+void DecodeUnsupported(OpDecodeData *)
 {
-    decode_data->asm_str[0] = '\0';
+
 }
 
-void DecodeMovRegisterMemory(OpDecodeData *decode_data)
+void DecodeMovRegisterOrMemory(OpDecodeData *decode_data)
 {
-    DecodeD(1, decode_data);
-    DecodeW(0, decode_data);
-    DecodeModRM(6, 0, decode_data);
-    DecodeReg(1, 3, decode_data);
-    DecodeDisplacement(decode_data);
-
-    char reg_str[TRANSLATED_REG_MAX_LEN];
-    TranslateReg(reg_str, decode_data);
-
-    char r_m_str[TRANSLATED_R_M_MAX_LEN];
-    TranslateRM(r_m_str, decode_data);
-
-    if (decode_data->d == 0)
-    {
-        snprintf(decode_data->asm_str, sizeof(decode_data->asm_str), "mov %s, %s", r_m_str, reg_str);
-    }
-    else
-    {
-        snprintf(decode_data->asm_str, sizeof(decode_data->asm_str), "mov %s, %s", reg_str, r_m_str);
-    }
+    decode_data->mnemonic = mnemonic_mov;
+    DecodeFieldsRegisterOrMemoryAndEither(decode_data);
+    DecodeOperandsRegisterOrMemoryAndEither(decode_data);
 }
 
 void DecodeMovMemoryToAccumulator(OpDecodeData *decode_data)
 {
-    DecodeW(0, decode_data);
-    DecodeAddr(decode_data);
-
-    snprintf(decode_data->asm_str, sizeof(decode_data->asm_str), "mov ax, [%u]", decode_data->addr);
+    decode_data->mnemonic = mnemonic_mov;
+    DecodeFieldsMemoryAndAccumulator(decode_data);
+    DecodeOperandsAccumulatorAndMemory(decode_data);
 }
 
 void DecodeMovAccumulatorToMemory(OpDecodeData *decode_data)
 {
-    DecodeW(0, decode_data);
-    DecodeAddr(decode_data);
-
-    snprintf(decode_data->asm_str, sizeof(decode_data->asm_str), "mov [%u], ax", decode_data->addr);}
+    decode_data->mnemonic = mnemonic_mov;
+    DecodeFieldsMemoryAndAccumulator(decode_data);
+    DecodeOperandsMemoryAndAccumulator(decode_data);
+}
 
 void DecodeMovImmediateToRegister(OpDecodeData *decode_data)
 {
-    DecodeW(3, decode_data);
-    DecodeReg(0, 0, decode_data);
-    DecodeData(1, decode_data);
-
-    char reg_str[TRANSLATED_REG_MAX_LEN];
-    TranslateReg(reg_str, decode_data);
-
-    snprintf(decode_data->asm_str, sizeof(decode_data->asm_str), "mov %s, %u", reg_str, decode_data->data);
+    decode_data->mnemonic = mnemonic_mov;
+    DecodeFieldsRegisterAndImmediate(decode_data);
+    DecodeOperandsRegisterAndImmediate(decode_data);
 }
 
 void DecodeMovImmediateToRegisterOrMemory(OpDecodeData *decode_data)
 {
-    DecodeW(0, decode_data);
-    DecodeModRM(6, 0, decode_data);
-    const uint8_t num_bytes_read = DecodeDisplacement(decode_data);
-    DecodeData(2 + num_bytes_read, decode_data);
+    decode_data->mnemonic = mnemonic_mov;
+    DecodeFieldsRegisterOrMemoryAndImmediate(decode_data);
+    DecodeOperandsRegisterOrMemoryAndImmediate(decode_data);
+}
 
-    char r_m_str[TRANSLATED_R_M_MAX_LEN];
-    TranslateRM(r_m_str, decode_data);
+void DecodeAddRegisterOrMemory(OpDecodeData *decode_data)
+{
+    decode_data->mnemonic = mnemonic_add;
+    DecodeFieldsRegisterOrMemoryAndEither(decode_data);
+    DecodeOperandsRegisterOrMemoryAndEither(decode_data);
+}
 
-    if (decode_data->w == 0)
-    {
-        snprintf(decode_data->asm_str, sizeof(decode_data->asm_str), "mov %s, byte %u", r_m_str, decode_data->data);
-    }
-    else
-    {
-        snprintf(decode_data->asm_str, sizeof(decode_data->asm_str), "mov %s, word %u", r_m_str, decode_data->data);
-    }
+void DecodeAddImmediateToRegisterOrMemory(OpDecodeData *decode_data)
+{
+    decode_data->mnemonic = mnemonic_add;
+    DecodeS(1, decode_data);
+    DecodeFieldsRegisterOrMemoryAndImmediate(decode_data);
+    DecodeOperandsRegisterOrMemoryAndImmediate(decode_data);
+}
+
+void DecodeAddImmediateToAccumulator(OpDecodeData *decode_data)
+{
+    decode_data->mnemonic = mnemonic_add;
+    DecodeFieldsAccumulatorAndImmediate(decode_data);
+    DecodeOperandsAccumulatorAndImmediate(decode_data);
 }
 
 op_decoder_t OP_DECODERS[256] = {
-    REPEAT_136(DecodeUnsupported),                   // 0b00000000 - 0b10000111 [  0 - 135]
-    REPEAT_4(DecodeMovRegisterMemory),               // 0b10001000 - 0b10001011 [136 - 139]
+    REPEAT_4(DecodeAddRegisterOrMemory),             // 0b00000000 - 0b00000011 [  0 -   3]
+    REPEAT_2(DecodeAddImmediateToAccumulator),       // 0b00000100 - 0b00000101 [  4 -   5]
+    REPEAT_122(DecodeUnsupported),                   // 0b00000110 - 0b01111111 [  6 - 127]
+    REPEAT_4(DecodeAddImmediateToRegisterOrMemory),  // 0b10000000 - 0b10000011 [128 - 131]
+    REPEAT_4(DecodeUnsupported),                     // 0b10000100 - 0b10000111 [132 - 135]
+    REPEAT_4(DecodeMovRegisterOrMemory),             // 0b10001000 - 0b10001011 [136 - 139]
     REPEAT_20(DecodeUnsupported),                    // 0b10001100 - 0b10011111 [140 - 159]
     REPEAT_2(DecodeMovMemoryToAccumulator),          // 0b10100000 - 0b10100001 [160 - 161]
     REPEAT_2(DecodeMovAccumulatorToMemory),          // 0b10100010 - 0b10100011 [162 - 163]
