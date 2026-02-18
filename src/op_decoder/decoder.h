@@ -24,6 +24,7 @@ struct OpDecodeData
     int32_t displacement;            // 8/16 bits
 
     const char *mnemonic;
+    uint8_t num_operands;
     char left_operand[OPERAND_MAX_LEN];
     char right_operand[OPERAND_MAX_LEN];
 };

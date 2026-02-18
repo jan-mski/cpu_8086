@@ -18,6 +18,7 @@ void DecodeFieldsRegisterOrMemoryAndImmediate(OpDecodeData *decode_data);
 void DecodeFieldsRegisterAndImmediate(OpDecodeData *decode_data);
 void DecodeFieldsMemoryAndAccumulator(OpDecodeData *decode_data);
 void DecodeFieldsAccumulatorAndImmediate(OpDecodeData *decode_data);
+void DecodeFieldsReturnFromCall(OpDecodeData *decode_data);
 
 // # Memory/register
 const uint8_t REG_OR_MEM_BUFFER_MAX_LEN = 18;
@@ -33,3 +34,4 @@ void DecodeOperandsRegisterAndImmediate(OpDecodeData *decode_data);
 void DecodeOperandsAccumulatorAndMemory(OpDecodeData *decode_data);
 void DecodeOperandsMemoryAndAccumulator(OpDecodeData *decode_data);
 void DecodeOperandsAccumulatorAndImmediate(OpDecodeData *decode_data);
+void DecodeOperandsReturnFromCall(OpDecodeData *decode_data);

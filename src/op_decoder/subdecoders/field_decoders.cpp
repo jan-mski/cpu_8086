@@ -81,26 +81,28 @@ uint8_t DecodeDisplacementNone(OpDecodeData *)
     return 0;
 }
 
-uint8_t DecodeDisplacement8Bit(OpDecodeData *decode_data)
+uint8_t DecodeDisplacement8Bit(const uint8_t displacement_byte_1_index, OpDecodeData *decode_data)
 {
-    ReadNextBytesToIndex(2, decode_data);
-    const uint8_t sign = (decode_data->bytes[2] >> 7) & 0b1;
+    ReadNextBytesToIndex(displacement_byte_1_index, decode_data);
+    const uint8_t sign = (decode_data->bytes[displacement_byte_1_index] >> 7) & 0b1;
     if (sign == 1)  // negative number, so we do two's complement
     {
-        decode_data->displacement = -((decode_data->bytes[2] ^ 0b11111111) + 0b1);
+        decode_data->displacement = -((decode_data->bytes[displacement_byte_1_index] ^ 0b11111111) + 0b1);
     }
     else
     {
-        decode_data->displacement = decode_data->bytes[2];
+        decode_data->displacement = decode_data->bytes[displacement_byte_1_index];
     }
 
     return 1;
 }
 
-uint8_t DecodeDisplacement16Bit(OpDecodeData *decode_data)
+uint8_t DecodeDisplacement16Bit(const uint8_t displacement_byte_1_index, OpDecodeData *decode_data)
 {
-    ReadNextBytesToIndex(3, decode_data);
-    decode_data->displacement = (decode_data->bytes[3] << 8) | decode_data->bytes[2];
+    const uint8_t displacement_byte_2_index = displacement_byte_1_index + 1;
+    ReadNextBytesToIndex(displacement_byte_2_index, decode_data);
+    decode_data->displacement = (decode_data->bytes[displacement_byte_2_index] << 8) |
+        decode_data->bytes[displacement_byte_1_index];
 
     return 2;
 }
@@ -113,17 +115,17 @@ uint8_t DecodeDisplacement(OpDecodeData *decode_data)
         {
             if (decode_data->r_m == 0b110)
             {
-                return DecodeDisplacement16Bit(decode_data);
+                return DecodeDisplacement16Bit(2, decode_data);
             }
             return DecodeDisplacementNone(decode_data);
         } break;
         case 0b01:
         {
-            return DecodeDisplacement8Bit(decode_data);
+            return DecodeDisplacement8Bit(2, decode_data);
         } break;
         case 0b10:
         {
-            return DecodeDisplacement16Bit(decode_data);
+            return DecodeDisplacement16Bit(2, decode_data);
         } break;
         default:
         {
@@ -169,4 +171,9 @@ void DecodeFieldsAccumulatorAndImmediate(OpDecodeData *decode_data)
 {
     DecodeW(0, decode_data);
     DecodeData(1, decode_data);
+}
+
+void DecodeFieldsReturnFromCall(OpDecodeData *decode_data)
+{
+    DecodeDisplacement8Bit(1, decode_data);
 }

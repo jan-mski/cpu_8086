@@ -19,6 +19,7 @@ void DecodeOperandsRegisterOrMemoryAndEither(OpDecodeData *decode_data)
         snprintf(decode_data->left_operand, OPERAND_MAX_LEN, "%s", reg_str);
         snprintf(decode_data->right_operand, OPERAND_MAX_LEN, "%s", r_m_str);
     }
+    decode_data->num_operands = 2;
 }
 
 void DecodeOperandsRegisterOrMemoryAndImmediate(OpDecodeData *decode_data)
@@ -35,6 +36,7 @@ void DecodeOperandsRegisterOrMemoryAndImmediate(OpDecodeData *decode_data)
         const char *qualifier = decode_data->w == 0 ? "byte" : "word";
         snprintf(decode_data->left_operand, OPERAND_MAX_LEN, "%s %s", qualifier, r_m_str);
     }
+    decode_data->num_operands = 2;
 }
 
 void DecodeOperandsRegisterAndImmediate(OpDecodeData *decode_data)
@@ -44,22 +46,32 @@ void DecodeOperandsRegisterAndImmediate(OpDecodeData *decode_data)
 
     snprintf(decode_data->left_operand, OPERAND_MAX_LEN, "%s", reg_str);
     snprintf(decode_data->right_operand, OPERAND_MAX_LEN, "%u", decode_data->data);
+    decode_data->num_operands = 2;
 }
 
 void DecodeOperandsAccumulatorAndMemory(OpDecodeData * decode_data)
 {
     snprintf(decode_data->left_operand, OPERAND_MAX_LEN, "ax");
     snprintf(decode_data->right_operand, OPERAND_MAX_LEN, "[%u]", decode_data->addr);
+    decode_data->num_operands = 2;
 }
 
 void DecodeOperandsMemoryAndAccumulator(OpDecodeData * decode_data)
 {
     snprintf(decode_data->left_operand, OPERAND_MAX_LEN, "[%u]", decode_data->addr);
     snprintf(decode_data->right_operand, OPERAND_MAX_LEN, "ax");
+    decode_data->num_operands = 2;
 }
 
 void DecodeOperandsAccumulatorAndImmediate(OpDecodeData * decode_data)
 {
     snprintf(decode_data->left_operand, OPERAND_MAX_LEN, decode_data->w == 0 ? "al" : "ax");
     snprintf(decode_data->right_operand, OPERAND_MAX_LEN, "%u", decode_data->data);
+    decode_data->num_operands = 2;
+}
+
+void DecodeOperandsReturnFromCall(OpDecodeData *decode_data)
+{
+    snprintf(decode_data->left_operand, OPERAND_MAX_LEN, "($+2) + %i", decode_data->displacement);
+    decode_data->num_operands = 1;
 }
