@@ -6,19 +6,6 @@ const char *REGISTER_NAMES_W1[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di
 const char **REGISTER_NAMES[] = {REGISTER_NAMES_W0, REGISTER_NAMES_W1};
 const char *ADDRESS_CALCULATION_BASES[] = {"bx + si", "bx + di", "bp + si", "bp + di", "si", "di", "bp", "bx"};
 
-const char *ADDRESS_CALCULATION_REGISTERS_MOD_ZERO[][2] = {
-    {"bx", "si"}, {"bx", "di"}, {"bp", "si"}, {"bp", "di"}, {"si"}, {"di"}, {}, {"bx"}
-};
-const char *ADDRESS_CALCULATION_REGISTERS_MOD_NON_ZERO[][2] = {
-    {"bx", "si"}, {"bx", "di"}, {"bp", "si"}, {"bp", "di"}, {"si"}, {"di"}, {"bp"}, {"bx"}
-};
-const char *(*ADDRESS_CALCULATION_REGISTERS[])[2] = {
-    ADDRESS_CALCULATION_REGISTERS_MOD_ZERO,
-    ADDRESS_CALCULATION_REGISTERS_MOD_NON_ZERO,
-    ADDRESS_CALCULATION_REGISTERS_MOD_NON_ZERO,
-    ADDRESS_CALCULATION_REGISTERS_MOD_NON_ZERO
-};
-
 void CalculateAddressNoDisplacement(char *buffer, const OpDecodeData *decode_data)
 {
     snprintf(buffer, REG_OR_MEM_BUFFER_MAX_LEN, "[%s]", ADDRESS_CALCULATION_BASES[decode_data->r_m]);

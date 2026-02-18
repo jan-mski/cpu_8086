@@ -10,6 +10,8 @@ void ReadNextBytesToIndex(const uint8_t byte_index, OpDecodeData *decode_data)
     }
 }
 
+// # Single fields
+
 void DecodeW(const uint8_t w_shift, OpDecodeData *decode_data)
 {
     decode_data->w = (decode_data->bytes[0] >> w_shift) & 0b1;
@@ -66,6 +68,14 @@ void DecodeAddr(OpDecodeData *decode_data)
     }
 }
 
+void DecodeArithmeticMnemonic(OpDecodeData *decode_data)
+{
+    ReadNextBytesToIndex(1, decode_data);
+    decode_data->common_mnemonic = (decode_data->bytes[1] >> 3) & 0b111;
+}
+
+// ## Displacement
+
 uint8_t DecodeDisplacementNone(OpDecodeData *)
 {
     return 0;
@@ -121,6 +131,9 @@ uint8_t DecodeDisplacement(OpDecodeData *decode_data)
         } break;
     }
 }
+
+
+// # Field aggregates
 
 void DecodeFieldsRegisterOrMemoryAndEither(OpDecodeData *decode_data)
 {

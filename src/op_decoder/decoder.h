@@ -18,6 +18,7 @@ struct OpDecodeData
     uint8_t mod;                     // 2 bits
     uint8_t reg;                     // 3 bits
     uint8_t r_m;                     // 3 bits
+    uint8_t common_mnemonic;         // 3 bits
     uint16_t data;                   // 8/16 bits
     uint16_t addr;                   // 8/16 bits
     int32_t displacement;            // 8/16 bits

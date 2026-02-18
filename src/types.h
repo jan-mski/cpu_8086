@@ -14,10 +14,12 @@
     REPEAT_12(x), REPEAT_4(x)
 #define REPEAT_20(x) \
     REPEAT_16(x), REPEAT_4(x)
+#define REPEAT_34(x) \
+    REPEAT_20(x), REPEAT_12(x), REPEAT_2(x)
 #define REPEAT_56(x) \
     REPEAT_20(x), REPEAT_20(x), REPEAT_16(x)
-#define REPEAT_122(x) \
-    REPEAT_56(x), REPEAT_56(x), REPEAT_6(x), REPEAT_4(x)
+#define REPEAT_82(x) \
+    REPEAT_56(x), REPEAT_20(x), REPEAT_6(x)
 
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
