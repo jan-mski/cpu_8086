@@ -1,4 +1,4 @@
-﻿size_t ReadNextByte(InstructionInput *instruction_input, InstructionDecodingContext *decoding_context)
+﻿size_t ReadNextByte(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     FILE *stream = instruction_input->stream;
     if (!stream)
@@ -13,8 +13,8 @@
 }
 
 void ReadNextBytesToIndex(InstructionInput *instruction_input,
-                          InstructionDecodingContext *decoding_context,
-                          const uint8_t byte_index)
+                          DecodingContext *decoding_context,
+                          uint8_t byte_index)
 {
     while (decoding_context->num_bytes_read <= byte_index)
     {

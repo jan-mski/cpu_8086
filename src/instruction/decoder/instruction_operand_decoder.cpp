@@ -31,13 +31,13 @@ Register EFFECTIVE_ADDRESS_REGISTERS[][2] = {
     {REGISTER_BX}
 };
 
-void SetEffectiveAddressNoDisplacement(Operand *operand, const InstructionDecodingContext *decoding_context)
+void SetEffectiveAddressNoDisplacement(Operand *operand, const DecodingContext *decoding_context)
 {
     operand->type = OPERAND_MEMORY_ADDRESS;
     operand->memory_address.registers = EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m];
 }
 
-void SetDirectAddress(Operand *operand, const InstructionDecodingContext *decoding_context)
+void SetDirectAddress(Operand *operand, const DecodingContext *decoding_context)
 {
     operand->type = OPERAND_MEMORY_ADDRESS;
 
@@ -46,7 +46,7 @@ void SetDirectAddress(Operand *operand, const InstructionDecodingContext *decodi
     memory_address->displacement = decoding_context->displacement;
 }
 
-void SetEffectiveAddressWithDisplacement(Operand *operand, const InstructionDecodingContext *decoding_context)
+void SetEffectiveAddressWithDisplacement(Operand *operand, const DecodingContext *decoding_context)
 {
     operand->type = OPERAND_MEMORY_ADDRESS;
 
@@ -61,7 +61,7 @@ void SetRegisterName(Operand *operand, const uint8_t w, const uint8_t reg_or_r_m
     operand->register_ = REGISTERS_BY_W[w][reg_or_r_m];
 }
 
-bool DecodeRegisterOrMemoryAddress(Operand *operand, const InstructionDecodingContext *decoding_context)
+bool DecodeRegisterOrMemoryAddress(Operand *operand, const DecodingContext *decoding_context)
 {
     switch (decoding_context->mod)
     {
@@ -90,13 +90,13 @@ bool DecodeRegisterOrMemoryAddress(Operand *operand, const InstructionDecodingCo
     return false;
 }
 
-void DecodeRegister(Operand *operand, const InstructionDecodingContext *decoding_context)
+void DecodeRegister(Operand *operand, const DecodingContext *decoding_context)
 {
     SetRegisterName(operand, decoding_context->w, decoding_context->reg);
 }
 
 
-void DecodeOperandsRegisterOrMemoryAndEither(InstructionDecodingContext *decoding_context)
+void DecodeOperandsRegisterOrMemoryAndEither(DecodingContext *decoding_context)
 {
     if (decoding_context->d == 0)
     {
@@ -110,7 +110,7 @@ void DecodeOperandsRegisterOrMemoryAndEither(InstructionDecodingContext *decodin
     }
 }
 
-void DecodeOperandsRegisterOrMemoryAndImmediate(InstructionDecodingContext *decoding_context)
+void DecodeOperandsRegisterOrMemoryAndImmediate(DecodingContext *decoding_context)
 {
     const bool is_register = DecodeRegisterOrMemoryAddress(&decoding_context->operands[0], decoding_context);
 
@@ -125,7 +125,7 @@ void DecodeOperandsRegisterOrMemoryAndImmediate(InstructionDecodingContext *deco
     }
 }
 
-void DecodeOperandsRegisterAndImmediate(InstructionDecodingContext *decoding_context)
+void DecodeOperandsRegisterAndImmediate(DecodingContext *decoding_context)
 {
     DecodeRegister(&decoding_context->operands[0], decoding_context);
 
@@ -134,7 +134,7 @@ void DecodeOperandsRegisterAndImmediate(InstructionDecodingContext *decoding_con
     right_operand->immediate_value = decoding_context->data;
 }
 
-void DecodeOperandsAccumulatorAndMemory(InstructionDecodingContext *decoding_context)
+void DecodeOperandsAccumulatorAndMemory(DecodingContext *decoding_context)
 {
     Operand *left_operand = &decoding_context->operands[0];
     left_operand->type = OPERAND_REGISTER;
@@ -146,7 +146,7 @@ void DecodeOperandsAccumulatorAndMemory(InstructionDecodingContext *decoding_con
     right_operand->memory_address.displacement = decoding_context->addr;
 }
 
-void DecodeOperandsMemoryAndAccumulator(InstructionDecodingContext *decoding_context)
+void DecodeOperandsMemoryAndAccumulator(DecodingContext *decoding_context)
 {
     Operand *left_operand = &decoding_context->operands[0];
     left_operand->type = OPERAND_MEMORY_ADDRESS;
@@ -158,7 +158,7 @@ void DecodeOperandsMemoryAndAccumulator(InstructionDecodingContext *decoding_con
     right_operand->register_ = REGISTER_AX;
 }
 
-void DecodeOperandsAccumulatorAndImmediate(InstructionDecodingContext * decoding_context)
+void DecodeOperandsAccumulatorAndImmediate(DecodingContext * decoding_context)
 {
     Operand *left_operand = &decoding_context->operands[0];
     left_operand->type = OPERAND_REGISTER;
@@ -169,7 +169,7 @@ void DecodeOperandsAccumulatorAndImmediate(InstructionDecodingContext * decoding
     right_operand->immediate_value = decoding_context->data;
 }
 
-void DecodeOperandsReturnFromCall(InstructionDecodingContext *decoding_context)
+void DecodeOperandsReturnFromCall(DecodingContext *decoding_context)
 {
     Operand *left_operand = &decoding_context->operands[0];
     left_operand->type = OPERAND_LABEL_LIKE_DISPLACEMENT;

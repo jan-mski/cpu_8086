@@ -1,28 +1,6 @@
 ﻿const uint8_t INSTRUCTION_MAX_BYTES = 6;
 const uint8_t REGISTER_NAMES_MAX_LEN = 2;
 
-enum Register
-{
-    REGISTER_NONE,
-    REGISTER_AL,
-    REGISTER_AH,
-    REGISTER_AX,
-    REGISTER_BL,
-    REGISTER_BH,
-    REGISTER_BX,
-    REGISTER_CL,
-    REGISTER_CH,
-    REGISTER_CX,
-    REGISTER_DL,
-    REGISTER_DH,
-    REGISTER_DX,
-    REGISTER_SP,
-    REGISTER_BP,
-    REGISTER_SI,
-    REGISTER_DI,
-    REGISTER_COUNT
-};
-
 enum OperandType
 {
     OPERAND_NONE,
@@ -30,6 +8,38 @@ enum OperandType
     OPERAND_MEMORY_ADDRESS,
     OPERAND_IMMEDIATE,
     OPERAND_LABEL_LIKE_DISPLACEMENT
+};
+
+enum Mnemonic
+{
+    MNEMONIC_NONE,
+
+    MNEMONIC_MOV,
+    MNEMONIC_ADD,
+    MNEMONIC_SUB,
+    MNEMONIC_CMP,
+    MNEMONIC_JO,
+    MNEMONIC_JNO,
+    MNEMONIC_JB_JNAE,
+    MNEMONIC_JNB_JAE,
+    MNEMONIC_JE_JZ,
+    MNEMONIC_JNE_JNZ,
+    MNEMONIC_JBE_JNA,
+    MNEMONIC_JNBE_JA,
+    MNEMONIC_JS,
+    MNEMONIC_JNS,
+    MNEMONIC_JP_JPE,
+    MNEMONIC_JNP_JPO,
+    MNEMONIC_JL_JNGE,
+    MNEMONIC_JNL_JGE,
+    MNEMONIC_JLE_JNG,
+    MNEMONIC_JNLE_JG,
+    MNEMONIC_LOOPNZ_LOOPNE,
+    MNEMONIC_LOOPZ_LOOPE,
+    MNEMONIC_LOOP,
+    MNEMONIC_JCXZ,
+
+    MNEMONIC_COUNT
 };
 
 struct MemoryAddress
@@ -49,7 +59,7 @@ struct Operand
     int32_t label_like_displacement;
 };
 
-struct InstructionDecodingContext
+struct DecodingContext
 {
     uint8_t bytes[INSTRUCTION_MAX_BYTES];
     uint8_t num_bytes_read;
@@ -64,6 +74,6 @@ struct InstructionDecodingContext
     uint16_t addr;                   // 8/16 bits
     int32_t displacement;            // 8/16 bits
 
-    const char *mnemonic;
+    Mnemonic mnemonic;
     Operand operands[2];
 };

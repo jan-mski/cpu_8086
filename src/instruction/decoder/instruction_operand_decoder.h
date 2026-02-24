@@ -1,7 +1,7 @@
-﻿void DecodeOperandsRegisterOrMemoryAndEither(InstructionDecodingContext *decoding_context);
-void DecodeOperandsRegisterOrMemoryAndImmediate(InstructionDecodingContext *decoding_context);
-void DecodeOperandsRegisterAndImmediate(InstructionDecodingContext *decoding_context);
-void DecodeOperandsAccumulatorAndMemory(InstructionDecodingContext *decoding_context);
-void DecodeOperandsMemoryAndAccumulator(InstructionDecodingContext *decoding_context);
-void DecodeOperandsAccumulatorAndImmediate(InstructionDecodingContext *decoding_context);
-void DecodeOperandsReturnFromCall(InstructionDecodingContext *decoding_context);
+﻿void DecodeOperandsRegisterOrMemoryAndEither(DecodingContext *decoding_context);
+void DecodeOperandsRegisterOrMemoryAndImmediate(DecodingContext *decoding_context);
+void DecodeOperandsRegisterAndImmediate(DecodingContext *decoding_context);
+void DecodeOperandsAccumulatorAndMemory(DecodingContext *decoding_context);
+void DecodeOperandsMemoryAndAccumulator(DecodingContext *decoding_context);
+void DecodeOperandsAccumulatorAndImmediate(DecodingContext *decoding_context);
+void DecodeOperandsReturnFromCall(DecodingContext *decoding_context);

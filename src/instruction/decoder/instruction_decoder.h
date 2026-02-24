@@ -21,4 +21,4 @@
 #define REPEAT_50(x) \
     REPEAT_20(x), REPEAT_20(x), REPEAT_10(x)
 
-void DecodeInstruction(InstructionInput *instruction_input, InstructionDecodingContext *decoding_context);
+void DecodeInstruction(InstructionInput *instruction_input, DecodingContext *decoding_context);

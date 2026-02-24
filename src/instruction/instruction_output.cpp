@@ -20,15 +20,49 @@ const char *REGISTER_NAMES[] = {
     "di"
 };
 
+const char *MNEMONIC_STRINGS[] = {
+    0,
+    "mov",
+    "add",
+    "sub",
+    "cmp",
+    "jo",
+    "jno",
+    "jb",
+    "jnb",
+    "je",
+    "jne",
+    "jbe",
+    "jnbe",
+    "js",
+    "jns",
+    "jp",
+    "jnp",
+    "jl",
+    "jnl",
+    "jle",
+    "jnle",
+    "loopnz",
+    "loopz",
+    "loop",
+    "jcxz"
+};
+
 const char *GetRegisterName(Register register_)
 {
     static_assert(REGISTER_COUNT == ARRAY_SIZE(REGISTER_NAMES), "REGISTER_COUNT and size of REGISTER_NAMES must be equal");
     return REGISTER_NAMES[register_];
 }
 
-void PrintInstructionString(FILE *output_stream, const InstructionDecodingContext *decoding_context)
+const char *GetMnemonicString(Mnemonic mnemonic)
 {
-    fprintf(output_stream, "%s", decoding_context->mnemonic);
+    static_assert(MNEMONIC_COUNT == ARRAY_SIZE(MNEMONIC_STRINGS), "MNEMONIC_COUNT and size of MNEMONIC_NAMES must be equal");
+    return MNEMONIC_STRINGS[mnemonic];
+}
+
+void PrintInstructionString(FILE *output_stream, const DecodingContext *decoding_context)
+{
+    fprintf(output_stream, "%s", GetMnemonicString(decoding_context->mnemonic));
 
     for (size_t operand_idx = 0; operand_idx < ARRAY_SIZE(decoding_context->operands); ++operand_idx)
     {
