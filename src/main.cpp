@@ -14,8 +14,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    InstructionInput instruction_input = {file};
-    DecodeInstructions(stdout, &instruction_input);
+    DecodeInstructions(stdout, file);
 
     fclose(file);
 

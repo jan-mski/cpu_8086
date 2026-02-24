@@ -2,13 +2,14 @@
 #include "instruction/instruction_output.h"
 #include "instruction/decoder/instruction_decoder.h"
 
-void DecodeInstructions(FILE *output_stream, InstructionInput *instruction_input)
+void DecodeInstructions(FILE *output_stream, FILE *input_stream)
 {
+    InstructionInput instruction_input = {input_stream};
     InstructionDecodingContext decoding_context = {};
 
-    while (ReadNextByte(instruction_input, &decoding_context) != 0)
+    while (ReadNextByte(&instruction_input, &decoding_context) != 0)
     {
-        DecodeInstruction(instruction_input, &decoding_context);
+        DecodeInstruction(&instruction_input, &decoding_context);
 
         if (!decoding_context.mnemonic)
         {

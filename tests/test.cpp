@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../src/cpu.h"
-#include "../src/instruction/instruction_input.h"
 
 TEST_CASE("Instructions are decoded correctly")
 {
@@ -23,8 +22,7 @@ TEST_CASE("Instructions are decoded correctly")
     FILE *asm_file = fopen("test.asm", "w");
     fprintf(asm_file, "bits 16\n");
 
-    InstructionInput instruction_input = {input_file};
-    DecodeInstructions(asm_file, &instruction_input);
+    DecodeInstructions(asm_file, input_file);
 
     fclose(input_file);
     fclose(asm_file);
