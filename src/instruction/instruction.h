@@ -1,13 +1,13 @@
 ﻿const uint8_t INSTRUCTION_MAX_BYTES = 6;
-const uint8_t REGISTER_NAMES_MAX_LEN = 2;
+const uint8_t REGISTERS_MAX_LEN = 2;
 
 enum OperandType
 {
-    OPERAND_NONE,
-    OPERAND_REGISTER,
-    OPERAND_MEMORY_ADDRESS,
-    OPERAND_IMMEDIATE,
-    OPERAND_LABEL_LIKE_DISPLACEMENT
+    OPERAND_TYPE_NONE,
+    OPERAND_TYPE_REGISTER,
+    OPERAND_TYPE_MEMORY_ADDRESS,
+    OPERAND_TYPE_IMMEDIATE,
+    OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT
 };
 
 enum Mnemonic
@@ -42,21 +42,34 @@ enum Mnemonic
     MNEMONIC_COUNT
 };
 
+enum MemoryAddressQualifier
+{
+    MEMORY_ADDRESS_QUALIFIER_NONE,
+
+    MEMORY_ADDRESS_QUALIFIER_BYTE,
+    MEMORY_ADDRESS_QUALIFIER_WORD,
+
+    MEMORY_ADDRESS_QUALIFIER_COUNT
+};
+
 struct MemoryAddress
 {
     bool direct;
-    const char *qualifier;
-    Register *registers;
+    MemoryAddressQualifier qualifier;
+    Register registers[REGISTERS_MAX_LEN];
     int32_t displacement;
 };
 
 struct Operand
 {
     OperandType type;
-    Register register_;
-    MemoryAddress memory_address;
-    uint16_t immediate_value;
-    int32_t label_like_displacement;
+    union
+    {
+        Register register_;
+        MemoryAddress memory_address;
+        uint16_t immediate_value;
+        int32_t label_like_displacement;
+    };
 };
 
 struct DecodingContext
@@ -73,7 +86,10 @@ struct DecodingContext
     uint16_t data;                   // 8/16 bits
     uint16_t addr;                   // 8/16 bits
     int32_t displacement;            // 8/16 bits
+};
 
+struct Instruction
+{
     Mnemonic mnemonic;
     Operand operands[2];
 };

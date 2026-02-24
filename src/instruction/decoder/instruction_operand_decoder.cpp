@@ -1,4 +1,5 @@
-﻿Register REGISTERS_BY_W[][8] = {
+﻿
+Register REGISTERS_BY_W[][8] = {
     {
         REGISTER_AL,
         REGISTER_CL,
@@ -31,15 +32,23 @@ Register EFFECTIVE_ADDRESS_REGISTERS[][2] = {
     {REGISTER_BX}
 };
 
+void SetEffectiveAddressRegisters(Operand *operand, Register *registers)
+{
+    for (uint8_t i = 0; i < REGISTERS_MAX_LEN; ++i)
+    {
+        operand->memory_address.registers[i] = registers[i];
+    }
+}
+
 void SetEffectiveAddressNoDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_MEMORY_ADDRESS;
-    operand->memory_address.registers = EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m];
+    operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
+    SetEffectiveAddressRegisters(operand, EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m]);
 }
 
 void SetDirectAddress(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_MEMORY_ADDRESS;
+    operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
 
     MemoryAddress *memory_address = &operand->memory_address;
     memory_address->direct = true;
@@ -48,16 +57,16 @@ void SetDirectAddress(Operand *operand, DecodingContext *decoding_context)
 
 void SetEffectiveAddressWithDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_MEMORY_ADDRESS;
+    operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
 
     MemoryAddress *memory_address = &operand->memory_address;
-    memory_address->registers = EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m];
+    SetEffectiveAddressRegisters(operand, EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m]);
     memory_address->displacement = decoding_context->displacement;
 }
 
 void SetRegisterName(Operand *operand, uint8_t w, uint8_t reg_or_r_m)
 {
-    operand->type = OPERAND_REGISTER;
+    operand->type = OPERAND_TYPE_REGISTER;
     operand->register_ = REGISTERS_BY_W[w][reg_or_r_m];
 }
 
@@ -96,82 +105,83 @@ void DecodeRegister(Operand *operand, DecodingContext *decoding_context)
 }
 
 
-void DecodeOperandsRegisterOrMemoryAndEither(DecodingContext *decoding_context)
+void DecodeOperandsRegisterOrMemoryAndEither(Instruction *instruction, DecodingContext *decoding_context)
 {
     if (decoding_context->d == 0)
     {
-        DecodeRegisterOrMemoryAddress(&decoding_context->operands[0], decoding_context);
-        DecodeRegister(&decoding_context->operands[1], decoding_context);
+        DecodeRegisterOrMemoryAddress(&instruction->operands[0], decoding_context);
+        DecodeRegister(&instruction->operands[1], decoding_context);
     }
     else
     {
-        DecodeRegister(&decoding_context->operands[0], decoding_context);
-        DecodeRegisterOrMemoryAddress(&decoding_context->operands[1], decoding_context);
+        DecodeRegister(&instruction->operands[0], decoding_context);
+        DecodeRegisterOrMemoryAddress(&instruction->operands[1], decoding_context);
     }
 }
 
-void DecodeOperandsRegisterOrMemoryAndImmediate(DecodingContext *decoding_context)
+void DecodeOperandsRegisterOrMemoryAndImmediate(Instruction *instruction, DecodingContext *decoding_context)
 {
-    bool is_register = DecodeRegisterOrMemoryAddress(&decoding_context->operands[0], decoding_context);
+    bool is_register = DecodeRegisterOrMemoryAddress(&instruction->operands[0], decoding_context);
 
-    Operand *right_operand = &decoding_context->operands[1];
-    right_operand->type = OPERAND_IMMEDIATE;
+    Operand *right_operand = &instruction->operands[1];
+    right_operand->type = OPERAND_TYPE_IMMEDIATE;
     right_operand->immediate_value = decoding_context->data;
 
     if (!is_register)
     {
-        const char *qualifier = decoding_context->w == 0 ? "byte" : "word";
-        decoding_context->operands[0].memory_address.qualifier = qualifier;
+        instruction->operands[0].memory_address.qualifier = decoding_context->w == 0
+            ? MEMORY_ADDRESS_QUALIFIER_BYTE
+            : MEMORY_ADDRESS_QUALIFIER_WORD;
     }
 }
 
-void DecodeOperandsRegisterAndImmediate(DecodingContext *decoding_context)
+void DecodeOperandsRegisterAndImmediate(Instruction *instruction, DecodingContext *decoding_context)
 {
-    DecodeRegister(&decoding_context->operands[0], decoding_context);
+    DecodeRegister(&instruction->operands[0], decoding_context);
 
-    Operand *right_operand = &decoding_context->operands[1];
-    right_operand->type = OPERAND_IMMEDIATE;
+    Operand *right_operand = &instruction->operands[1];
+    right_operand->type = OPERAND_TYPE_IMMEDIATE;
     right_operand->immediate_value = decoding_context->data;
 }
 
-void DecodeOperandsAccumulatorAndMemory(DecodingContext *decoding_context)
+void DecodeOperandsAccumulatorAndMemory(Instruction *instruction, DecodingContext *decoding_context)
 {
-    Operand *left_operand = &decoding_context->operands[0];
-    left_operand->type = OPERAND_REGISTER;
+    Operand *left_operand = &instruction->operands[0];
+    left_operand->type = OPERAND_TYPE_REGISTER;
     left_operand->register_ = REGISTER_AX;
 
-    Operand *right_operand = &decoding_context->operands[1];
-    right_operand->type = OPERAND_MEMORY_ADDRESS;
+    Operand *right_operand = &instruction->operands[1];
+    right_operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
     right_operand->memory_address.direct = true;
     right_operand->memory_address.displacement = decoding_context->addr;
 }
 
-void DecodeOperandsMemoryAndAccumulator(DecodingContext *decoding_context)
+void DecodeOperandsMemoryAndAccumulator(Instruction *instruction, DecodingContext *decoding_context)
 {
-    Operand *left_operand = &decoding_context->operands[0];
-    left_operand->type = OPERAND_MEMORY_ADDRESS;
+    Operand *left_operand = &instruction->operands[0];
+    left_operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
     left_operand->memory_address.direct = true;
     left_operand->memory_address.displacement = decoding_context->addr;
 
-    Operand *right_operand = &decoding_context->operands[1];
-    right_operand->type = OPERAND_REGISTER;
+    Operand *right_operand = &instruction->operands[1];
+    right_operand->type = OPERAND_TYPE_REGISTER;
     right_operand->register_ = REGISTER_AX;
 }
 
-void DecodeOperandsAccumulatorAndImmediate(DecodingContext *decoding_context)
+void DecodeOperandsAccumulatorAndImmediate(Instruction *instruction, DecodingContext *decoding_context)
 {
-    Operand *left_operand = &decoding_context->operands[0];
-    left_operand->type = OPERAND_REGISTER;
+    Operand *left_operand = &instruction->operands[0];
+    left_operand->type = OPERAND_TYPE_REGISTER;
     left_operand->register_ = decoding_context->w == 0 ? REGISTER_AL : REGISTER_AX;
 
-    Operand *right_operand = &decoding_context->operands[1];
-    right_operand->type = OPERAND_IMMEDIATE;
+    Operand *right_operand = &instruction->operands[1];
+    right_operand->type = OPERAND_TYPE_IMMEDIATE;
     right_operand->immediate_value = decoding_context->data;
 }
 
-void DecodeOperandsReturnFromCall(DecodingContext *decoding_context)
+void DecodeOperandsReturnFromCall(Instruction *instruction, DecodingContext *decoding_context)
 {
-    Operand *left_operand = &decoding_context->operands[0];
-    left_operand->type = OPERAND_LABEL_LIKE_DISPLACEMENT;
+    Operand *left_operand = &instruction->operands[0];
+    left_operand->type = OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT;
     left_operand->label_like_displacement = decoding_context->displacement;
 }

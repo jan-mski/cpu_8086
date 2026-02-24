@@ -1,13 +1,13 @@
-﻿typedef void (*inst_decoder_t)(InstructionInput *instruction_input, DecodingContext *decoding_context);
+﻿typedef Instruction (*inst_decoder_t)(InstructionInput *instruction_input, DecodingContext *decoding_context);
 
-void DecodeUnsupported(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeUnsupported(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
-
+    return {};
 }
 
 // # MOV
 
-void DecodeMOVRegisterOrMemoryToEither(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeMOVRegisterOrMemoryToEither(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeD(1, decoding_context);
     DecodeW(0, decoding_context);
@@ -15,47 +15,57 @@ void DecodeMOVRegisterOrMemoryToEither(InstructionInput *instruction_input, Deco
     DecodeReg(instruction_input, 1, 3, decoding_context);
     DecodeDisplacement(instruction_input, decoding_context);
 
-    DecodeOperandsRegisterOrMemoryAndEither(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_MOV;
+    Instruction instruction = {MNEMONIC_MOV};
+    DecodeOperandsRegisterOrMemoryAndEither(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeMOVMemoryToAccumulator(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeMOVMemoryToAccumulator(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeW(0, decoding_context);
     DecodeAddr(instruction_input, decoding_context);
 
-    DecodeOperandsAccumulatorAndMemory(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_MOV;
+    Instruction instruction = {MNEMONIC_MOV};
+    DecodeOperandsAccumulatorAndMemory(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeMOVAccumulatorToMemory(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeMOVAccumulatorToMemory(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeW(0, decoding_context);
     DecodeAddr(instruction_input, decoding_context);
 
-    DecodeOperandsMemoryAndAccumulator(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_MOV;
+    Instruction instruction = {MNEMONIC_MOV};
+    DecodeOperandsMemoryAndAccumulator(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeMOVImmediateToRegister(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeMOVImmediateToRegister(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeW(3, decoding_context);
     DecodeReg(instruction_input, 0, 0, decoding_context);
     DecodeData(instruction_input, 1, decoding_context);
 
-    DecodeOperandsRegisterAndImmediate(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_MOV;
+    Instruction instruction = {MNEMONIC_MOV};
+    DecodeOperandsRegisterAndImmediate(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeMOVImmediateToRegisterOrMemory(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeMOVImmediateToRegisterOrMemory(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeW(0, decoding_context);
     DecodeModAndRM(instruction_input, 6, 0, decoding_context);
     uint8_t num_bytes_read = DecodeDisplacement(instruction_input, decoding_context);
     DecodeData(instruction_input, 2 + num_bytes_read, decoding_context);
 
-    DecodeOperandsRegisterOrMemoryAndImmediate(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_MOV;
+    Instruction instruction = {MNEMONIC_MOV};
+    DecodeOperandsRegisterOrMemoryAndImmediate(&instruction, decoding_context);
+    
+    return instruction;
 }
 
 // # Arithmetic
@@ -70,7 +80,7 @@ Mnemonic SIGNED_ARITHMETIC_MNEMONICS[] = {
     MNEMONIC_CMP
 };
 
-void DecodeSignedArithmeticImmediateAndRegisterOrMemory(InstructionInput *instruction_input,
+Instruction DecodeSignedArithmeticImmediateAndRegisterOrMemory(InstructionInput *instruction_input,
                                                         DecodingContext *decoding_context)
 {
     DecodeS(1, decoding_context);
@@ -81,13 +91,15 @@ void DecodeSignedArithmeticImmediateAndRegisterOrMemory(InstructionInput *instru
     uint8_t num_bytes_read = DecodeDisplacement(instruction_input, decoding_context);
     DecodeData(instruction_input, 2 + num_bytes_read, decoding_context);
 
-    DecodeOperandsRegisterOrMemoryAndImmediate(decoding_context);
-    decoding_context->mnemonic = SIGNED_ARITHMETIC_MNEMONICS[decoding_context->common_mnemonic];
+    Instruction instruction = {SIGNED_ARITHMETIC_MNEMONICS[decoding_context->common_mnemonic]};
+    DecodeOperandsRegisterOrMemoryAndImmediate(&instruction, decoding_context);
+    
+    return instruction;
 }
 
 // ## ADD
 
-void DecodeADDRegisterOrMemoryToEither(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeADDRegisterOrMemoryToEither(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeD(1, decoding_context);
     DecodeW(0, decoding_context);
@@ -95,22 +107,26 @@ void DecodeADDRegisterOrMemoryToEither(InstructionInput *instruction_input, Deco
     DecodeReg(instruction_input, 1, 3, decoding_context);
     DecodeDisplacement(instruction_input, decoding_context);
 
-    DecodeOperandsRegisterOrMemoryAndEither(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_ADD;
+    Instruction instruction = {MNEMONIC_ADD};
+    DecodeOperandsRegisterOrMemoryAndEither(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeADDImmediateToAccumulator(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeADDImmediateToAccumulator(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeW(0, decoding_context);
     DecodeData(instruction_input, 1, decoding_context);
 
-    DecodeOperandsAccumulatorAndImmediate(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_ADD;
+    Instruction instruction = {MNEMONIC_ADD};
+    DecodeOperandsAccumulatorAndImmediate(&instruction, decoding_context);
+    
+    return instruction;
 }
 
 // ## SUB
 
-void DecodeSUBRegisterOrMemoryFromEither(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeSUBRegisterOrMemoryFromEither(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeD(1, decoding_context);
     DecodeW(0, decoding_context);
@@ -118,22 +134,26 @@ void DecodeSUBRegisterOrMemoryFromEither(InstructionInput *instruction_input, De
     DecodeReg(instruction_input, 1, 3, decoding_context);
     DecodeDisplacement(instruction_input, decoding_context);
 
-    DecodeOperandsRegisterOrMemoryAndEither(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_SUB;
+    Instruction instruction = {MNEMONIC_SUB};
+    DecodeOperandsRegisterOrMemoryAndEither(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeSUBImmediateFromAccumulator(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeSUBImmediateFromAccumulator(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeW(0, decoding_context);
     DecodeData(instruction_input, 1, decoding_context);
 
-    DecodeOperandsAccumulatorAndImmediate(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_SUB;
+    Instruction instruction = {MNEMONIC_SUB};
+    DecodeOperandsAccumulatorAndImmediate(&instruction, decoding_context);
+    
+    return instruction;
 }
 
 // ## CMP
 
-void DecodeCMPRegisterOrMemoryWithEither(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeCMPRegisterOrMemoryWithEither(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeD(1, decoding_context);
     DecodeW(0, decoding_context);
@@ -141,179 +161,223 @@ void DecodeCMPRegisterOrMemoryWithEither(InstructionInput *instruction_input, De
     DecodeReg(instruction_input, 1, 3, decoding_context);
     DecodeDisplacement(instruction_input, decoding_context);
 
-    DecodeOperandsRegisterOrMemoryAndEither(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_CMP;
+    Instruction instruction = {MNEMONIC_CMP};
+    DecodeOperandsRegisterOrMemoryAndEither(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeCMPImmediateWithAccumulator(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeCMPImmediateWithAccumulator(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeW(0, decoding_context);
     DecodeData(instruction_input, 1, decoding_context);
 
-    DecodeOperandsAccumulatorAndImmediate(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_CMP;
+    Instruction instruction = {MNEMONIC_CMP};
+    DecodeOperandsAccumulatorAndImmediate(&instruction, decoding_context);
+    
+    return instruction;
 }
 
 // ## Return from CALL
 
-void DecodeJO(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJO(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JO;
+    Instruction instruction = {MNEMONIC_JO};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJNO(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJNO(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JNO;
+    Instruction instruction = {MNEMONIC_JNO};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJB_JNAE(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJB_JNAE(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JB_JNAE;
+    Instruction instruction = {MNEMONIC_JB_JNAE};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJNB_JAE(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJNB_JAE(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JNB_JAE;
+    Instruction instruction = {MNEMONIC_JNB_JAE};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJE_JZ(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJE_JZ(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JE_JZ;
+    Instruction instruction = {MNEMONIC_JE_JZ};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJNE_JNZ(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJNE_JNZ(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JNE_JNZ;
+    Instruction instruction = {MNEMONIC_JNE_JNZ};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJBE_JNA(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJBE_JNA(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JBE_JNA;
+    Instruction instruction = {MNEMONIC_JBE_JNA};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJNBE_JA(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJNBE_JA(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JNBE_JA;
+    Instruction instruction = {MNEMONIC_JNBE_JA};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJS(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJS(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JS;
+    Instruction instruction = {MNEMONIC_JS};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJNS(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJNS(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JNS;
+    Instruction instruction = {MNEMONIC_JNS};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJP_JPE(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJP_JPE(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JP_JPE;
+    Instruction instruction = {MNEMONIC_JP_JPE};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJNP_JPO(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJNP_JPO(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JNP_JPO;
+    Instruction instruction = {MNEMONIC_JNP_JPO};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJL_JNGE(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJL_JNGE(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JL_JNGE;
+    Instruction instruction = {MNEMONIC_JL_JNGE};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJNL_JGE(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJNL_JGE(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JNL_JGE;
+    Instruction instruction = {MNEMONIC_JNL_JGE};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJLE_JNG(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJLE_JNG(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JLE_JNG;
+    Instruction instruction = {MNEMONIC_JLE_JNG};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJNLE_JG(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJNLE_JG(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JNLE_JG;
+    Instruction instruction = {MNEMONIC_JNLE_JG};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeLOOPNZ_LOOPNE(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeLOOPNZ_LOOPNE(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_LOOPNZ_LOOPNE;
+    Instruction instruction = {MNEMONIC_LOOPNZ_LOOPNE};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeLOOPZ_LOOPE(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeLOOPZ_LOOPE(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_LOOPZ_LOOPE;
+    Instruction instruction = {MNEMONIC_LOOPZ_LOOPE};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeLOOP(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeLOOP(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_LOOP;
+    Instruction instruction = {MNEMONIC_LOOP};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
-void DecodeJCXZ(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeJCXZ(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
-    DecodeOperandsReturnFromCall(decoding_context);
-    decoding_context->mnemonic = MNEMONIC_JCXZ;
+    Instruction instruction = {MNEMONIC_JCXZ};
+    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    
+    return instruction;
 }
 
 inst_decoder_t INSTRUCTION_DECODERS[256] = {
@@ -360,8 +424,9 @@ inst_decoder_t INSTRUCTION_DECODERS[256] = {
     REPEAT_28(DecodeUnsupported),                                  // 11100100 - 11111111 [228 - 255]
 };
 
-void DecodeInstruction(InstructionInput *instruction_input, DecodingContext *decoding_context)
+Instruction DecodeInstruction(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     inst_decoder_t instruction_decoder = INSTRUCTION_DECODERS[decoding_context->bytes[0]];
-    instruction_decoder(instruction_input, decoding_context);
+    
+    return instruction_decoder(instruction_input, decoding_context);
 }

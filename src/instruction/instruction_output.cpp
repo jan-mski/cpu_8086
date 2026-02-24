@@ -48,43 +48,61 @@ const char *MNEMONIC_STRINGS[] = {
     "jcxz"
 };
 
+const char *MEMORY_ADDRESS_QUALIFIER_STRINGS[] = {
+    0,
+    "byte",
+    "word",
+};
+
 const char *GetRegisterName(Register register_)
 {
-    static_assert(REGISTER_COUNT == ARRAY_SIZE(REGISTER_NAMES), "REGISTER_COUNT and size of REGISTER_NAMES must be equal");
+    static_assert(REGISTER_COUNT == ARRAY_SIZE(REGISTER_NAMES),
+        "REGISTER_COUNT and size of REGISTER_NAMES must be equal");
+
     return REGISTER_NAMES[register_];
 }
 
 const char *GetMnemonicString(Mnemonic mnemonic)
 {
-    static_assert(MNEMONIC_COUNT == ARRAY_SIZE(MNEMONIC_STRINGS), "MNEMONIC_COUNT and size of MNEMONIC_NAMES must be equal");
+    static_assert(MNEMONIC_COUNT == ARRAY_SIZE(MNEMONIC_STRINGS),
+        "MNEMONIC_COUNT and size of MNEMONIC_NAMES must be equal");
+
     return MNEMONIC_STRINGS[mnemonic];
 }
 
-void PrintInstructionString(FILE *output_stream, DecodingContext *decoding_context)
+const char *GetMemoryAddressQualifierString(MemoryAddressQualifier qualifier)
 {
-    fprintf(output_stream, "%s", GetMnemonicString(decoding_context->mnemonic));
+    static_assert(MEMORY_ADDRESS_QUALIFIER_COUNT == ARRAY_SIZE(MEMORY_ADDRESS_QUALIFIER_STRINGS),
+        "MEM_ADDR_QUALIFIER_COUNT and size of MEMORY_ADDRESS_QUALIFIER_STRINGS must be equal");
 
-    for (size_t operand_idx = 0; operand_idx < ARRAY_SIZE(decoding_context->operands); ++operand_idx)
+    return MEMORY_ADDRESS_QUALIFIER_STRINGS[qualifier];
+}
+
+void PrintInstructionString(FILE *output_stream, Instruction *instruction)
+{
+    fprintf(output_stream, "%s", GetMnemonicString(instruction->mnemonic));
+
+    for (size_t operand_idx = 0; operand_idx < ARRAY_SIZE(instruction->operands); ++operand_idx)
     {
-        Operand *operand = &decoding_context->operands[operand_idx];
+        Operand *operand = &instruction->operands[operand_idx];
         fprintf(output_stream, operand_idx == 0 ? " " : ", ");
 
         switch (operand->type)
         {
-            case OPERAND_NONE:
+            case OPERAND_TYPE_NONE:
             {
                 break;
             } break;
-            case OPERAND_REGISTER:
+            case OPERAND_TYPE_REGISTER:
             {
                 fprintf(output_stream, "%s", GetRegisterName(operand->register_));
             } break;
-            case OPERAND_MEMORY_ADDRESS:
+            case OPERAND_TYPE_MEMORY_ADDRESS:
             {
                 MemoryAddress *memory_address = &operand->memory_address;
                 if (memory_address->qualifier)
                 {
-                    fprintf(output_stream, "%s", memory_address->qualifier);
+                    fprintf(output_stream, "%s", GetMemoryAddressQualifierString(memory_address->qualifier));
                 }
                 if (memory_address->direct)
                 {
@@ -92,7 +110,7 @@ void PrintInstructionString(FILE *output_stream, DecodingContext *decoding_conte
                 }
                 else
                 {
-                    for (size_t register_idx = 0; register_idx < REGISTER_NAMES_MAX_LEN; ++register_idx)
+                    for (size_t register_idx = 0; register_idx < REGISTERS_MAX_LEN; ++register_idx)
                     {
                         const char *register_name = GetRegisterName(memory_address->registers[register_idx]);
                         if (!register_name)
@@ -104,11 +122,11 @@ void PrintInstructionString(FILE *output_stream, DecodingContext *decoding_conte
                     fprintf(output_stream, " + %i]", memory_address->displacement);
                 }
             } break;
-            case OPERAND_IMMEDIATE:
+            case OPERAND_TYPE_IMMEDIATE:
             {
                 fprintf(output_stream, "%u", operand->immediate_value);
             } break;
-            case OPERAND_LABEL_LIKE_DISPLACEMENT:
+            case OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT:
             {
                 fprintf(output_stream, "($+2) + %i", operand->label_like_displacement);
             } break;

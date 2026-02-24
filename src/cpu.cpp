@@ -27,15 +27,15 @@ void DecodeInstructions(FILE *output_stream, FILE *input_stream)
 
     while (ReadNextByte(&instruction_input, &decoding_context) != 0)
     {
-        DecodeInstruction(&instruction_input, &decoding_context);
+        Instruction instruction = DecodeInstruction(&instruction_input, &decoding_context);
 
-        if (decoding_context.mnemonic == MNEMONIC_NONE)
+        if (instruction.mnemonic == MNEMONIC_NONE)
         {
             fprintf(stderr, "Unsupported instruction. Terminating.");
             break;
         }
 
-        PrintInstructionString(output_stream, &decoding_context);
+        PrintInstructionString(output_stream, &instruction);
 
         decoding_context = {};
     }
