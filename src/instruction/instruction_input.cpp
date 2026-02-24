@@ -6,7 +6,7 @@
         return 0;
     }
 
-    const size_t num_bytes_read = fread(decoding_context->bytes + decoding_context->num_bytes_read, sizeof(uint8_t), 1, stream);
+    size_t num_bytes_read = fread(decoding_context->bytes + decoding_context->num_bytes_read, sizeof(uint8_t), 1, stream);
     decoding_context->num_bytes_read += num_bytes_read;
 
     return num_bytes_read;

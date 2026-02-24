@@ -51,7 +51,7 @@ void DecodeMOVImmediateToRegisterOrMemory(InstructionInput *instruction_input, D
 {
     DecodeW(0, decoding_context);
     DecodeModAndRM(instruction_input, 6, 0, decoding_context);
-    const uint8_t num_bytes_read = DecodeDisplacement(instruction_input, decoding_context);
+    uint8_t num_bytes_read = DecodeDisplacement(instruction_input, decoding_context);
     DecodeData(instruction_input, 2 + num_bytes_read, decoding_context);
 
     DecodeOperandsRegisterOrMemoryAndImmediate(decoding_context);
@@ -78,7 +78,7 @@ void DecodeSignedArithmeticImmediateAndRegisterOrMemory(InstructionInput *instru
 
     DecodeW(0, decoding_context);
     DecodeModAndRM(instruction_input, 6, 0, decoding_context);
-    const uint8_t num_bytes_read = DecodeDisplacement(instruction_input, decoding_context);
+    uint8_t num_bytes_read = DecodeDisplacement(instruction_input, decoding_context);
     DecodeData(instruction_input, 2 + num_bytes_read, decoding_context);
 
     DecodeOperandsRegisterOrMemoryAndImmediate(decoding_context);
@@ -362,6 +362,6 @@ inst_decoder_t INSTRUCTION_DECODERS[256] = {
 
 void DecodeInstruction(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
-    const inst_decoder_t instruction_decoder = INSTRUCTION_DECODERS[decoding_context->bytes[0]];
+    inst_decoder_t instruction_decoder = INSTRUCTION_DECODERS[decoding_context->bytes[0]];
     instruction_decoder(instruction_input, decoding_context);
 }

@@ -31,13 +31,13 @@ Register EFFECTIVE_ADDRESS_REGISTERS[][2] = {
     {REGISTER_BX}
 };
 
-void SetEffectiveAddressNoDisplacement(Operand *operand, const DecodingContext *decoding_context)
+void SetEffectiveAddressNoDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OPERAND_MEMORY_ADDRESS;
     operand->memory_address.registers = EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m];
 }
 
-void SetDirectAddress(Operand *operand, const DecodingContext *decoding_context)
+void SetDirectAddress(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OPERAND_MEMORY_ADDRESS;
 
@@ -46,7 +46,7 @@ void SetDirectAddress(Operand *operand, const DecodingContext *decoding_context)
     memory_address->displacement = decoding_context->displacement;
 }
 
-void SetEffectiveAddressWithDisplacement(Operand *operand, const DecodingContext *decoding_context)
+void SetEffectiveAddressWithDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OPERAND_MEMORY_ADDRESS;
 
@@ -55,13 +55,13 @@ void SetEffectiveAddressWithDisplacement(Operand *operand, const DecodingContext
     memory_address->displacement = decoding_context->displacement;
 }
 
-void SetRegisterName(Operand *operand, const uint8_t w, const uint8_t reg_or_r_m)
+void SetRegisterName(Operand *operand, uint8_t w, uint8_t reg_or_r_m)
 {
     operand->type = OPERAND_REGISTER;
     operand->register_ = REGISTERS_BY_W[w][reg_or_r_m];
 }
 
-bool DecodeRegisterOrMemoryAddress(Operand *operand, const DecodingContext *decoding_context)
+bool DecodeRegisterOrMemoryAddress(Operand *operand, DecodingContext *decoding_context)
 {
     switch (decoding_context->mod)
     {
@@ -90,7 +90,7 @@ bool DecodeRegisterOrMemoryAddress(Operand *operand, const DecodingContext *deco
     return false;
 }
 
-void DecodeRegister(Operand *operand, const DecodingContext *decoding_context)
+void DecodeRegister(Operand *operand, DecodingContext *decoding_context)
 {
     SetRegisterName(operand, decoding_context->w, decoding_context->reg);
 }
@@ -112,7 +112,7 @@ void DecodeOperandsRegisterOrMemoryAndEither(DecodingContext *decoding_context)
 
 void DecodeOperandsRegisterOrMemoryAndImmediate(DecodingContext *decoding_context)
 {
-    const bool is_register = DecodeRegisterOrMemoryAddress(&decoding_context->operands[0], decoding_context);
+    bool is_register = DecodeRegisterOrMemoryAddress(&decoding_context->operands[0], decoding_context);
 
     Operand *right_operand = &decoding_context->operands[1];
     right_operand->type = OPERAND_IMMEDIATE;
@@ -158,7 +158,7 @@ void DecodeOperandsMemoryAndAccumulator(DecodingContext *decoding_context)
     right_operand->register_ = REGISTER_AX;
 }
 
-void DecodeOperandsAccumulatorAndImmediate(DecodingContext * decoding_context)
+void DecodeOperandsAccumulatorAndImmediate(DecodingContext *decoding_context)
 {
     Operand *left_operand = &decoding_context->operands[0];
     left_operand->type = OPERAND_REGISTER;

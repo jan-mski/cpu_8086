@@ -60,13 +60,13 @@ const char *GetMnemonicString(Mnemonic mnemonic)
     return MNEMONIC_STRINGS[mnemonic];
 }
 
-void PrintInstructionString(FILE *output_stream, const DecodingContext *decoding_context)
+void PrintInstructionString(FILE *output_stream, DecodingContext *decoding_context)
 {
     fprintf(output_stream, "%s", GetMnemonicString(decoding_context->mnemonic));
 
     for (size_t operand_idx = 0; operand_idx < ARRAY_SIZE(decoding_context->operands); ++operand_idx)
     {
-        const Operand *operand = &decoding_context->operands[operand_idx];
+        Operand *operand = &decoding_context->operands[operand_idx];
         fprintf(output_stream, operand_idx == 0 ? " " : ", ");
 
         switch (operand->type)
@@ -81,7 +81,7 @@ void PrintInstructionString(FILE *output_stream, const DecodingContext *decoding
             } break;
             case OPERAND_MEMORY_ADDRESS:
             {
-                const MemoryAddress *memory_address = &operand->memory_address;
+                MemoryAddress *memory_address = &operand->memory_address;
                 if (memory_address->qualifier)
                 {
                     fprintf(output_stream, "%s", memory_address->qualifier);
