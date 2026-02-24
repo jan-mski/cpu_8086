@@ -1,7 +1,7 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
 const char *REGISTER_NAMES[] = {
-    "",
+    0,
     "al",
     "ah",
     "ax",
