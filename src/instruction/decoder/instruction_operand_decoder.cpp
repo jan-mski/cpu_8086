@@ -1,6 +1,4 @@
-﻿#include "../instruction.h"
-
-Register REGISTER_NAMES[][8] = {
+﻿Register REGISTERS_BY_W[][8] = {
     {
         REGISTER_AL,
         REGISTER_CL,
@@ -60,7 +58,7 @@ void SetEffectiveAddressWithDisplacement(Operand *operand, const InstructionDeco
 void SetRegisterName(Operand *operand, const uint8_t w, const uint8_t reg_or_r_m)
 {
     operand->type = OPERAND_REGISTER;
-    operand->register_ = REGISTER_NAMES[w][reg_or_r_m];
+    operand->register_ = REGISTERS_BY_W[w][reg_or_r_m];
 }
 
 bool DecodeRegisterOrMemoryAddress(Operand *operand, const InstructionDecodingContext *decoding_context)

@@ -1,6 +1,18 @@
-﻿#include "instruction/instruction_input.h"
+﻿// NOTE: Learning from the best here (Casey Muratori:)
+#include <cstdio>
+#include <cstdint>
+#include "cpu.h"
+#include "instruction/instruction.h"
+#include "instruction/instruction_input.h"
+#include "instruction/instruction_input.cpp"
 #include "instruction/instruction_output.h"
+#include "instruction/instruction_output.cpp"
+#include "instruction/decoder/instruction_field_decoder.h"
+#include "instruction/decoder/instruction_field_decoder.cpp"
+#include "instruction/decoder/instruction_operand_decoder.h"
+#include "instruction/decoder/instruction_operand_decoder.cpp"
 #include "instruction/decoder/instruction_decoder.h"
+#include "instruction/decoder/instruction_decoder.cpp"
 
 void DecodeInstructions(FILE *output_stream, FILE *input_stream)
 {

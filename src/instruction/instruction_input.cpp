@@ -1,6 +1,4 @@
-﻿#include "../instruction/instruction_input.h"
-
-size_t ReadNextByte(const InstructionInput *instruction_input, InstructionDecodingContext *decoding_context)
+﻿size_t ReadNextByte(InstructionInput *instruction_input, InstructionDecodingContext *decoding_context)
 {
     FILE *stream = instruction_input->stream;
     if (!stream)
@@ -14,7 +12,7 @@ size_t ReadNextByte(const InstructionInput *instruction_input, InstructionDecodi
     return num_bytes_read;
 }
 
-void ReadNextBytesToIndex(const InstructionInput *instruction_input,
+void ReadNextBytesToIndex(InstructionInput *instruction_input,
                           InstructionDecodingContext *decoding_context,
                           const uint8_t byte_index)
 {

@@ -1,8 +1,4 @@
-﻿#pragma once
-
-#include "../instruction.h"
-
-void DecodeOperandsRegisterOrMemoryAndEither(InstructionDecodingContext *decoding_context);
+﻿void DecodeOperandsRegisterOrMemoryAndEither(InstructionDecodingContext *decoding_context);
 void DecodeOperandsRegisterOrMemoryAndImmediate(InstructionDecodingContext *decoding_context);
 void DecodeOperandsRegisterAndImmediate(InstructionDecodingContext *decoding_context);
 void DecodeOperandsAccumulatorAndMemory(InstructionDecodingContext *decoding_context);

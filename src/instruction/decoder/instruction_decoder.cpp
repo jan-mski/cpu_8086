@@ -1,7 +1,4 @@
-﻿#include "instruction_field_decoder.h"
-#include "instruction_operand_decoder.h"
-
-typedef void (*inst_decoder_t)(InstructionInput *instruction_input, InstructionDecodingContext *decoding_context);
+﻿typedef void (*inst_decoder_t)(InstructionInput *instruction_input, InstructionDecodingContext *decoding_context);
 
 void DecodeUnsupported(InstructionInput *instruction_input, InstructionDecodingContext *decoding_context)
 {

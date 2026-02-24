@@ -1,8 +1,4 @@
-﻿#pragma once
-
-#include "../types.h"
-
-const uint8_t INSTRUCTION_MAX_BYTES = 6;
+﻿const uint8_t INSTRUCTION_MAX_BYTES = 6;
 const uint8_t REGISTER_NAMES_MAX_LEN = 2;
 
 enum Register

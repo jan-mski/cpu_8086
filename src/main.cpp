@@ -1,7 +1,7 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
+#include <cstdio>
 #include "cpu.h"
-#include "instruction/instruction_input.h"
 
 int main(int argc, char *argv[])
 {

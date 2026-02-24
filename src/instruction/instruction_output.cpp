@@ -1,9 +1,5 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-#include <cstdio>
-#include "../instruction/instruction.h"
-#include "instruction_output.h"
-
 const char *REGISTER_NAMES[] = {
     "",
     "al",
@@ -24,7 +20,7 @@ const char *REGISTER_NAMES[] = {
     "di"
 };
 
-const char *GetRegisterName(const Register register_)
+const char *GetRegisterName(Register register_)
 {
     static_assert(REGISTER_COUNT == ARRAY_SIZE(REGISTER_NAMES), "REGISTER_COUNT and size of REGISTER_NAMES must be equal");
     return REGISTER_NAMES[register_];

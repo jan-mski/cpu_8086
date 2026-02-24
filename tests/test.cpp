@@ -19,7 +19,11 @@ TEST_CASE("Instructions are decoded correctly")
     sprintf(input_path, "data/%s", file_name);
 
     FILE *input_file = fopen(input_path, "rb");
+    REQUIRE(input_file != NULL);
+
     FILE *asm_file = fopen("test.asm", "w");
+    REQUIRE(asm_file != NULL);
+
     fprintf(asm_file, "bits 16\n");
 
     DecodeInstructions(asm_file, input_file);
@@ -31,12 +35,15 @@ TEST_CASE("Instructions are decoded correctly")
     system(nasm_cmd);
 
     FILE *assembled = fopen("test.bin", "rb");
+    REQUIRE(assembled != NULL);
+
     input_file = fopen(input_path, "rb");
+    REQUIRE(input_file != NULL);
 
     fseek(assembled, 0, SEEK_END);
     fseek(input_file, 0, SEEK_END);
-    long assembled_size = ftell(assembled);
-    long input_size = ftell(input_file);
+    const long assembled_size = ftell(assembled);
+    const long input_size = ftell(input_file);
     fseek(assembled, 0, SEEK_SET);
     fseek(input_file, 0, SEEK_SET);
 
@@ -45,7 +52,7 @@ TEST_CASE("Instructions are decoded correctly")
     fread(assembled_data, 1, assembled_size, assembled);
     fread(original_data, 1, input_size, input_file);
 
-    int match = (assembled_size == input_size) && (memcmp(assembled_data, original_data, assembled_size) == 0);
+    const int match = (assembled_size == input_size) && (memcmp(assembled_data, original_data, assembled_size) == 0);
 
     if (!match) {
         printf("Invalid output for file '%s':\n", file_name);
