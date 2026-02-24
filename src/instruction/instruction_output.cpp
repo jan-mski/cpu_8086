@@ -4,6 +4,32 @@
 #include "../instruction/instruction.h"
 #include "instruction_output.h"
 
+const char *REGISTER_NAMES[] = {
+    "",
+    "al",
+    "ah",
+    "ax",
+    "bl",
+    "bh",
+    "bx",
+    "cl",
+    "ch",
+    "cx",
+    "dl",
+    "dh",
+    "dx",
+    "sp",
+    "bp",
+    "si",
+    "di"
+};
+
+const char *GetRegisterName(const Register register_)
+{
+    static_assert(REGISTER_COUNT == ARRAY_SIZE(REGISTER_NAMES), "REGISTER_COUNT and size of REGISTER_NAMES must be equal");
+    return REGISTER_NAMES[register_];
+}
+
 void PrintInstructionString(FILE *output_stream, const InstructionDecodingContext *decoding_context)
 {
     fprintf(output_stream, "%s", decoding_context->mnemonic);
@@ -21,7 +47,7 @@ void PrintInstructionString(FILE *output_stream, const InstructionDecodingContex
             } break;
             case OPERAND_REGISTER:
             {
-                fprintf(output_stream, "%s", operand->register_name);
+                fprintf(output_stream, "%s", GetRegisterName(operand->register_));
             } break;
             case OPERAND_MEMORY_ADDRESS:
             {
@@ -38,7 +64,7 @@ void PrintInstructionString(FILE *output_stream, const InstructionDecodingContex
                 {
                     for (size_t register_idx = 0; register_idx < REGISTER_NAMES_MAX_LEN; ++register_idx)
                     {
-                        const char *register_name = memory_address->register_names[register_idx];
+                        const char *register_name = GetRegisterName(memory_address->registers[register_idx]);
                         if (!register_name)
                         {
                             break;

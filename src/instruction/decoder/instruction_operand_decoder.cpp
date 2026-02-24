@@ -1,16 +1,42 @@
 ﻿#include "../instruction.h"
 
-const char *REGISTER_NAMES_W0[] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
-const char *REGISTER_NAMES_W1[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
-const char **REGISTER_NAMES[] = {REGISTER_NAMES_W0, REGISTER_NAMES_W1};
-const char *EFFECTIVE_ADDRESS_REGISTERS[][2] = {
-    {"bx", "si"}, {"bx", "di"}, {"bp", "si"}, {"bp", "di"}, {"si"}, {"di"}, {"bp"}, {"bx"}
+Register REGISTER_NAMES[][8] = {
+    {
+        REGISTER_AL,
+        REGISTER_CL,
+        REGISTER_DL,
+        REGISTER_BL,
+        REGISTER_AH,
+        REGISTER_CH,
+        REGISTER_DH,
+        REGISTER_BH
+    },
+    {
+        REGISTER_AX,
+        REGISTER_CX,
+        REGISTER_DX,
+        REGISTER_BX,
+        REGISTER_SP,
+        REGISTER_BP,
+        REGISTER_SI,
+        REGISTER_DI
+    }
+};
+Register EFFECTIVE_ADDRESS_REGISTERS[][2] = {
+    {REGISTER_BX, REGISTER_SI},
+    {REGISTER_BX, REGISTER_DI},
+    {REGISTER_BP, REGISTER_SI},
+    {REGISTER_BP, REGISTER_DI},
+    {REGISTER_SI},
+    {REGISTER_DI},
+    {REGISTER_BP},
+    {REGISTER_BX}
 };
 
 void SetEffectiveAddressNoDisplacement(Operand *operand, const InstructionDecodingContext *decoding_context)
 {
     operand->type = OPERAND_MEMORY_ADDRESS;
-    operand->memory_address.register_names = EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m];
+    operand->memory_address.registers = EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m];
 }
 
 void SetDirectAddress(Operand *operand, const InstructionDecodingContext *decoding_context)
@@ -27,14 +53,14 @@ void SetEffectiveAddressWithDisplacement(Operand *operand, const InstructionDeco
     operand->type = OPERAND_MEMORY_ADDRESS;
 
     MemoryAddress *memory_address = &operand->memory_address;
-    memory_address->register_names = EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m];
+    memory_address->registers = EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m];
     memory_address->displacement = decoding_context->displacement;
 }
 
 void SetRegisterName(Operand *operand, const uint8_t w, const uint8_t reg_or_r_m)
 {
     operand->type = OPERAND_REGISTER;
-    operand->register_name = REGISTER_NAMES[w][reg_or_r_m];
+    operand->register_ = REGISTER_NAMES[w][reg_or_r_m];
 }
 
 bool DecodeRegisterOrMemoryAddress(Operand *operand, const InstructionDecodingContext *decoding_context)
@@ -114,7 +140,7 @@ void DecodeOperandsAccumulatorAndMemory(InstructionDecodingContext *decoding_con
 {
     Operand *left_operand = &decoding_context->operands[0];
     left_operand->type = OPERAND_REGISTER;
-    left_operand->register_name = "ax";
+    left_operand->register_ = REGISTER_AX;
 
     Operand *right_operand = &decoding_context->operands[1];
     right_operand->type = OPERAND_MEMORY_ADDRESS;
@@ -131,14 +157,14 @@ void DecodeOperandsMemoryAndAccumulator(InstructionDecodingContext *decoding_con
 
     Operand *right_operand = &decoding_context->operands[1];
     right_operand->type = OPERAND_REGISTER;
-    right_operand->register_name = "ax";
+    right_operand->register_ = REGISTER_AX;
 }
 
 void DecodeOperandsAccumulatorAndImmediate(InstructionDecodingContext * decoding_context)
 {
     Operand *left_operand = &decoding_context->operands[0];
     left_operand->type = OPERAND_REGISTER;
-    left_operand->register_name = decoding_context->w == 0 ? "al" : "ax";
+    left_operand->register_ = decoding_context->w == 0 ? REGISTER_AL : REGISTER_AX;
 
     Operand *right_operand = &decoding_context->operands[1];
     right_operand->type = OPERAND_IMMEDIATE;

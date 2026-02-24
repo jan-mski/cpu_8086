@@ -2,8 +2,30 @@
 
 #include "../types.h"
 
-const uint8_t INSTRUCTION_MAX_LEN = 6;
+const uint8_t INSTRUCTION_MAX_BYTES = 6;
 const uint8_t REGISTER_NAMES_MAX_LEN = 2;
+
+enum Register
+{
+    REGISTER_NONE,
+    REGISTER_AL,
+    REGISTER_AH,
+    REGISTER_AX,
+    REGISTER_BL,
+    REGISTER_BH,
+    REGISTER_BX,
+    REGISTER_CL,
+    REGISTER_CH,
+    REGISTER_CX,
+    REGISTER_DL,
+    REGISTER_DH,
+    REGISTER_DX,
+    REGISTER_SP,
+    REGISTER_BP,
+    REGISTER_SI,
+    REGISTER_DI,
+    REGISTER_COUNT
+};
 
 enum OperandType
 {
@@ -18,14 +40,14 @@ struct MemoryAddress
 {
     bool direct;
     const char *qualifier;
-    const char **register_names;
+    Register *registers;
     int32_t displacement;
 };
 
 struct Operand
 {
     OperandType type;
-    const char *register_name;
+    Register register_;
     MemoryAddress memory_address;
     uint16_t immediate_value;
     int32_t label_like_displacement;
@@ -33,7 +55,7 @@ struct Operand
 
 struct InstructionDecodingContext
 {
-    uint8_t bytes[INSTRUCTION_MAX_LEN];
+    uint8_t bytes[INSTRUCTION_MAX_BYTES];
     uint8_t num_bytes_read;
     bool w;                          // 1 bit
     bool d;                          // 1 bit
