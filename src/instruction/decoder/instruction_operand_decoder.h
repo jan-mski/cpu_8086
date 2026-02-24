@@ -1,0 +1,11 @@
+﻿#pragma once
+
+#include "../instruction.h"
+
+void DecodeOperandsRegisterOrMemoryAndEither(InstructionDecodingContext *decoding_context);
+void DecodeOperandsRegisterOrMemoryAndImmediate(InstructionDecodingContext *decoding_context);
+void DecodeOperandsRegisterAndImmediate(InstructionDecodingContext *decoding_context);
+void DecodeOperandsAccumulatorAndMemory(InstructionDecodingContext *decoding_context);
+void DecodeOperandsMemoryAndAccumulator(InstructionDecodingContext *decoding_context);
+void DecodeOperandsAccumulatorAndImmediate(InstructionDecodingContext *decoding_context);
+void DecodeOperandsReturnFromCall(InstructionDecodingContext *decoding_context);

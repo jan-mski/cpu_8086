@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#define ARRAY_SIZE(array) ((sizeof(array) / sizeof(array[0])))
+
 #define REPEAT_2(x) \
     x, x
 #define REPEAT_4(x) \

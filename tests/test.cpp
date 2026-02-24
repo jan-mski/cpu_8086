@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-extern void DecodeOps(char **output_buffer, FILE *input_stream);
+#include "../src/cpu.h"
+#include "../src/instruction/instruction_input.h"
 
 TEST_CASE("Instructions are decoded correctly")
 {
@@ -19,69 +19,54 @@ TEST_CASE("Instructions are decoded correctly")
     char input_path[256], nasm_cmd[512];
     sprintf(input_path, "data/%s", file_name);
 
-    FILE *input = fopen(input_path, "rb");
+    FILE *input_file = fopen(input_path, "rb");
     FILE *asm_file = fopen("test.asm", "w");
     fprintf(asm_file, "bits 16\n");
 
-    char *output_buffer[128] = {};
-    for (uint8_t i = 0; i < 128; ++i)
-    {
-        output_buffer[i] = new char[64];
-    }
-    DecodeOps(output_buffer, input);
+    InstructionInput instruction_input = {input_file};
+    DecodeInstructions(asm_file, &instruction_input);
 
-    for (int i = 0; i < 128; ++i)
-    {
-        const char *asm_str = output_buffer[i];
-        if (asm_str == 0)
-        {
-            break;
-        }
-        fprintf(asm_file, "%s\n", asm_str);
-    }
-    fclose(input);
+    fclose(input_file);
     fclose(asm_file);
 
     sprintf(nasm_cmd, "nasm test.asm -o test.bin");
     system(nasm_cmd);
 
     FILE *assembled = fopen("test.bin", "rb");
-    input = fopen(input_path, "rb");
+    input_file = fopen(input_path, "rb");
 
     fseek(assembled, 0, SEEK_END);
-    fseek(input, 0, SEEK_END);
+    fseek(input_file, 0, SEEK_END);
     long assembled_size = ftell(assembled);
-    long input_size = ftell(input);
+    long input_size = ftell(input_file);
     fseek(assembled, 0, SEEK_SET);
-    fseek(input, 0, SEEK_SET);
+    fseek(input_file, 0, SEEK_SET);
 
     char *assembled_data = (char *) malloc(assembled_size);
     char *original_data = (char *) malloc(input_size);
     fread(assembled_data, 1, assembled_size, assembled);
-    fread(original_data, 1, input_size, input);
+    fread(original_data, 1, input_size, input_file);
 
     int match = (assembled_size == input_size) && (memcmp(assembled_data, original_data, assembled_size) == 0);
 
     if (!match) {
         printf("Invalid output for file '%s':\n", file_name);
-        for (int i = 0; i < 128; ++i) {
-            const char *asm_str = output_buffer[i];
-            if (asm_str == 0)
-            {
-                break;
-            }
-            printf("%s\n", output_buffer[i]);
+
+        asm_file = fopen("test.asm", "r");
+
+        char output_buffer[64];
+        while (fgets(output_buffer, 64, asm_file) != 0)
+        {
+            printf("%s\n", output_buffer);
         }
+
+        fclose(asm_file);
     }
 
-    for (int i = 0; i < 128; ++i)
-    {
-        delete[] output_buffer[i];
-    }
     free(assembled_data);
     free(original_data);
     fclose(assembled);
-    fclose(input);
+    fclose(input_file);
 
     REQUIRE(match);
 }
