@@ -23,6 +23,7 @@ const char *REGISTER_NAMES[] = {
 const char *MNEMONIC_STRINGS[] = {
     0,
     "mov",
+    "push",
     "add",
     "sub",
     "cmp",
@@ -80,12 +81,14 @@ const char *GetMemoryAddressQualifierString(MemoryAddressQualifier qualifier)
 
 void PrintInstructionString(FILE *output_stream, Instruction *instruction)
 {
-    fprintf(output_stream, "%s", GetMnemonicString(instruction->mnemonic));
+    char asm_string[64];
+    uint8_t asm_string_idx = sprintf(asm_string, "%s", GetMnemonicString(instruction->mnemonic));
 
     for (size_t operand_idx = 0; operand_idx < ARRAY_SIZE(instruction->operands); ++operand_idx)
     {
         Operand *operand = &instruction->operands[operand_idx];
-        fprintf(output_stream, operand_idx == 0 ? " " : ", ");
+        asm_string_idx += sprintf(asm_string + asm_string_idx,
+            (operand_idx == 0 && operand->type != OPERAND_TYPE_NONE) ? " " : ", ");
 
         switch (operand->type)
         {
@@ -95,18 +98,18 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
             } break;
             case OPERAND_TYPE_REGISTER:
             {
-                fprintf(output_stream, "%s", GetRegisterName(operand->register_));
+                asm_string_idx += sprintf(asm_string + asm_string_idx, "%s", GetRegisterName(operand->register_));
             } break;
             case OPERAND_TYPE_MEMORY_ADDRESS:
             {
                 MemoryAddress *memory_address = &operand->memory_address;
                 if (memory_address->qualifier)
                 {
-                    fprintf(output_stream, "%s", GetMemoryAddressQualifierString(memory_address->qualifier));
+                    asm_string_idx += sprintf(asm_string + asm_string_idx, "%s ", GetMemoryAddressQualifierString(memory_address->qualifier));
                 }
                 if (memory_address->direct)
                 {
-                    fprintf(output_stream, "[%i]", memory_address->displacement);
+                    asm_string_idx += sprintf(asm_string + asm_string_idx, "[%i]", memory_address->displacement);
                 }
                 else
                 {
@@ -117,21 +120,22 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
                         {
                             break;
                         }
-                        fprintf(output_stream, register_idx == 0 ? "[%s" : " + %s", register_name);
+                        asm_string_idx += sprintf(asm_string + asm_string_idx, register_idx == 0 ? "[%s" : " + %s", register_name);
                     }
-                    fprintf(output_stream, " + %i]", memory_address->displacement);
+                    asm_string_idx += sprintf(asm_string + asm_string_idx, " + %i]", memory_address->displacement);
                 }
             } break;
             case OPERAND_TYPE_IMMEDIATE:
             {
-                fprintf(output_stream, "%u", operand->immediate_value);
+                asm_string_idx += sprintf(asm_string + asm_string_idx, "%u", operand->immediate_value);
             } break;
             case OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT:
             {
-                fprintf(output_stream, "($+2) + %i", operand->label_like_displacement);
+                asm_string_idx += sprintf(asm_string + asm_string_idx, "($+2) + %i", operand->label_like_displacement);
             } break;
         }
     }
 
-    fprintf(output_stream, "\n");
+    asm_string_idx += sprintf(asm_string + asm_string_idx, "\n");
+    fprintf(output_stream, "%s", asm_string);
 }

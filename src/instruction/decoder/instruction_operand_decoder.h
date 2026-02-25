@@ -1,7 +1,9 @@
 ﻿void DecodeOperandsRegisterOrMemoryAndEither(Instruction *instruction, DecodingContext *decoding_context);
-void DecodeOperandsRegisterOrMemoryAndImmediate(Instruction *instruction, DecodingContext *decoding_context);
-void DecodeOperandsRegisterAndImmediate(Instruction *instruction, DecodingContext *decoding_context);
-void DecodeOperandsAccumulatorAndMemory(Instruction *instruction, DecodingContext *decoding_context);
-void DecodeOperandsMemoryAndAccumulator(Instruction *instruction, DecodingContext *decoding_context);
-void DecodeOperandsAccumulatorAndImmediate(Instruction *instruction, DecodingContext *decoding_context);
-void DecodeOperandsReturnFromCall(Instruction *instruction, DecodingContext *decoding_context);
+void DecodeOperandLabelLikeDisplacement(Operand *operand, DecodingContext *decoding_context);
+void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
+                                          DecodingContext *decoding_context,
+                                          bool is_instruction_wide = false);
+void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context, bool is_instruction_wide = false);
+void DecodeOperandImmediate(Operand *operand, DecodingContext *decoding_context);
+void DecodeOperandAccumulator(Operand *left_operand, DecodingContext *decoding_context);
+void DecodeOperandDirectAddress(Operand *right_operand, DecodingContext *decoding_context);

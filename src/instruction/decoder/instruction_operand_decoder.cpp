@@ -70,7 +70,9 @@ void SetRegisterName(Operand *operand, uint8_t w, uint8_t reg_or_r_m)
     operand->register_ = REGISTERS_BY_W[w][reg_or_r_m];
 }
 
-bool DecodeRegisterOrMemoryAddress(Operand *operand, DecodingContext *decoding_context)
+void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
+                                          DecodingContext *decoding_context,
+                                          bool is_instruction_wide)
 {
     switch (decoding_context->mod)
     {
@@ -92,96 +94,57 @@ bool DecodeRegisterOrMemoryAddress(Operand *operand, DecodingContext *decoding_c
         default:
         {
             SetRegisterName(operand, decoding_context->w, decoding_context->r_m);
-            return true;
+            return;
         } break;
     }
 
-    return false;
+    MemoryAddressQualifier qualifier = (is_instruction_wide || decoding_context->w == 1)
+                                           ? MEMORY_ADDRESS_QUALIFIER_WORD
+                                           : MEMORY_ADDRESS_QUALIFIER_BYTE;
+    operand->memory_address.qualifier = qualifier;
 }
 
-void DecodeRegister(Operand *operand, DecodingContext *decoding_context)
+void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context, bool is_instruction_wide)
 {
-    SetRegisterName(operand, decoding_context->w, decoding_context->reg);
+    SetRegisterName(operand, (is_instruction_wide || decoding_context->w), decoding_context->reg);
 }
-
 
 void DecodeOperandsRegisterOrMemoryAndEither(Instruction *instruction, DecodingContext *decoding_context)
 {
     if (decoding_context->d == 0)
     {
-        DecodeRegisterOrMemoryAddress(&instruction->operands[0], decoding_context);
-        DecodeRegister(&instruction->operands[1], decoding_context);
+        DecodeOperandRegisterOrMemoryAddress(&instruction->operands[0], decoding_context);
+        DecodeOperandRegister(&instruction->operands[1], decoding_context);
     }
     else
     {
-        DecodeRegister(&instruction->operands[0], decoding_context);
-        DecodeRegisterOrMemoryAddress(&instruction->operands[1], decoding_context);
+        DecodeOperandRegister(&instruction->operands[0], decoding_context);
+        DecodeOperandRegisterOrMemoryAddress(&instruction->operands[1], decoding_context);
     }
 }
 
-void DecodeOperandsRegisterOrMemoryAndImmediate(Instruction *instruction, DecodingContext *decoding_context)
+void DecodeOperandImmediate(Operand *operand, DecodingContext *decoding_context)
 {
-    bool is_register = DecodeRegisterOrMemoryAddress(&instruction->operands[0], decoding_context);
-
-    Operand *right_operand = &instruction->operands[1];
-    right_operand->type = OPERAND_TYPE_IMMEDIATE;
-    right_operand->immediate_value = decoding_context->data;
-
-    if (!is_register)
-    {
-        instruction->operands[0].memory_address.qualifier = decoding_context->w == 0
-            ? MEMORY_ADDRESS_QUALIFIER_BYTE
-            : MEMORY_ADDRESS_QUALIFIER_WORD;
-    }
+    operand->type = OPERAND_TYPE_IMMEDIATE;
+    operand->immediate_value = decoding_context->data;
 }
 
-void DecodeOperandsRegisterAndImmediate(Instruction *instruction, DecodingContext *decoding_context)
+void DecodeOperandAccumulator(Operand *left_operand, DecodingContext *decoding_context)
 {
-    DecodeRegister(&instruction->operands[0], decoding_context);
-
-    Operand *right_operand = &instruction->operands[1];
-    right_operand->type = OPERAND_TYPE_IMMEDIATE;
-    right_operand->immediate_value = decoding_context->data;
-}
-
-void DecodeOperandsAccumulatorAndMemory(Instruction *instruction, DecodingContext *decoding_context)
-{
-    Operand *left_operand = &instruction->operands[0];
     left_operand->type = OPERAND_TYPE_REGISTER;
-    left_operand->register_ = REGISTER_AX;
+    left_operand->register_ = decoding_context->w == 0 ? REGISTER_AL : REGISTER_AX;
+    // left_operand->register_ = REGISTER_AX;
+}
 
-    Operand *right_operand = &instruction->operands[1];
+void DecodeOperandDirectAddress(Operand *right_operand, DecodingContext *decoding_context)
+{
     right_operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
     right_operand->memory_address.direct = true;
     right_operand->memory_address.displacement = decoding_context->addr;
 }
 
-void DecodeOperandsMemoryAndAccumulator(Instruction *instruction, DecodingContext *decoding_context)
+void DecodeOperandLabelLikeDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
-    Operand *left_operand = &instruction->operands[0];
-    left_operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
-    left_operand->memory_address.direct = true;
-    left_operand->memory_address.displacement = decoding_context->addr;
-
-    Operand *right_operand = &instruction->operands[1];
-    right_operand->type = OPERAND_TYPE_REGISTER;
-    right_operand->register_ = REGISTER_AX;
-}
-
-void DecodeOperandsAccumulatorAndImmediate(Instruction *instruction, DecodingContext *decoding_context)
-{
-    Operand *left_operand = &instruction->operands[0];
-    left_operand->type = OPERAND_TYPE_REGISTER;
-    left_operand->register_ = decoding_context->w == 0 ? REGISTER_AL : REGISTER_AX;
-
-    Operand *right_operand = &instruction->operands[1];
-    right_operand->type = OPERAND_TYPE_IMMEDIATE;
-    right_operand->immediate_value = decoding_context->data;
-}
-
-void DecodeOperandsReturnFromCall(Instruction *instruction, DecodingContext *decoding_context)
-{
-    Operand *left_operand = &instruction->operands[0];
-    left_operand->type = OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT;
-    left_operand->label_like_displacement = decoding_context->displacement;
+    operand->type = OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT;
+    operand->label_like_displacement = decoding_context->displacement;
 }

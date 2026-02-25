@@ -31,7 +31,8 @@ Instruction DecodeMOVMemoryToAccumulator(InstructionInput *instruction_input,
     DecodeAddr(instruction_input, decoding_context);
 
     Instruction instruction = {MNEMONIC_MOV};
-    DecodeOperandsAccumulatorAndMemory(&instruction, decoding_context);
+    DecodeOperandAccumulator(&instruction.operands[0], decoding_context);
+    DecodeOperandDirectAddress(&instruction.operands[1], decoding_context);
 
     return instruction;
 }
@@ -44,7 +45,8 @@ Instruction DecodeMOVAccumulatorToMemory(InstructionInput *instruction_input,
     DecodeAddr(instruction_input, decoding_context);
 
     Instruction instruction = {MNEMONIC_MOV};
-    DecodeOperandsMemoryAndAccumulator(&instruction, decoding_context);
+    DecodeOperandDirectAddress(&instruction.operands[0], decoding_context);
+    DecodeOperandAccumulator(&instruction.operands[1], decoding_context);
 
     return instruction;
 }
@@ -58,7 +60,8 @@ Instruction DecodeMOVImmediateToRegister(InstructionInput *instruction_input,
     DecodeData(instruction_input, 1, decoding_context);
 
     Instruction instruction = {MNEMONIC_MOV};
-    DecodeOperandsRegisterAndImmediate(&instruction, decoding_context);
+    DecodeOperandRegister(&instruction.operands[0], decoding_context);
+    DecodeOperandImmediate(&instruction.operands[1], decoding_context);
 
     return instruction;
 }
@@ -73,7 +76,8 @@ Instruction DecodeMOVImmediateToRegisterOrMemory(InstructionInput *instruction_i
     DecodeData(instruction_input, 2 + num_bytes_read, decoding_context);
 
     Instruction instruction = {MNEMONIC_MOV};
-    DecodeOperandsRegisterOrMemoryAndImmediate(&instruction, decoding_context);
+    DecodeOperandRegisterOrMemoryAddress(&instruction.operands[0], decoding_context);
+    DecodeOperandImmediate(&instruction.operands[1], decoding_context);
 
     return instruction;
 }
@@ -103,7 +107,8 @@ Instruction DecodeSignedArithmeticImmediateAndRegisterOrMemory(InstructionInput 
     DecodeData(instruction_input, 2 + num_bytes_read, decoding_context);
 
     Instruction instruction = {SIGNED_ARITHMETIC_MNEMONICS[decoding_context->common_mnemonic]};
-    DecodeOperandsRegisterOrMemoryAndImmediate(&instruction, decoding_context);
+    DecodeOperandRegisterOrMemoryAddress(&instruction.operands[0], decoding_context);
+    DecodeOperandImmediate(&instruction.operands[1], decoding_context);
 
     return instruction;
 }
@@ -134,7 +139,8 @@ Instruction DecodeADDImmediateToAccumulator(InstructionInput *instruction_input,
     DecodeData(instruction_input, 1, decoding_context);
 
     Instruction instruction = {MNEMONIC_ADD};
-    DecodeOperandsAccumulatorAndImmediate(&instruction, decoding_context);
+    DecodeOperandAccumulator(&instruction.operands[0], decoding_context);
+    DecodeOperandImmediate(&instruction.operands[1], decoding_context);
 
     return instruction;
 }
@@ -165,7 +171,8 @@ Instruction DecodeSUBImmediateFromAccumulator(InstructionInput *instruction_inpu
     DecodeData(instruction_input, 1, decoding_context);
 
     Instruction instruction = {MNEMONIC_SUB};
-    DecodeOperandsAccumulatorAndImmediate(&instruction, decoding_context);
+    DecodeOperandAccumulator(&instruction.operands[0], decoding_context);
+    DecodeOperandImmediate(&instruction.operands[1], decoding_context);
 
     return instruction;
 }
@@ -196,7 +203,8 @@ Instruction DecodeCMPImmediateWithAccumulator(InstructionInput *instruction_inpu
     DecodeData(instruction_input, 1, decoding_context);
 
     Instruction instruction = {MNEMONIC_CMP};
-    DecodeOperandsAccumulatorAndImmediate(&instruction, decoding_context);
+    DecodeOperandAccumulator(&instruction.operands[0], decoding_context);
+    DecodeOperandImmediate(&instruction.operands[1], decoding_context);
 
     return instruction;
 }
@@ -210,7 +218,34 @@ Instruction DecodeReturnFromCall(InstructionInput *instruction_input,
     DecodeDisplacement8Bit(instruction_input, 1, decoding_context);
 
     Instruction instruction = {decoder_function_args.mnemonic};
-    DecodeOperandsReturnFromCall(&instruction, decoding_context);
+    DecodeOperandLabelLikeDisplacement(&instruction.operands[0], decoding_context);
+
+    return instruction;
+}
+
+// ## PUSH
+
+Instruction DecodePUSHRegisterOrMemory(InstructionInput *instruction_input,
+                                       DecodingContext *decoding_context,
+                                       DecoderFunctionArgs decoder_function_args)
+{
+    DecodeModAndRM(instruction_input, 6, 0, decoding_context);
+    DecodeDisplacement(instruction_input, decoding_context);
+
+    Instruction instruction = {MNEMONIC_PUSH};
+    DecodeOperandRegisterOrMemoryAddress(&instruction.operands[0], decoding_context, true);
+
+    return instruction;
+}
+
+Instruction DecodePUSHRegister(InstructionInput *instruction_input,
+                               DecodingContext *decoding_context,
+                               DecoderFunctionArgs decoder_function_args)
+{
+    DecodeReg(instruction_input, 0, 0, decoding_context);
+
+    Instruction instruction = {MNEMONIC_PUSH};
+    DecodeOperandRegister(&instruction.operands[0], decoding_context, true);
 
     return instruction;
 }
@@ -225,7 +260,9 @@ InstructionDecodeSpec INSTRUCTION_DECODE_SPECS[256] = {
     /* 00101110 - 00110111 [ 46 -  55] */ REPEAT_10({DecodeUnsupported}),
     /* 00111000 - 00111011 [ 56 -  59] */ REPEAT_4({DecodeCMPRegisterOrMemoryWithEither}),
     /* 00111100 - 00111101 [ 60 -  61] */ REPEAT_2({DecodeCMPImmediateWithAccumulator}),
-    /* 00111110 - 01101111 [ 62 - 111] */ REPEAT_50({DecodeUnsupported}),
+    /* 00111110 - 01101111 [ 62 -  79] */ REPEAT_18({DecodeUnsupported}),
+    /* 01010000 - 01010111 [ 80 -  87] */ REPEAT_8({DecodePUSHRegister}),
+    /* 00111110 - 01101111 [ 88 - 111] */ REPEAT_24({DecodeUnsupported}),
     /* 01110000 - 01110000 [112 - 112] */ {DecodeReturnFromCall, MNEMONIC_JO},
     /* 01110001 - 01110001 [113 - 113] */ {DecodeReturnFromCall, MNEMONIC_JNO},
     /* 01110010 - 01110010 [114 - 114] */ {DecodeReturnFromCall, MNEMONIC_JB_JNAE},
@@ -257,7 +294,8 @@ InstructionDecodeSpec INSTRUCTION_DECODE_SPECS[256] = {
     /* 11100001 - 11100001 [225 - 225] */ {DecodeReturnFromCall, MNEMONIC_LOOPZ_LOOPE},
     /* 11100010 - 11100010 [226 - 226] */ {DecodeReturnFromCall, MNEMONIC_LOOP},
     /* 11100011 - 11100011 [227 - 227] */ {DecodeReturnFromCall, MNEMONIC_JCXZ},
-    /* 11100100 - 11111111 [228 - 255] */ REPEAT_28({DecodeUnsupported}),
+    /* 11100100 - 11111110 [228 - 254] */ REPEAT_27({DecodeUnsupported}),
+    /* 11111111 - 11111111 [255 - 255] */ {DecodePUSHRegisterOrMemory}
 };
 
 Instruction DecodeInstruction(InstructionInput *instruction_input,

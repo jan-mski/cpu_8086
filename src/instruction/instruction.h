@@ -15,6 +15,7 @@ enum Mnemonic
     MNEMONIC_NONE,
 
     MNEMONIC_MOV,
+    MNEMONIC_PUSH,
     MNEMONIC_ADD,
     MNEMONIC_SUB,
     MNEMONIC_CMP,
