@@ -16,6 +16,7 @@ enum Mnemonic
 
     MNEMONIC_MOV,
     MNEMONIC_PUSH,
+    MNEMONIC_POP,
     MNEMONIC_ADD,
     MNEMONIC_SUB,
     MNEMONIC_CMP,
@@ -81,12 +82,13 @@ struct DecodingContext
     bool d;                          // 1 bit
     bool s;                          // 1 bit
     uint8_t mod;                     // 2 bits
+    uint8_t sr;                      // 2 bits
     uint8_t reg;                     // 3 bits
     uint8_t r_m;                     // 3 bits
     uint8_t common_mnemonic;         // 3 bits
-    uint16_t data;                   // 8/16 bits
-    uint16_t addr;                   // 8/16 bits
-    int32_t displacement;            // 8/16 bits
+    uint16_t data;                   // 8 || 16 bits
+    uint16_t addr;                   // 8 || 16 bits
+    int32_t displacement;            // 8 || 16 bits
 };
 
 struct Instruction

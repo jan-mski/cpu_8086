@@ -21,6 +21,11 @@ enum Register
     REGISTER_SI,
     REGISTER_DI,
 
+    REGISTER_ES,
+    REGISTER_CS,
+    REGISTER_SS,
+    REGISTER_DS,
+
     REGISTER_COUNT
 };
 

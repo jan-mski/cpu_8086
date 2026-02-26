@@ -63,7 +63,7 @@ TEST_CASE("Instructions are decoded correctly")
         char output_buffer[64];
         while (fgets(output_buffer, 64, asm_file) != 0)
         {
-            printf("%s\n", output_buffer);
+            printf("%s", output_buffer);
         }
 
         fclose(asm_file);

@@ -1,5 +1,4 @@
-﻿
-Register REGISTERS_BY_W[][8] = {
+﻿Register REGISTERS_BY_W[][8] = {
     {
         REGISTER_AL,
         REGISTER_CL,
@@ -30,6 +29,12 @@ Register EFFECTIVE_ADDRESS_REGISTERS[][2] = {
     {REGISTER_DI},
     {REGISTER_BP},
     {REGISTER_BX}
+};
+Register SEGMENT_REGISTERS[] = {
+    REGISTER_ES,
+    REGISTER_CS,
+    REGISTER_SS,
+    REGISTER_DS
 };
 
 void SetEffectiveAddressRegisters(Operand *operand, Register *registers)
@@ -107,6 +112,12 @@ void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
 void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context, bool is_instruction_wide)
 {
     SetRegisterName(operand, (is_instruction_wide || decoding_context->w), decoding_context->reg);
+}
+
+void DecodeOperandSegmentRegister(Operand *operand, DecodingContext *decoding_context)
+{
+    operand->type = OPERAND_TYPE_REGISTER;
+    operand->register_ = SEGMENT_REGISTERS[decoding_context->sr];
 }
 
 void DecodeOperandsRegisterOrMemoryAndEither(Instruction *instruction, DecodingContext *decoding_context)

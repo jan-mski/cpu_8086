@@ -1,29 +1,25 @@
-﻿#define REPEAT_2(x) \
-    x, x
-#define REPEAT_4(x) \
-    REPEAT_2(x), REPEAT_2(x)
-#define REPEAT_6(x) \
-    REPEAT_4(x), REPEAT_2(x)
-#define REPEAT_8(x) \
-    REPEAT_6(x), REPEAT_2(x)
-#define REPEAT_10(x) \
-    REPEAT_6(x), REPEAT_4(x)
-#define REPEAT_12(x) \
-    REPEAT_6(x), REPEAT_6(x)
-#define REPEAT_16(x) \
-    REPEAT_12(x), REPEAT_4(x)
-#define REPEAT_18(x) \
-    REPEAT_16(x), REPEAT_2(x)
-#define REPEAT_20(x) \
-    REPEAT_16(x), REPEAT_4(x)
-#define REPEAT_24(x) \
-    REPEAT_20(x), REPEAT_4(x)
-#define REPEAT_27(x) \
-    REPEAT_24(x), REPEAT_2(x), x
-#define REPEAT_34(x) \
-    REPEAT_20(x), REPEAT_12(x), REPEAT_2(x)
-#define REPEAT_50(x) \
-    REPEAT_20(x), REPEAT_20(x), REPEAT_10(x)
+﻿#define REPEAT_2(...) \
+    __VA_ARGS__, __VA_ARGS__
+#define REPEAT_3(...) \
+    REPEAT_2(__VA_ARGS__), __VA_ARGS__
+#define REPEAT_4(...) \
+    REPEAT_2(__VA_ARGS__), REPEAT_2(__VA_ARGS__)
+#define REPEAT_6(...) \
+    REPEAT_4(__VA_ARGS__), REPEAT_2(__VA_ARGS__)
+#define REPEAT_8(...) \
+    REPEAT_6(__VA_ARGS__), REPEAT_2(__VA_ARGS__)
+#define REPEAT_10(...) \
+    REPEAT_6(__VA_ARGS__), REPEAT_4(__VA_ARGS__)
+#define REPEAT_12(...) \
+    REPEAT_6(__VA_ARGS__), REPEAT_6(__VA_ARGS__)
+#define REPEAT_16(...) \
+    REPEAT_12(__VA_ARGS__), REPEAT_4(__VA_ARGS__)
+#define REPEAT_18(...) \
+    REPEAT_16(__VA_ARGS__), REPEAT_2(__VA_ARGS__)
+#define REPEAT_24(...) \
+    REPEAT_16(__VA_ARGS__), REPEAT_8(__VA_ARGS__)
+#define REPEAT_27(...) \
+    REPEAT_24(__VA_ARGS__), REPEAT_2(__VA_ARGS__), __VA_ARGS__
 
 struct DecoderFunctionArgs
 {

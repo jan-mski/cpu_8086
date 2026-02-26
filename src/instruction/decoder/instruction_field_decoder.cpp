@@ -34,6 +34,15 @@ void DecodeReg(InstructionInput *instruction_input,
     decoding_context->reg = (decoding_context->bytes[reg_byte_index] >> reg_shift) & 0b111;
 }
 
+void DecodeSR(InstructionInput *instruction_input,
+               uint8_t sr_byte_index,
+               uint8_t sr_shift,
+               DecodingContext *decoding_context)
+{
+    ReadNextBytesToIndex(instruction_input, decoding_context, sr_byte_index);
+    decoding_context->sr = (decoding_context->bytes[sr_byte_index] >> sr_shift) & 0b11;
+}
+
 void DecodeData(InstructionInput *instruction_input,
                 uint8_t data_byte_1_index,
                 DecodingContext *decoding_context)

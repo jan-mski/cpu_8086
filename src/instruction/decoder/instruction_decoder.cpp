@@ -223,46 +223,69 @@ Instruction DecodeReturnFromCall(InstructionInput *instruction_input,
     return instruction;
 }
 
-// ## PUSH
+// ## PUSH, POP
 
-Instruction DecodePUSHRegisterOrMemory(InstructionInput *instruction_input,
-                                       DecodingContext *decoding_context,
-                                       DecoderFunctionArgs decoder_function_args)
+Instruction DecodeStackOperationRegisterOrMemory(InstructionInput *instruction_input,
+                                                 DecodingContext *decoding_context,
+                                                 DecoderFunctionArgs decoder_function_args)
 {
     DecodeModAndRM(instruction_input, 6, 0, decoding_context);
     DecodeDisplacement(instruction_input, decoding_context);
 
-    Instruction instruction = {MNEMONIC_PUSH};
+    Instruction instruction = {decoder_function_args.mnemonic};
     DecodeOperandRegisterOrMemoryAddress(&instruction.operands[0], decoding_context, true);
 
     return instruction;
 }
 
-Instruction DecodePUSHRegister(InstructionInput *instruction_input,
-                               DecodingContext *decoding_context,
-                               DecoderFunctionArgs decoder_function_args)
+Instruction DecodeStackOperationRegister(InstructionInput *instruction_input,
+                                         DecodingContext *decoding_context,
+                                         DecoderFunctionArgs decoder_function_args)
 {
     DecodeReg(instruction_input, 0, 0, decoding_context);
 
-    Instruction instruction = {MNEMONIC_PUSH};
+    Instruction instruction = {decoder_function_args.mnemonic};
     DecodeOperandRegister(&instruction.operands[0], decoding_context, true);
 
     return instruction;
 }
 
+Instruction DecodeStackOperationSegmentRegister(InstructionInput *instruction_input,
+                                                DecodingContext *decoding_context,
+                                                DecoderFunctionArgs decoder_function_args)
+{
+    DecodeSR(instruction_input, 0, 3, decoding_context);
+
+    Instruction instruction = {decoder_function_args.mnemonic};
+    DecodeOperandSegmentRegister(&instruction.operands[0], decoding_context);
+
+    return instruction;
+}
 
 InstructionDecodeSpec INSTRUCTION_DECODE_SPECS[256] = {
     /* 00000000 - 00000011 [  0 -   3] */ REPEAT_4({DecodeADDRegisterOrMemoryToEither}),
     /* 00000100 - 00000101 [  4 -   5] */ REPEAT_2({DecodeADDImmediateToAccumulator}),
-    /* 00000110 - 00100111 [  6 -  39] */ REPEAT_34({DecodeUnsupported}),
+    /* 00000110 - 00000110 [  6 -   6] */ {DecodeStackOperationSegmentRegister, MNEMONIC_PUSH},
+    /* 00000111 - 00000111 [  7 -   7] */ {DecodeStackOperationSegmentRegister, MNEMONIC_POP},
+    /* 00001000 - 00001101 [  8 -  13] */ REPEAT_6({DecodeUnsupported}),
+    /* 00001110 - 00001110 [ 14 -  14] */ {DecodeStackOperationSegmentRegister, MNEMONIC_PUSH},
+    /* 00001111 - 00001111 [ 15 -  15] */ {DecodeStackOperationSegmentRegister, MNEMONIC_POP},
+    /* 00010000 - 00010101 [ 16 -  21] */ REPEAT_6({DecodeUnsupported}),
+    /* 00010110 - 00010110 [ 22 -  22] */ {DecodeStackOperationSegmentRegister, MNEMONIC_PUSH},
+    /* 00010111 - 00010111 [ 23 -  23] */ {DecodeStackOperationSegmentRegister, MNEMONIC_POP},
+    /* 00011000 - 00011101 [ 24 -  29] */ REPEAT_6({DecodeStackOperationSegmentRegister, MNEMONIC_PUSH}),
+    /* 00011110 - 00011110 [ 30 -  30] */ {DecodeStackOperationSegmentRegister, MNEMONIC_PUSH},
+    /* 00011111 - 00011111 [ 31 -  31] */ {DecodeStackOperationSegmentRegister, MNEMONIC_POP},
+    /* 00100000 - 00100111 [ 32 -  39] */ REPEAT_8({DecodeUnsupported}),
     /* 00101000 - 00101011 [ 40 -  43] */ REPEAT_4({DecodeSUBRegisterOrMemoryFromEither}),
     /* 00101100 - 00101101 [ 44 -  45] */ REPEAT_2({DecodeSUBImmediateFromAccumulator}),
     /* 00101110 - 00110111 [ 46 -  55] */ REPEAT_10({DecodeUnsupported}),
     /* 00111000 - 00111011 [ 56 -  59] */ REPEAT_4({DecodeCMPRegisterOrMemoryWithEither}),
     /* 00111100 - 00111101 [ 60 -  61] */ REPEAT_2({DecodeCMPImmediateWithAccumulator}),
     /* 00111110 - 01101111 [ 62 -  79] */ REPEAT_18({DecodeUnsupported}),
-    /* 01010000 - 01010111 [ 80 -  87] */ REPEAT_8({DecodePUSHRegister}),
-    /* 00111110 - 01101111 [ 88 - 111] */ REPEAT_24({DecodeUnsupported}),
+    /* 01010000 - 01010111 [ 80 -  87] */ REPEAT_8({DecodeStackOperationRegister, MNEMONIC_PUSH}),
+    /* 00111110 - 01011111 [ 88 -  95] */ REPEAT_8({DecodeStackOperationRegister, MNEMONIC_POP}),
+    /* 01100000 - 01101111 [ 96 - 111] */ REPEAT_16({DecodeUnsupported}),
     /* 01110000 - 01110000 [112 - 112] */ {DecodeReturnFromCall, MNEMONIC_JO},
     /* 01110001 - 01110001 [113 - 113] */ {DecodeReturnFromCall, MNEMONIC_JNO},
     /* 01110010 - 01110010 [114 - 114] */ {DecodeReturnFromCall, MNEMONIC_JB_JNAE},
@@ -282,7 +305,9 @@ InstructionDecodeSpec INSTRUCTION_DECODE_SPECS[256] = {
     /* 10000000 - 10000011 [128 - 131] */ REPEAT_4({DecodeSignedArithmeticImmediateAndRegisterOrMemory}),
     /* 10000100 - 10000111 [132 - 135] */ REPEAT_4({DecodeUnsupported}),
     /* 10001000 - 10001011 [136 - 139] */ REPEAT_4({DecodeMOVRegisterOrMemoryToEither}),
-    /* 10001100 - 10011111 [140 - 159] */ REPEAT_20({DecodeUnsupported}),
+    /* 10001100 - 10001110 [140 - 142] */ REPEAT_3({DecodeUnsupported}),
+    /* 10001111 - 10001111 [143 - 143] */ {DecodeStackOperationRegisterOrMemory, MNEMONIC_POP},
+    /* 10010000 - 10011111 [144 - 159] */ REPEAT_16({DecodeUnsupported}),
     /* 10100000 - 10100001 [160 - 161] */ REPEAT_2({DecodeMOVMemoryToAccumulator}),
     /* 10100010 - 10100011 [162 - 163] */ REPEAT_2({DecodeMOVAccumulatorToMemory}),
     /* 10100100 - 10101111 [164 - 175] */ REPEAT_12({DecodeUnsupported}),
@@ -295,7 +320,7 @@ InstructionDecodeSpec INSTRUCTION_DECODE_SPECS[256] = {
     /* 11100010 - 11100010 [226 - 226] */ {DecodeReturnFromCall, MNEMONIC_LOOP},
     /* 11100011 - 11100011 [227 - 227] */ {DecodeReturnFromCall, MNEMONIC_JCXZ},
     /* 11100100 - 11111110 [228 - 254] */ REPEAT_27({DecodeUnsupported}),
-    /* 11111111 - 11111111 [255 - 255] */ {DecodePUSHRegisterOrMemory}
+    /* 11111111 - 11111111 [255 - 255] */ {DecodeStackOperationRegisterOrMemory, MNEMONIC_PUSH}
 };
 
 Instruction DecodeInstruction(InstructionInput *instruction_input,

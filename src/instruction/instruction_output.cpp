@@ -17,13 +17,18 @@ const char *REGISTER_NAMES[] = {
     "sp",
     "bp",
     "si",
-    "di"
+    "di",
+    "es",
+    "cs",
+    "ss",
+    "ds"
 };
 
 const char *MNEMONIC_STRINGS[] = {
     0,
     "mov",
     "push",
+    "pop",
     "add",
     "sub",
     "cmp",
@@ -136,6 +141,6 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
         }
     }
 
-    asm_string_idx += sprintf(asm_string + asm_string_idx, "\n");
-    fprintf(output_stream, "%s", asm_string);
+    sprintf(asm_string + asm_string_idx, "\0");
+    fprintf(output_stream, "%s\n", asm_string);
 }
