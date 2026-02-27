@@ -37,11 +37,11 @@ Register SEGMENT_REGISTERS[] = {
     REGISTER_DS
 };
 
-void SetEffectiveAddressRegisters(Operand *operand, Register *registers)
+void SetEffectiveAddressRegisters(Operand *operand, Register *effective_address_registers)
 {
-    for (uint8_t i = 0; i < REGISTERS_MAX_LEN; ++i)
+    for (uint8_t i = 0; i < ARRAY_SIZE(operand->memory_address.registers); ++i)
     {
-        operand->memory_address.registers[i] = registers[i];
+        operand->memory_address.registers[i] = effective_address_registers[i];
     }
 }
 
@@ -140,18 +140,17 @@ void DecodeOperandImmediate(Operand *operand, DecodingContext *decoding_context)
     operand->immediate_value = decoding_context->data;
 }
 
-void DecodeOperandAccumulator(Operand *left_operand, DecodingContext *decoding_context)
+void DecodeOperandAccumulator(Operand *operand, DecodingContext *decoding_context)
 {
-    left_operand->type = OPERAND_TYPE_REGISTER;
-    left_operand->register_ = decoding_context->w == 0 ? REGISTER_AL : REGISTER_AX;
-    // left_operand->register_ = REGISTER_AX;
+    operand->type = OPERAND_TYPE_REGISTER;
+    operand->register_ = decoding_context->w == 0 ? REGISTER_AL : REGISTER_AX;
 }
 
-void DecodeOperandDirectAddress(Operand *right_operand, DecodingContext *decoding_context)
+void DecodeOperandDirectAddress(Operand *operand, DecodingContext *decoding_context)
 {
-    right_operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
-    right_operand->memory_address.direct = true;
-    right_operand->memory_address.displacement = decoding_context->addr;
+    operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
+    operand->memory_address.direct = true;
+    operand->memory_address.displacement = decoding_context->addr;
 }
 
 void DecodeOperandLabelLikeDisplacement(Operand *operand, DecodingContext *decoding_context)

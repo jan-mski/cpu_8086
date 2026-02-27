@@ -92,8 +92,13 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
     for (size_t operand_idx = 0; operand_idx < ARRAY_SIZE(instruction->operands); ++operand_idx)
     {
         Operand *operand = &instruction->operands[operand_idx];
-        asm_string_idx += sprintf(asm_string + asm_string_idx,
-            (operand_idx == 0 && operand->type != OPERAND_TYPE_NONE) ? " " : ", ");
+
+        if (operand->type == OPERAND_TYPE_NONE)
+        {
+            continue;
+        }
+
+        asm_string_idx += sprintf(asm_string + asm_string_idx, operand_idx == 0 ? " " : ", ");
 
         switch (operand->type)
         {
@@ -118,7 +123,7 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
                 }
                 else
                 {
-                    for (size_t register_idx = 0; register_idx < REGISTERS_MAX_LEN; ++register_idx)
+                    for (size_t register_idx = 0; register_idx < ARRAY_SIZE(memory_address->registers); ++register_idx)
                     {
                         const char *register_name = GetRegisterName(memory_address->registers[register_idx]);
                         if (!register_name)

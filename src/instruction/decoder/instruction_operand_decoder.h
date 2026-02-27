@@ -6,5 +6,5 @@ void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
 void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context, bool is_instruction_wide = false);
 void DecodeOperandSegmentRegister(Operand *operand, DecodingContext *decoding_context);
 void DecodeOperandImmediate(Operand *operand, DecodingContext *decoding_context);
-void DecodeOperandAccumulator(Operand *left_operand, DecodingContext *decoding_context);
-void DecodeOperandDirectAddress(Operand *right_operand, DecodingContext *decoding_context);
+void DecodeOperandAccumulator(Operand *operand, DecodingContext *decoding_context);
+void DecodeOperandDirectAddress(Operand *operand, DecodingContext *decoding_context);

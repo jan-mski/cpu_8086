@@ -22,6 +22,7 @@
 
 void DecodeInstructions(FILE *output_stream, FILE *input_stream)
 {
+    InitializeInstructionDecodeSpecs();
     InstructionInput instruction_input = {input_stream};
     DecodingContext decoding_context = {};
 
