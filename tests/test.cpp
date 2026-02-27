@@ -55,19 +55,14 @@ TEST_CASE("Instructions are decoded correctly")
 
     const int match = (assembled_size == input_size) && (memcmp(assembled_data, original_data, assembled_size) == 0);
 
-    if (!match) {
-        printf("Invalid output for file '%s':\n", file_name);
-
-        asm_file = fopen("test.asm", "r");
-
-        char output_buffer[64];
-        while (fgets(output_buffer, 64, asm_file) != 0)
-        {
-            printf("%s", output_buffer);
-        }
-
-        fclose(asm_file);
+    printf("Output for file (match=%i)'%s':\n", match, file_name);
+    asm_file = fopen("test.asm", "r");
+    char output_buffer[64];
+    while (fgets(output_buffer, 64, asm_file) != 0)
+    {
+        printf("%s", output_buffer);
     }
+    fclose(asm_file);
 
     free(assembled_data);
     free(original_data);

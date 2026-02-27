@@ -1,9 +1,11 @@
 ﻿void DecodeW(uint8_t w_shift, DecodingContext *decoding_context);
 void DecodeD(uint8_t d_shift, DecodingContext *decoding_context);
 void DecodeS(uint8_t s_shift, DecodingContext *decoding_context);
-void DecodeModAndRM(InstructionInput *instruction_input, uint8_t mod_shift, uint8_t r_m_shift, DecodingContext *decoding_context);
+void DecodeMod(InstructionInput *instruction_input, uint8_t mod_shift, DecodingContext *decoding_context);
+void DecodeRM(InstructionInput *instruction_input, uint8_t r_m_shift, DecodingContext *decoding_context);
+
 void DecodeReg(InstructionInput *instruction_input, uint8_t reg_byte_index, uint8_t reg_shift, DecodingContext *decoding_context);
-void DecodeData(InstructionInput *instruction_input, uint8_t data_byte_1_index, DecodingContext *decoding_context);
+void DecodeData(InstructionInput *instruction_input, DecodingContext *decoding_context);
 void DecodeAddr(InstructionInput *instruction_input, DecodingContext *decoding_context);
 void DecodeArithmeticMnemonic(InstructionInput *instruction_input, DecodingContext *decoding_context);
 uint8_t DecodeDisplacement8Bit(InstructionInput *instruction_input, uint8_t displacement_byte_1_index, DecodingContext *decoding_context);

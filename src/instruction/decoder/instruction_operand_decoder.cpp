@@ -51,10 +51,9 @@ void SetEffectiveAddressNoDisplacement(Operand *operand, DecodingContext *decodi
     SetEffectiveAddressRegisters(operand, EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m]);
 }
 
-void SetDirectAddress(Operand *operand, DecodingContext *decoding_context)
+void SetDirectAddressFromDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
-
     MemoryAddress *memory_address = &operand->memory_address;
     memory_address->direct = true;
     memory_address->displacement = decoding_context->displacement;
@@ -63,7 +62,6 @@ void SetDirectAddress(Operand *operand, DecodingContext *decoding_context)
 void SetEffectiveAddressWithDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
-
     MemoryAddress *memory_address = &operand->memory_address;
     SetEffectiveAddressRegisters(operand, EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m]);
     memory_address->displacement = decoding_context->displacement;
@@ -85,7 +83,7 @@ void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
         {
             if (decoding_context->r_m == 0b110)
             {
-                SetDirectAddress(operand, decoding_context);
+                SetDirectAddressFromDisplacement(operand, decoding_context);
             } else
             {
                 SetEffectiveAddressNoDisplacement(operand, decoding_context);

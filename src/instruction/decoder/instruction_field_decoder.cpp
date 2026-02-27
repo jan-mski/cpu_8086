@@ -15,13 +15,15 @@ void DecodeS(uint8_t s_shift, DecodingContext *decoding_context)
     decoding_context->s = (decoding_context->bytes[0] >> s_shift) & 0b1;
 }
 
-void DecodeModAndRM(InstructionInput *instruction_input,
-                    uint8_t mod_shift,
-                    uint8_t r_m_shift,
-                    DecodingContext *decoding_context)
+void DecodeMod(InstructionInput *instruction_input, uint8_t mod_shift, DecodingContext *decoding_context)
 {
     ReadNextBytesToIndex(instruction_input, decoding_context, 1);
     decoding_context->mod = (decoding_context->bytes[1] >> mod_shift) & 0b11;
+}
+
+void DecodeRM(InstructionInput *instruction_input, uint8_t r_m_shift, DecodingContext *decoding_context)
+{
+    ReadNextBytesToIndex(instruction_input, decoding_context, 1);
     decoding_context->r_m = (decoding_context->bytes[1] >> r_m_shift) & 0b111;
 }
 
@@ -44,16 +46,16 @@ void DecodeSR(InstructionInput *instruction_input,
 }
 
 void DecodeData(InstructionInput *instruction_input,
-                uint8_t data_byte_1_index,
                 DecodingContext *decoding_context)
 {
+    uint8_t data_byte_1_index = decoding_context->num_bytes_read;
     if (decoding_context->w == 0 || decoding_context->s == 1)
     {
         ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_1_index);
         decoding_context->data = decoding_context->bytes[data_byte_1_index];
     } else if (decoding_context->s == 0)
     {
-        uint8_t data_byte_2_index = data_byte_1_index + 1;
+        uint8_t data_byte_2_index = decoding_context->num_bytes_read + 1;
         ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_2_index);
         decoding_context->data = (decoding_context->bytes[data_byte_2_index] << 8) | decoding_context->bytes[data_byte_1_index];
     }
