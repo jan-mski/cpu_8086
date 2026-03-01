@@ -34,6 +34,8 @@ struct FieldSpec
     FieldTypeSpec type_spec;
     uint8_t byte_index;
     uint8_t bit_shift;
+    bool is_forced;
+    uint8_t forced_value;
 };
 
 struct InstructionSpec
@@ -41,7 +43,6 @@ struct InstructionSpec
     Mnemonic mnemonic;
     FieldSpec field_specs[7];
     OperandTypeSpec operand_type_specs[2];
-    bool is_instruction_wide;
 };
 
 typedef Instruction (*inst_decoder_t)(InstructionInput *instruction_input, DecodingContext *decoding_context, InstructionSpec decoder_function_args);

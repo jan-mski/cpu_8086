@@ -1,18 +1,24 @@
 ﻿typedef uint8_t (*displacement_decoder_t)(DecodingContext *decoding_context);
 
-void DecodeW(uint8_t w_shift, DecodingContext *decoding_context)
+void DecodeW(FieldSpec field_spec, DecodingContext *decoding_context)
 {
-    decoding_context->w = (decoding_context->bytes[0] >> w_shift) & 0b1;
+    decoding_context->w = field_spec.is_forced
+                           ? field_spec.forced_value
+                           : (decoding_context->bytes[field_spec.byte_index] >> field_spec.bit_shift) & 0b1;
 }
 
-void DecodeD(uint8_t d_shift, DecodingContext *decoding_context)
+void DecodeD(FieldSpec field_spec, DecodingContext *decoding_context)
 {
-    decoding_context->d = (decoding_context->bytes[0] >> d_shift) & 0b1;
+    decoding_context->d = field_spec.is_forced
+                              ? field_spec.forced_value
+                              : (decoding_context->bytes[field_spec.byte_index] >> field_spec.bit_shift) & 0b1;
 }
 
-void DecodeS(uint8_t s_shift, DecodingContext *decoding_context)
+void DecodeS(FieldSpec field_spec, DecodingContext *decoding_context)
 {
-    decoding_context->s = (decoding_context->bytes[0] >> s_shift) & 0b1;
+    decoding_context->s = field_spec.is_forced
+                             ? field_spec.forced_value
+                             : (decoding_context->bytes[field_spec.byte_index] >> field_spec.bit_shift) & 0b1;
 }
 
 void DecodeMod(InstructionInput *instruction_input, uint8_t mod_shift, DecodingContext *decoding_context)

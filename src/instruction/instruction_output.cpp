@@ -29,6 +29,7 @@ const char *MNEMONIC_STRINGS[] = {
     "mov",
     "push",
     "pop",
+    "xchg",
     "add",
     "sub",
     "cmp",

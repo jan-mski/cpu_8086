@@ -74,8 +74,7 @@ void SetRegisterName(Operand *operand, uint8_t w, uint8_t reg_or_r_m)
 }
 
 void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
-                                          DecodingContext *decoding_context,
-                                          bool is_instruction_wide)
+                                          DecodingContext *decoding_context)
 {
     switch (decoding_context->mod)
     {
@@ -101,15 +100,15 @@ void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
         } break;
     }
 
-    MemoryAddressQualifier qualifier = (is_instruction_wide || decoding_context->w == 1)
+    MemoryAddressQualifier qualifier = decoding_context->w == 1
                                            ? MEMORY_ADDRESS_QUALIFIER_WORD
                                            : MEMORY_ADDRESS_QUALIFIER_BYTE;
     operand->memory_address.qualifier = qualifier;
 }
 
-void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context, bool is_instruction_wide)
+void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context)
 {
-    SetRegisterName(operand, (is_instruction_wide || decoding_context->w), decoding_context->reg);
+    SetRegisterName(operand, decoding_context->w, decoding_context->reg);
 }
 
 void DecodeOperandSegmentRegister(Operand *operand, DecodingContext *decoding_context)
@@ -141,7 +140,9 @@ void DecodeOperandImmediate(Operand *operand, DecodingContext *decoding_context)
 void DecodeOperandAccumulator(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OPERAND_TYPE_REGISTER;
-    operand->register_ = decoding_context->w == 0 ? REGISTER_AL : REGISTER_AX;
+    operand->register_ = decoding_context->w == 1
+                             ? REGISTER_AX
+                             : REGISTER_AL;
 }
 
 void DecodeOperandDirectAddress(Operand *operand, DecodingContext *decoding_context)

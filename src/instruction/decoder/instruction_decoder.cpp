@@ -11,6 +11,9 @@
 #define ADDR FIELD_TYPE_SPEC_ADDR
 #define ARITHM_MNEMO FIELD_TYPE_SPEC_ARITHMETIC_MNEMO
 
+#define D_FORCED(forced_value) {D, 0, 0, 1, forced_value}
+#define W_FORCED(forced_value) {W, 0, 0, 1, forced_value}
+
 #define REGISTER OPERAND_TYPE_SPEC_REGISTER
 #define SEG_REGISTER OPERAND_TYPE_SPEC_SEGMENT_REGISTER
 #define ACCUMULATOR OPERAND_TYPE_SPEC_ACCUMULATOR
@@ -100,22 +103,22 @@ InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 01001101 */ {},
     /* 01001110 */ {},
     /* 01001111 */ {},
-    /* 01010000 */ {MNEMONIC_PUSH, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01010001 */ {MNEMONIC_PUSH, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01010010 */ {MNEMONIC_PUSH, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01010011 */ {MNEMONIC_PUSH, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01010100 */ {MNEMONIC_PUSH, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01010101 */ {MNEMONIC_PUSH, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01010110 */ {MNEMONIC_PUSH, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01010111 */ {MNEMONIC_PUSH, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01011000 */ {MNEMONIC_POP, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01011001 */ {MNEMONIC_POP, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01011010 */ {MNEMONIC_POP, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01011011 */ {MNEMONIC_POP, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01011100 */ {MNEMONIC_POP, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01011101 */ {MNEMONIC_POP, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01011110 */ {MNEMONIC_POP, {{REG, 0, 0}}, {REGISTER}, true},
-    /* 01011111 */ {MNEMONIC_POP, {{REG, 0, 0}}, {REGISTER}, true},
+    /* 01010000 */ {MNEMONIC_PUSH, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01010001 */ {MNEMONIC_PUSH, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01010010 */ {MNEMONIC_PUSH, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01010011 */ {MNEMONIC_PUSH, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01010100 */ {MNEMONIC_PUSH, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01010101 */ {MNEMONIC_PUSH, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01010110 */ {MNEMONIC_PUSH, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01010111 */ {MNEMONIC_PUSH, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01011000 */ {MNEMONIC_POP, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01011001 */ {MNEMONIC_POP, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01011010 */ {MNEMONIC_POP, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01011011 */ {MNEMONIC_POP, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01011100 */ {MNEMONIC_POP, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01011101 */ {MNEMONIC_POP, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01011110 */ {MNEMONIC_POP, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
+    /* 01011111 */ {MNEMONIC_POP, {W_FORCED(1), {REG, 0, 0}}, {REGISTER}},
     /* 01100000 */ {},
     /* 01100001 */ {},
     /* 01100010 */ {},
@@ -154,8 +157,8 @@ InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 10000011 */ {MNEMONIC_NONE, {{S, 0, 1}, {ARITHM_MNEMO}, {W, 0, 0}, {MOD, 1, 6}, {RM, 1, 0}, {DISP}, {DATA}}, {REG_OR_MEM_ADDR, IMMEDIATE}},
     /* 10000100 */ {},
     /* 10000101 */ {},
-    /* 10000110 */ {},
-    /* 10000111 */ {},
+    /* 10000110 */ {MNEMONIC_XCHG, {D_FORCED(1), {W, 0, 0}, {MOD, 1, 6}, {REG, 1, 3}, {RM, 1, 0}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
+    /* 10000111 */ {MNEMONIC_XCHG, {D_FORCED(1), {W, 0, 0}, {MOD, 1, 6}, {REG, 1, 3}, {RM, 1, 0}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
     /* 10001000 */ {MNEMONIC_MOV, {{D, 0, 1}, {W, 0, 0}, {MOD, 1, 6}, {RM, 1, 0}, {REG, 1, 3}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
     /* 10001001 */ {MNEMONIC_MOV, {{D, 0, 1}, {W, 0, 0}, {MOD, 1, 6}, {RM, 1, 0}, {REG, 1, 3}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
     /* 10001010 */ {MNEMONIC_MOV, {{D, 0, 1}, {W, 0, 0}, {MOD, 1, 6}, {RM, 1, 0}, {REG, 1, 3}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
@@ -163,15 +166,15 @@ InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 10001100 */ {},
     /* 10001101 */ {},
     /* 10001110 */ {},
-    /* 10001111 */ {MNEMONIC_POP, {{MOD, 1, 6}, {RM, 1, 0}, {DISP}}, {REG_OR_MEM_ADDR}, true},
-    /* 10010000 */ {},
-    /* 10010001 */ {},
-    /* 10010010 */ {},
-    /* 10010011 */ {},
-    /* 10010100 */ {},
-    /* 10010101 */ {},
-    /* 10010110 */ {},
-    /* 10010111 */ {},
+    /* 10001111 */ {MNEMONIC_POP, {W_FORCED(1), {MOD, 1, 6}, {RM, 1, 0}, {DISP}}, {REG_OR_MEM_ADDR}},
+    /* 10010000 */ {MNEMONIC_XCHG, {W_FORCED(1), {REG, 0, 0}}, {REGISTER, ACCUMULATOR}},
+    /* 10010001 */ {MNEMONIC_XCHG, {W_FORCED(1), {REG, 0, 0}}, {REGISTER, ACCUMULATOR}},
+    /* 10010010 */ {MNEMONIC_XCHG, {W_FORCED(1), {REG, 0, 0}}, {REGISTER, ACCUMULATOR}},
+    /* 10010011 */ {MNEMONIC_XCHG, {W_FORCED(1), {REG, 0, 0}}, {REGISTER, ACCUMULATOR}},
+    /* 10010100 */ {MNEMONIC_XCHG, {W_FORCED(1), {REG, 0, 0}}, {REGISTER, ACCUMULATOR}},
+    /* 10010101 */ {MNEMONIC_XCHG, {W_FORCED(1), {REG, 0, 0}}, {REGISTER, ACCUMULATOR}},
+    /* 10010110 */ {MNEMONIC_XCHG, {W_FORCED(1), {REG, 0, 0}}, {REGISTER, ACCUMULATOR}},
+    /* 10010111 */ {MNEMONIC_XCHG, {W_FORCED(1), {REG, 0, 0}}, {REGISTER, ACCUMULATOR}},
     /* 10011000 */ {},
     /* 10011001 */ {},
     /* 10011010 */ {},
@@ -275,7 +278,7 @@ InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 11111100 */ {},
     /* 11111101 */ {},
     /* 11111110 */ {},
-    /* 11111111 */ {MNEMONIC_PUSH, {{MOD, 1, 6}, {RM, 1, 0}, {DISP}}, {REG_OR_MEM_ADDR}, true},
+    /* 11111111 */ {MNEMONIC_PUSH, {W_FORCED(1), {MOD, 1, 6}, {RM, 1, 0}, {DISP}}, {REG_OR_MEM_ADDR}},
 };
 
 Mnemonic SIGNED_ARITHMETIC_MNEMONICS[] = {
@@ -312,15 +315,15 @@ Instruction DecodeInstruction(InstructionInput *instruction_input,
             } break;
             case FIELD_TYPE_SPEC_D:
             {
-                DecodeD(field_spec.bit_shift, decoding_context);
+                DecodeD(field_spec, decoding_context);
             } break;
             case FIELD_TYPE_SPEC_S:
             {
-                DecodeS(field_spec.bit_shift, decoding_context);
+                DecodeS(field_spec, decoding_context);
             } break;
             case FIELD_TYPE_SPEC_W:
             {
-                DecodeW(field_spec.bit_shift, decoding_context);
+                DecodeW(field_spec, decoding_context);
             } break;
             case FIELD_TYPE_SPEC_MOD:
             {
@@ -387,7 +390,7 @@ Instruction DecodeInstruction(InstructionInput *instruction_input,
             } break;
             case OPERAND_TYPE_SPEC_REGISTER:
             {
-                DecodeOperandRegister(&instruction.operands[i], decoding_context, instruction_spec->is_instruction_wide);
+                DecodeOperandRegister(&instruction.operands[i], decoding_context);
             } break;
             case OPERAND_TYPE_SPEC_SEGMENT_REGISTER:
             {
@@ -395,7 +398,7 @@ Instruction DecodeInstruction(InstructionInput *instruction_input,
             } break;
             case OPERAND_TYPE_SPEC_REGISTER_OR_MEMORY_ADDRESS:
             {
-                DecodeOperandRegisterOrMemoryAddress(&instruction.operands[i], decoding_context, instruction_spec->is_instruction_wide);
+                DecodeOperandRegisterOrMemoryAddress(&instruction.operands[i], decoding_context);
             } break;
             case OPERAND_TYPE_SPEC_DIRECT_MEMORY_ADDRESS:
             {
