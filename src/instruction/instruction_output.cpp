@@ -31,6 +31,7 @@ const char *MNEMONIC_STRINGS[] = {
     "pop",
     "xchg",
     "in",
+    "out",
     "add",
     "sub",
     "cmp",

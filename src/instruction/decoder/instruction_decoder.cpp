@@ -255,16 +255,16 @@ InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 11100011 */ {MNEMONIC_JCXZ, {{DISP_8, 1}}, {LABEL_DISP}},
     /* 11100100 */ {MNEMONIC_IN, {{W, 0, 0}, {DATA_8}}, {ACCUMULATOR, IMMEDIATE}},
     /* 11100101 */ {MNEMONIC_IN, {{W, 0, 0}, {DATA_8}}, {ACCUMULATOR, IMMEDIATE}},
-    /* 11100110 */ {},
-    /* 11100111 */ {},
+    /* 11100110 */ {MNEMONIC_OUT, {{W, 0, 0}, {DATA_8}}, {IMMEDIATE, ACCUMULATOR}},
+    /* 11100111 */ {MNEMONIC_OUT, {{W, 0, 0}, {DATA_8}}, {IMMEDIATE, ACCUMULATOR}},
     /* 11101000 */ {},
     /* 11101001 */ {},
     /* 11101010 */ {},
     /* 11101011 */ {},
     /* 11101100 */ {MNEMONIC_IN, {{W, 0, 0}}, {ACCUMULATOR, DATA_REG}},
     /* 11101101 */ {MNEMONIC_IN, {{W, 0, 0}}, {ACCUMULATOR, DATA_REG}},
-    /* 11101110 */ {},
-    /* 11101111 */ {},
+    /* 11101110 */ {MNEMONIC_OUT, {{W, 0, 0}}, {DATA_REG, ACCUMULATOR}},
+    /* 11101111 */ {MNEMONIC_OUT, {{W, 0, 0}}, {DATA_REG, ACCUMULATOR}},
     /* 11110000 */ {},
     /* 11110001 */ {},
     /* 11110010 */ {},
@@ -420,11 +420,11 @@ Instruction DecodeInstruction(InstructionInput *instruction_input,
             } break;
             case OPERAND_TYPE_SPEC_IMMEDIATE:
             {
-                DecodeOperandImmediate(&instruction.operands[1], decoding_context);
+                DecodeOperandImmediate(&instruction.operands[i], decoding_context);
             } break;
             case OPERAND_TYPE_SPEC_LABEL_LIKE_DISPLACEMENT:
             {
-                DecodeOperandLabelLikeDisplacement(&instruction.operands[0], decoding_context);
+                DecodeOperandLabelLikeDisplacement(&instruction.operands[i], decoding_context);
             } break;
         }
     }
