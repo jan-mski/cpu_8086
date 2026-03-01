@@ -145,6 +145,12 @@ void DecodeOperandAccumulator(Operand *operand, DecodingContext *decoding_contex
                              : REGISTER_AL;
 }
 
+void DecodeOperandDataRegister(Operand *operand, DecodingContext *decoding_context)
+{
+    operand->type = OPERAND_TYPE_REGISTER;
+    operand->register_ = REGISTER_DX;
+}
+
 void DecodeOperandDirectAddress(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OPERAND_TYPE_MEMORY_ADDRESS;

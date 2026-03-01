@@ -51,19 +51,30 @@ void DecodeSR(InstructionInput *instruction_input,
     decoding_context->sr = (decoding_context->bytes[sr_byte_index] >> sr_shift) & 0b11;
 }
 
+void DecodeData8Bit(InstructionInput *instruction_input, DecodingContext *decoding_context) {
+    uint8_t data_byte_1_index = decoding_context->num_bytes_read;
+    ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_1_index);
+    decoding_context->data = decoding_context->bytes[data_byte_1_index];
+}
+
+void DecodeData16Bit(InstructionInput *instruction_input, DecodingContext *decoding_context)
+{
+    uint8_t data_byte_1_index = decoding_context->num_bytes_read;
+    uint8_t data_byte_2_index = data_byte_1_index + 1;
+    ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_2_index);
+    decoding_context->data = (decoding_context->bytes[data_byte_2_index] << 8) |
+                             decoding_context->bytes[data_byte_1_index];
+}
+
 void DecodeData(InstructionInput *instruction_input,
                 DecodingContext *decoding_context)
 {
-    uint8_t data_byte_1_index = decoding_context->num_bytes_read;
     if (decoding_context->w == 0 || decoding_context->s == 1)
     {
-        ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_1_index);
-        decoding_context->data = decoding_context->bytes[data_byte_1_index];
+        DecodeData8Bit(instruction_input, decoding_context);
     } else if (decoding_context->s == 0)
     {
-        uint8_t data_byte_2_index = decoding_context->num_bytes_read + 1;
-        ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_2_index);
-        decoding_context->data = (decoding_context->bytes[data_byte_2_index] << 8) | decoding_context->bytes[data_byte_1_index];
+        DecodeData16Bit(instruction_input, decoding_context);
     }
 }
 

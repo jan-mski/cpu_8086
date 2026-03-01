@@ -7,6 +7,7 @@
 #define SR FIELD_TYPE_SPEC_SR
 #define DISP_8 FIELD_TYPE_SPEC_DISP_8
 #define DISP FIELD_TYPE_SPEC_DISP
+#define DATA_8 FIELD_TYPE_SPEC_DATA_8
 #define DATA FIELD_TYPE_SPEC_DATA
 #define ADDR FIELD_TYPE_SPEC_ADDR
 #define ARITHM_MNEMO FIELD_TYPE_SPEC_ARITHMETIC_MNEMO
@@ -16,6 +17,7 @@
 
 #define REGISTER OPERAND_TYPE_SPEC_REGISTER
 #define SEG_REGISTER OPERAND_TYPE_SPEC_SEGMENT_REGISTER
+#define DATA_REG OPERAND_TYPE_SPEC_DATA_REGISTER
 #define ACCUMULATOR OPERAND_TYPE_SPEC_ACCUMULATOR
 #define REG_OR_MEM_ADDR OPERAND_TYPE_SPEC_REGISTER_OR_MEMORY_ADDRESS
 #define IMMEDIATE OPERAND_TYPE_SPEC_IMMEDIATE
@@ -251,16 +253,16 @@ InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 11100001 */ {MNEMONIC_LOOPZ_LOOPE, {{DISP_8, 1}}, {LABEL_DISP}},
     /* 11100010 */ {MNEMONIC_LOOP, {{DISP_8, 1}}, {LABEL_DISP}},
     /* 11100011 */ {MNEMONIC_JCXZ, {{DISP_8, 1}}, {LABEL_DISP}},
-    /* 11100100 */ {},
-    /* 11100101 */ {},
+    /* 11100100 */ {MNEMONIC_IN, {{W, 0, 0}, {DATA_8}}, {ACCUMULATOR, IMMEDIATE}},
+    /* 11100101 */ {MNEMONIC_IN, {{W, 0, 0}, {DATA_8}}, {ACCUMULATOR, IMMEDIATE}},
     /* 11100110 */ {},
     /* 11100111 */ {},
     /* 11101000 */ {},
     /* 11101001 */ {},
     /* 11101010 */ {},
     /* 11101011 */ {},
-    /* 11101100 */ {},
-    /* 11101101 */ {},
+    /* 11101100 */ {MNEMONIC_IN, {{W, 0, 0}}, {ACCUMULATOR, DATA_REG}},
+    /* 11101101 */ {MNEMONIC_IN, {{W, 0, 0}}, {ACCUMULATOR, DATA_REG}},
     /* 11101110 */ {},
     /* 11101111 */ {},
     /* 11110000 */ {},
@@ -349,6 +351,10 @@ Instruction DecodeInstruction(InstructionInput *instruction_input,
             {
                 DecodeDisplacement(instruction_input, decoding_context);
             } break;
+            case FIELD_TYPE_SPEC_DATA_8:
+            {
+                DecodeData8Bit(instruction_input, decoding_context);
+            } break;
             case FIELD_TYPE_SPEC_DATA:
             {
                 DecodeData(instruction_input, decoding_context);
@@ -395,6 +401,10 @@ Instruction DecodeInstruction(InstructionInput *instruction_input,
             case OPERAND_TYPE_SPEC_SEGMENT_REGISTER:
             {
                 DecodeOperandSegmentRegister(&instruction.operands[i], decoding_context);
+            } break;
+            case OPERAND_TYPE_SPEC_DATA_REGISTER:
+            {
+                DecodeOperandDataRegister(&instruction.operands[i], decoding_context);
             } break;
             case OPERAND_TYPE_SPEC_REGISTER_OR_MEMORY_ADDRESS:
             {

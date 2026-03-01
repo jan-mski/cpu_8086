@@ -4,6 +4,7 @@ void DecodeS(FieldSpec field_spec, DecodingContext *decoding_context);
 void DecodeMod(InstructionInput *instruction_input, uint8_t mod_shift, DecodingContext *decoding_context);
 void DecodeRM(InstructionInput *instruction_input, uint8_t r_m_shift, DecodingContext *decoding_context);
 void DecodeReg(InstructionInput *instruction_input, uint8_t reg_byte_index, uint8_t reg_shift, DecodingContext *decoding_context);
+void DecodeData8Bit(InstructionInput *instruction_input, DecodingContext *decoding_context);
 void DecodeData(InstructionInput *instruction_input, DecodingContext *decoding_context);
 void DecodeAddr(InstructionInput *instruction_input, DecodingContext *decoding_context);
 void DecodeArithmeticMnemonic(InstructionInput *instruction_input, DecodingContext *decoding_context);
