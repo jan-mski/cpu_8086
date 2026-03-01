@@ -41,12 +41,12 @@ InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 00001101 */ {},
     /* 00001110 */ {MNEMONIC_PUSH, {{SR, 0, 3}}, {SEG_REGISTER}},
     /* 00001111 */ {MNEMONIC_POP, {{SR, 0, 3}}, {SEG_REGISTER}},
-    /* 00010000 */ {},
-    /* 00010001 */ {},
-    /* 00010010 */ {},
-    /* 00010011 */ {},
-    /* 00010100 */ {},
-    /* 00010101 */ {},
+    /* 00010000 */ {MNEMONIC_ADC, {{D, 0, 1}, {W, 0, 0}, {MOD, 1, 6}, {RM, 1, 0}, {REG, 1, 3}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
+    /* 00010001 */ {MNEMONIC_ADC, {{D, 0, 1}, {W, 0, 0}, {MOD, 1, 6}, {RM, 1, 0}, {REG, 1, 3}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
+    /* 00010010 */ {MNEMONIC_ADC, {{D, 0, 1}, {W, 0, 0}, {MOD, 1, 6}, {RM, 1, 0}, {REG, 1, 3}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
+    /* 00010011 */ {MNEMONIC_ADC, {{D, 0, 1}, {W, 0, 0}, {MOD, 1, 6}, {RM, 1, 0}, {REG, 1, 3}, {DISP}}, {REG_OR_MEM_ADDR, REG_OR_MEM_ADDR}},
+    /* 00010100 */ {MNEMONIC_ADC, {{W, 0, 0}, {DATA}}, {ACCUMULATOR, IMMEDIATE}},
+    /* 00010101 */ {MNEMONIC_ADC, {{W, 0, 0}, {DATA}}, {ACCUMULATOR, IMMEDIATE}},
     /* 00010110 */ {MNEMONIC_PUSH, {{SR, 0, 3}}, {SEG_REGISTER}},
     /* 00010111 */ {MNEMONIC_POP, {{SR, 0, 3}}, {SEG_REGISTER}},
     /* 00011000 */ {MNEMONIC_PUSH, {{SR, 0, 3}}, {SEG_REGISTER}},
@@ -286,7 +286,7 @@ InstructionSpec INSTRUCTION_SPECS[256] = {
 Mnemonic SIGNED_ARITHMETIC_MNEMONICS[] = {
     MNEMONIC_ADD,
     MNEMONIC_NONE,
-    MNEMONIC_NONE, // "adc" - unsupported
+    MNEMONIC_ADC,
     MNEMONIC_NONE, // "sbb" - unsupported
     MNEMONIC_NONE,
     MNEMONIC_SUB,
