@@ -317,21 +317,21 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
         /* 000 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_TEST, {O_REG_OR_MEM, O_IMM}}},
         /* 001 */ {},
         /* 010 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_NOT, {O_REG_OR_MEM}} },
-        /* 011 */ {},  // NEG
-        /* 100 */ {},  // MUL
-        /* 101 */ {},  // IMUL
-        /* 110 */ {},  // DIV
-        /* 111 */ {},  // IDIV
+        /* 011 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_NEG, {O_REG_OR_MEM}} },
+        /* 100 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_MUL, {O_REG_OR_MEM}} },
+        /* 101 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_IMUL, {O_REG_OR_MEM}} },
+        /* 110 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_DIV, {O_REG_OR_MEM}} },
+        /* 111 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_IDIV, {O_REG_OR_MEM}} },
     }},
     /* 11110111 */ { .type = T_EXTENDED, .bodies {
         /* 000 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_TEST, {O_REG_OR_MEM, O_IMM}}},
         /* 001 */ {},
         /* 010 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_NOT, {O_REG_OR_MEM}} },
-        /* 011 */ {},  // NEG
-        /* 100 */ {},  // MUL
-        /* 101 */ {},  // IMUL
-        /* 110 */ {},  // DIV
-        /* 111 */ {},  // IDIV
+        /* 011 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_NEG, {O_REG_OR_MEM}} },
+        /* 100 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_MUL, {O_REG_OR_MEM}} },
+        /* 101 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_IMUL, {O_REG_OR_MEM}} },
+        /* 110 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_DIV, {O_REG_OR_MEM}} },
+        /* 111 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_IDIV, {O_REG_OR_MEM}} },
     }},
     /* 11111000 */ {},
     /* 11111001 */ {},
