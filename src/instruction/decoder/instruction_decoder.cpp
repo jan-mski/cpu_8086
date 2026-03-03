@@ -264,8 +264,8 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 10111111 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{W, 3}, {REG, 0}}, .byte_2 {{DATA}}, .byte_3456 {}, .format {MNEMONIC_MOV, {O_REG, O_IMM}}}}},
     /* 11000000 */ {},
     /* 11000001 */ {},
-    /* 11000010 */ {},
-    /* 11000011 */ {},
+    /* 11000010 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1)}, .byte_2 {{DATA}},                            .byte_3456 {},                     .format {MNEMONIC_RET, {O_IMM}}}}},
+    /* 11000011 */ { .type = T_REGULAR, .bodies {{ .byte_1 {},               .byte_2 {},                                     .byte_3456 {},                     .format {MNEMONIC_RET, {}}}}},
     /* 11000100 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1)}, .byte_2 {{MOD, 6}, {REG, 3}, {RM, 0}}, .byte_3456 {{DISP}},            .format {MNEMONIC_LES, {O_REG, O_REG_OR_MEM}}}}},
     /* 11000101 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1)}, .byte_2 {{MOD, 6}, {REG, 3}, {RM, 0}}, .byte_3456 {{DISP}},            .format {MNEMONIC_LDS, {O_REG, O_REG_OR_MEM}}}}},
     /* 11000110 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{W, 0}},      .byte_2 {{MOD, 6}, {RM, 0}},              .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_MOV, {O_REG_OR_MEM, O_IMM}}}}},
@@ -381,20 +381,20 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 11111110 */ { .type = T_EXTENDED, .bodies {
         /* 000 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_INC, {O_REG_OR_MEM}}},
         /* 001 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_DEC, {O_REG_OR_MEM}}},
-        /* 010 */ {},  // MNEMONIC_CALL
-        /* 011 */ {},  // MNEMONIC_CALL
-        /* 100 */ {},  // MNEMONIC_JMP
-        /* 101 */ {},  // MNEMONIC_JMP
+        /* 010 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_CALL, {O_REG_OR_MEM}}},
+        /* 011 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_CALL, {O_REG_OR_MEM}}},
+        /* 100 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_JMP, {O_REG_OR_MEM}}},
+        /* 101 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_JMP, {O_REG_OR_MEM}}},
         /* 110 */ { .byte_1 {W_FORCED(1)}, .byte_2 {{MOD, 6}, {RM, 0}}, .byte_3456 {{DISP}}, .format {MNEMONIC_PUSH, {O_REG_OR_MEM}}},
         /* 111 */ {},
     }},
     /* 11111111 */ { .type = T_EXTENDED, .bodies {
         /* 000 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_INC, {O_REG_OR_MEM}}},
         /* 001 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_DEC, {O_REG_OR_MEM}}},
-        /* 010 */ {},  // MNEMONIC_CALL
-        /* 011 */ {},  // MNEMONIC_CALL
-        /* 100 */ {},  // MNEMONIC_JMP
-        /* 101 */ {},  // MNEMONIC_JMP
+        /* 010 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_CALL, {O_REG_OR_MEM}}},
+        /* 011 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_CALL, {O_REG_OR_MEM}}},
+        /* 100 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_JMP, {O_REG_OR_MEM}}},
+        /* 101 */ { .byte_1 {{W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_JMP, {O_REG_OR_MEM}}},
         /* 110 */ { .byte_1 {W_FORCED(1)}, .byte_2 {{MOD, 6}, {RM, 0}}, .byte_3456 {{DISP}}, .format {MNEMONIC_PUSH, {O_REG_OR_MEM}}},
         /* 111 */ {},
     }},
