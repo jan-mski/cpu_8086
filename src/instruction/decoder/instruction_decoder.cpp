@@ -169,7 +169,7 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
         /* 011 */ { .byte_1 {{S, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_SBB, {O_REG_OR_MEM, O_IMM}}},
         /* 100 */ { .byte_1 {{S, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_AND, {O_REG_OR_MEM, O_IMM}}},
         /* 101 */ { .byte_1 {{S, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_SUB, {O_REG_OR_MEM, O_IMM}}},
-        /* 110 */ {},
+        /* 110 */ { .byte_1 {{W, 0}},            .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_XOR, {O_REG_OR_MEM, O_IMM}}},
         /* 111 */ { .byte_1 {{S, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_CMP, {O_REG_OR_MEM, O_IMM}}},
     }},
     /* 10000001 */ { .type = T_EXTENDED, .bodies {
@@ -179,7 +179,7 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
         /* 011 */ { .byte_1 {{S, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_SBB, {O_REG_OR_MEM, O_IMM}}},
         /* 100 */ { .byte_1 {{S, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_AND, {O_REG_OR_MEM, O_IMM}}},
         /* 101 */ { .byte_1 {{S, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_SUB, {O_REG_OR_MEM, O_IMM}}},
-        /* 110 */ {},
+        /* 110 */ { .byte_1 {{W, 0}},            .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_XOR, {O_REG_OR_MEM, O_IMM}}},
         /* 111 */ { .byte_1 {{S, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}, {DATA}}, .format {MNEMONIC_CMP, {O_REG_OR_MEM, O_IMM}}},
     }},
     /* 10000010 */ { .type = T_EXTENDED, .bodies {
