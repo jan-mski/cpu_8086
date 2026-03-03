@@ -71,6 +71,7 @@ const char *MNEMONIC_STRINGS[] = {
     "and",
     "test",
     "or",
+    "xor",
     "jo",
     "jno",
     "jb",
@@ -90,7 +91,16 @@ const char *MNEMONIC_STRINGS[] = {
     "loopnz",
     "loopz",
     "loop",
-    "jcxz"
+    "jcxz",
+    "clc",
+    "cmc",
+    "stc",
+    "cld",
+    "std",
+    "cli",
+    "sti",
+    "hlt",
+    "wait",
 };
 
 const char *MEMORY_ADDRESS_QUALIFIER_STRINGS[] = {
