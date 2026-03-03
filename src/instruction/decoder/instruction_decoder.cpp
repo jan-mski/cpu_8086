@@ -3,6 +3,7 @@
 
 #define D FIELD_TYPE_SPEC_D
 #define S FIELD_TYPE_SPEC_S
+#define V FIELD_TYPE_SPEC_V
 #define W FIELD_TYPE_SPEC_W
 #define MOD FIELD_TYPE_SPEC_MOD
 #define RM FIELD_TYPE_SPEC_RM
@@ -25,6 +26,7 @@
 #define O_IMM OPERAND_TYPE_SPEC_IMMEDIATE
 #define O_LABEL_DISP OPERAND_TYPE_SPEC_LABEL_LIKE_DISPLACEMENT
 #define O_DIRECT_ADDR OPERAND_TYPE_SPEC_DIRECT_MEMORY_ADDRESS
+#define O_SHIFT_CNT OPERAND_TYPE_SPEC_SHIFT_ROTATE_COUNT
 
 #define OPCODE_EXT_BYTE_FIELDS {{MOD, 6}, {FIELD_TYPE_SPEC_OPCODE_EXTENSION, 3}, {RM, 0}}
 
@@ -275,10 +277,46 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 11001101 */ {},
     /* 11001110 */ {},
     /* 11001111 */ {},
-    /* 11010000 */ {},
-    /* 11010001 */ {},
-    /* 11010010 */ {},
-    /* 11010011 */ {},
+    /* 11010000 */ { .type = T_EXTENDED, .bodies {
+        /* 000 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}},
+        /* 001 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_ROR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 010 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_RCL, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 011 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_RCR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 100 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 101 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SHR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 110 */ {},
+        /* 111 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SAR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+    }},
+    /* 11010001 */ { .type = T_EXTENDED, .bodies {
+        /* 000 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}},
+        /* 001 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_ROR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 010 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_RCL, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 011 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_RCR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 100 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 101 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SHR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 110 */ {},
+        /* 111 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SAR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+    }},
+    /* 11010010 */ { .type = T_EXTENDED, .bodies {
+        /* 000 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}},
+        /* 001 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_ROR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 010 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_RCL, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 011 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_RCR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 100 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 101 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SHR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 110 */ {},
+        /* 111 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SAR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+    }},
+    /* 11010011 */ { .type = T_EXTENDED, .bodies {
+        /* 000 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}},
+        /* 001 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_ROR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 010 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_RCL, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 011 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_RCR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 100 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 101 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SHR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+        /* 110 */ {},
+        /* 111 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SAR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
+    }},
     /* 11010100 */ {},
     /* 11010101 */ {},
     /* 11010110 */ {},
@@ -394,6 +432,10 @@ void DecodeByteFields(FieldSpec *byte_field_specs,
             {
                 DecodeS(field_spec, decoding_context);
             } break;
+            case FIELD_TYPE_SPEC_V:
+            {
+                DecodeV(field_spec, decoding_context);
+            } break;
             case FIELD_TYPE_SPEC_W:
             {
                 DecodeW(field_spec, decoding_context);
@@ -497,6 +539,10 @@ void DecodeOperands(Instruction *instruction, InstructionFormatSpec *instruction
             case OPERAND_TYPE_SPEC_LABEL_LIKE_DISPLACEMENT:
             {
                 DecodeOperandLabelLikeDisplacement(&instruction->operands[i], decoding_context);
+            } break;
+            case OPERAND_TYPE_SPEC_SHIFT_ROTATE_COUNT:
+            {
+                DecodeOperandShiftRotateCount(&instruction->operands[i], decoding_context);
             } break;
         }
     }

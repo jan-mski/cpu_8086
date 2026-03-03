@@ -7,3 +7,4 @@ void DecodeOperandAccumulator(Operand *operand, DecodingContext *decoding_contex
 void DecodeOperandDataRegister(Operand *operand, DecodingContext *decoding_context);
 void DecodeOperandDirectAddress(Operand *operand, DecodingContext *decoding_context);
 void DecodeOperandLabelLikeDisplacement(Operand *operand, DecodingContext *decoding_context);
+void DecodeOperandShiftRotateCount(Operand *operand, DecodingContext *decoding_context);

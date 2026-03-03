@@ -40,6 +40,13 @@ enum Mnemonic : uint8_t
     MNEMONIC_DIV,
     MNEMONIC_IDIV,
     MNEMONIC_NOT,
+    MNEMONIC_SHL_SAL,
+    MNEMONIC_SHR,
+    MNEMONIC_SAR,
+    MNEMONIC_ROL,
+    MNEMONIC_ROR,
+    MNEMONIC_RCL,
+    MNEMONIC_RCR,
     MNEMONIC_AND,
     MNEMONIC_TEST,
     MNEMONIC_OR,
@@ -101,9 +108,10 @@ struct DecodingContext
 {
     uint8_t bytes[INSTRUCTION_MAX_BYTES];
     uint8_t num_bytes_read;
-    bool w;                          // 1 bit
     bool d;                          // 1 bit
     bool s;                          // 1 bit
+    bool v;                          // 1 bit
+    bool w;                          // 1 bit
     uint8_t mod;                     // 2 bits
     uint8_t sr;                      // 2 bits
     uint8_t reg;                     // 3 bits

@@ -163,3 +163,17 @@ void DecodeOperandLabelLikeDisplacement(Operand *operand, DecodingContext *decod
     operand->type = OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT;
     operand->label_like_displacement = decoding_context->displacement;
 }
+
+void DecodeOperandShiftRotateCount(Operand *operand, DecodingContext *decoding_context)
+{
+    if (decoding_context->v == 0)
+    {
+        operand->type = OPERAND_TYPE_IMMEDIATE;
+        operand->immediate_value = 1;
+    } else
+    {
+        operand->type = OPERAND_TYPE_REGISTER;
+        operand->register_ = REGISTER_CL;
+    }
+
+}

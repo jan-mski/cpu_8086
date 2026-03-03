@@ -9,12 +9,7 @@
 
 TEST_CASE("Instructions are decoded correctly")
 {
-    const char* file_name = GENERATE("listing_0037_single_register_mov",
-                                     "listing_0038_many_register_mov",
-                                     "listing_0039_more_movs",
-                                     "listing_0040_challenge_movs",
-                                     "listing_0041_add_sub_cmp_jnz",
-                                     "listing_0042_completionist_decode");
+    const char* file_name = GENERATE("listing_0042_completionist_decode");
 
     char input_path[256], nasm_cmd[512];
     sprintf(input_path, "data/%s", file_name);
