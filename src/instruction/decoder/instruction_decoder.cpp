@@ -12,6 +12,7 @@
 #define DISP_8 FIELD_TYPE_SPEC_DISP_8
 #define DISP FIELD_TYPE_SPEC_DISP
 #define DATA_8 FIELD_TYPE_SPEC_DATA_8
+#define IGNORED_8 FIELD_TYPE_SPEC_DATA_8
 #define DATA FIELD_TYPE_SPEC_DATA
 #define ADDR FIELD_TYPE_SPEC_ADDR
 
@@ -72,7 +73,7 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 00100100 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{W, 0}},            .byte_2 {{DATA}},                            .byte_3456 {},          .format {MNEMONIC_AND, {O_ACC, O_IMM}} }}},
     /* 00100101 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{W, 0}},            .byte_2 {{DATA}},                            .byte_3456 {},          .format {MNEMONIC_AND, {O_ACC, O_IMM}} }}},
     /* 00100110 */ {},
-    /* 00100111 */ {},
+    /* 00100111 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_DAA, {}} }} },
     /* 00101000 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{D, 1}, {W, 0}}, .byte_2 {{MOD, 6}, {REG, 3}, {RM, 0}}, .byte_3456 {{DISP}}, .format {MNEMONIC_SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}}}},
     /* 00101001 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{D, 1}, {W, 0}}, .byte_2 {{MOD, 6}, {REG, 3}, {RM, 0}}, .byte_3456 {{DISP}}, .format {MNEMONIC_SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}}}},
     /* 00101010 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{D, 1}, {W, 0}}, .byte_2 {{MOD, 6}, {REG, 3}, {RM, 0}}, .byte_3456 {{DISP}}, .format {MNEMONIC_SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}}}},
@@ -80,7 +81,7 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 00101100 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{W, 0}},            .byte_2 {{DATA}},                            .byte_3456 {},          .format {MNEMONIC_SUB, {O_ACC, O_IMM}}}}},
     /* 00101101 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{W, 0}},            .byte_2 {{DATA}},                            .byte_3456 {},          .format {MNEMONIC_SUB, {O_ACC, O_IMM}}}}},
     /* 00101110 */ {},
-    /* 00101111 */ {},
+    /* 00101111 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_DAS, {}} }} },
     /* 00110000 */ {},
     /* 00110001 */ {},
     /* 00110010 */ {},
@@ -88,7 +89,7 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 00110100 */ {},
     /* 00110101 */ {},
     /* 00110110 */ {},
-    /* 00110111 */ {},
+    /* 00110111 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_AAA, {}} }} },
     /* 00111000 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{D, 1}, {W, 0}}, .byte_2 {{MOD, 6}, {REG, 3}, {RM, 0}}, .byte_3456 {{DISP}}, .format {MNEMONIC_CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}}}},
     /* 00111001 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{D, 1}, {W, 0}}, .byte_2 {{MOD, 6}, {REG, 3}, {RM, 0}}, .byte_3456 {{DISP}}, .format {MNEMONIC_CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}}}},
     /* 00111010 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{D, 1}, {W, 0}}, .byte_2 {{MOD, 6}, {REG, 3}, {RM, 0}}, .byte_3456 {{DISP}}, .format {MNEMONIC_CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}}}},
@@ -96,7 +97,7 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 00111100 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{W, 0}},            .byte_2 {{DATA}},                            .byte_3456 {},          .format {MNEMONIC_CMP, {O_ACC, O_IMM}}}}},
     /* 00111101 */ { .type = T_REGULAR, .bodies {{ .byte_1 {{W, 0}},            .byte_2 {{DATA}},                            .byte_3456 {},          .format {MNEMONIC_CMP, {O_ACC, O_IMM}}}}},
     /* 00111110 */ {},
-    /* 00111111 */ {},
+    /* 00111111 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_AAS, {}} }} },
     /* 01000000 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1), {REG, 0}}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_INC, {O_REG}}}} },
     /* 01000001 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1), {REG, 0}}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_INC, {O_REG}}}} },
     /* 01000010 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1), {REG, 0}}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_INC, {O_REG}}}} },
@@ -221,8 +222,8 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 10010101 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1), {REG, 0}}, .byte_2 {},                                         .byte_3456 {},                     .format {MNEMONIC_XCHG, {O_REG, O_ACC}}}}},
     /* 10010110 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1), {REG, 0}}, .byte_2 {},                                         .byte_3456 {},                     .format {MNEMONIC_XCHG, {O_REG, O_ACC}}}}},
     /* 10010111 */ { .type = T_REGULAR, .bodies {{ .byte_1 {W_FORCED(1), {REG, 0}}, .byte_2 {},                                         .byte_3456 {},                     .format {MNEMONIC_XCHG, {O_REG, O_ACC}}}}},
-    /* 10011000 */ {},
-    /* 10011001 */ {},
+    /* 10011000 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_CBW, {}} }} },
+    /* 10011001 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_CWD, {}} }} },
     /* 10011010 */ {},
     /* 10011011 */ {},
     /* 10011100 */ { .type = T_REGULAR, .bodies {{ .byte_1 {},                            .byte_2 {},                                         .byte_3456 {},                     .format {MNEMONIC_PUSHF, {}}}}},
@@ -317,8 +318,8 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
         /* 110 */ {},
         /* 111 */ { .byte_1 {{V, 1}, {W, 0}}, .byte_2 = OPCODE_EXT_BYTE_FIELDS, .byte_3456 {{DISP}}, .format {MNEMONIC_SAR, {O_REG_OR_MEM, O_SHIFT_CNT}} },
     }},
-    /* 11010100 */ {},
-    /* 11010101 */ {},
+    /* 11010100 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {{IGNORED_8}}, .byte_3456 {}, .format {MNEMONIC_AAM, {}} }} },
+    /* 11010101 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {{IGNORED_8}}, .byte_3456 {}, .format {MNEMONIC_AAD, {}} }} },
     /* 11010110 */ {},
     /* 11010111 */ { .type = T_REGULAR, .bodies {{ .byte_1 {}, .byte_2 {}, .byte_3456 {}, .format {MNEMONIC_XLAT, {}}}}},
     /* 11011000 */ {},
