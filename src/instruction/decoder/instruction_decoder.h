@@ -1,4 +1,14 @@
-﻿enum FieldTypeSpec
+﻿const uint8_t BYTE_FIELDS_MAX_LEN = 3;
+
+enum InstructionTypeSpec : uint8_t
+{
+    INSTRUCTION_TYPE_NONE,
+
+    INSTRUCTION_TYPE_REGULAR,
+    INSTRUCTION_TYPE_EXTENDED_OPCODE
+};
+
+enum FieldTypeSpec : uint8_t
 {
     FIELD_TYPE_SPEC_NONE,
 
@@ -14,10 +24,10 @@
     FIELD_TYPE_SPEC_DATA_8,
     FIELD_TYPE_SPEC_DATA,
     FIELD_TYPE_SPEC_ADDR,
-    FIELD_TYPE_SPEC_ARITHMETIC_MNEMO,
+    FIELD_TYPE_SPEC_OPCODE_EXTENSION,
 };
 
-enum OperandTypeSpec
+enum OperandTypeSpec : uint8_t
 {
     OPERAND_TYPE_SPEC_NONE,
 
@@ -33,26 +43,32 @@ enum OperandTypeSpec
 
 struct FieldSpec
 {
-    FieldTypeSpec type_spec;
-    uint8_t byte_index;
+    FieldTypeSpec type;
     uint8_t bit_shift;
     bool is_forced;
     uint8_t forced_value;
 };
 
-struct InstructionSpec
+struct InstructionFormatSpec
 {
     Mnemonic mnemonic;
-    FieldSpec field_specs[7];
-    OperandTypeSpec operand_type_specs[2];
+    OperandTypeSpec operand_types[2];
+};
+
+struct InstructionSpecBody
+{
+    FieldSpec byte_1[BYTE_FIELDS_MAX_LEN];
+    FieldSpec byte_2[BYTE_FIELDS_MAX_LEN];
+    FieldSpec byte_3456[BYTE_FIELDS_MAX_LEN];
+    InstructionFormatSpec format;
+};
+
+struct InstructionSpec
+{
+    InstructionTypeSpec type;
+    InstructionSpecBody bodies[8];
 };
 
 typedef Instruction (*inst_decoder_t)(InstructionInput *instruction_input, DecodingContext *decoding_context, InstructionSpec decoder_function_args);
-
-struct InstructionDecodeSpec
-{
-    inst_decoder_t decoder_function;
-    InstructionSpec instruction_spec;
-};
 
 Instruction DecodeInstruction(InstructionInput *instruction_input, DecodingContext *decoding_context);

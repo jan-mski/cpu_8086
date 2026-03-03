@@ -1,6 +1,6 @@
 ﻿#define ARRAY_SIZE(array) ((sizeof(array) / sizeof(array[0])))
 
-enum Register
+enum Register : uint8_t
 {
     REGISTER_NONE,
 

@@ -1,7 +1,7 @@
 ﻿const uint8_t INSTRUCTION_MAX_BYTES = 6;
 const uint8_t REGISTERS_MAX_LEN = 2;
 
-enum OperandType
+enum OperandType : uint8_t
 {
     OPERAND_TYPE_NONE,
 
@@ -11,7 +11,7 @@ enum OperandType
     OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT
 };
 
-enum Mnemonic
+enum Mnemonic : uint8_t
 {
     MNEMONIC_NONE,
 
@@ -33,6 +33,8 @@ enum Mnemonic
     MNEMONIC_ADC,
     MNEMONIC_SUB,
     MNEMONIC_CMP,
+    MNEMONIC_NOT,
+    MNEMONIC_TEST,
     MNEMONIC_JO,
     MNEMONIC_JNO,
     MNEMONIC_JB_JNAE,
@@ -57,7 +59,7 @@ enum Mnemonic
     MNEMONIC_COUNT
 };
 
-enum MemoryAddressQualifier
+enum MemoryAddressQualifier : uint8_t
 {
     MEMORY_ADDRESS_QUALIFIER_NONE,
 
@@ -98,7 +100,7 @@ struct DecodingContext
     uint8_t sr;                      // 2 bits
     uint8_t reg;                     // 3 bits
     uint8_t r_m;                     // 3 bits
-    uint8_t common_mnemonic;         // 3 bits
+    uint8_t opcode_extension;        // 3 bits
     uint16_t data;                   // 8 || 16 bits
     uint16_t addr;                   // 8 || 16 bits
     int32_t displacement;            // 8 || 16 bits

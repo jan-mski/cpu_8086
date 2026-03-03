@@ -44,6 +44,8 @@ const char *MNEMONIC_STRINGS[] = {
     "adc",
     "sub",
     "cmp",
+    "not",
+    "test",
     "jo",
     "jno",
     "jb",

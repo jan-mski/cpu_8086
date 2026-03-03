@@ -7,7 +7,7 @@ void DecodeReg(InstructionInput *instruction_input, uint8_t reg_byte_index, uint
 void DecodeData8Bit(InstructionInput *instruction_input, DecodingContext *decoding_context);
 void DecodeData(InstructionInput *instruction_input, DecodingContext *decoding_context);
 void DecodeAddr(InstructionInput *instruction_input, DecodingContext *decoding_context);
-void DecodeArithmeticMnemonic(InstructionInput *instruction_input, DecodingContext *decoding_context);
+void DecodeOpcodeExtension(InstructionInput *instruction_input, DecodingContext *decoding_context);
 uint8_t DecodeDisplacement8Bit(InstructionInput *instruction_input, uint8_t displacement_byte_1_index, DecodingContext *decoding_context);
 uint8_t DecodeDisplacement16Bit(InstructionInput *instruction_input, uint8_t displacement_byte_1_index, DecodingContext *decoding_context);
 uint8_t DecodeDisplacement(InstructionInput *instruction_input, DecodingContext *decoding_context);

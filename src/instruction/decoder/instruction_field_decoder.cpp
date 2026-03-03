@@ -4,21 +4,21 @@ void DecodeW(FieldSpec field_spec, DecodingContext *decoding_context)
 {
     decoding_context->w = field_spec.is_forced
                            ? field_spec.forced_value
-                           : (decoding_context->bytes[field_spec.byte_index] >> field_spec.bit_shift) & 0b1;
+                           : (decoding_context->bytes[0] >> field_spec.bit_shift) & 0b1;
 }
 
 void DecodeD(FieldSpec field_spec, DecodingContext *decoding_context)
 {
     decoding_context->d = field_spec.is_forced
                               ? field_spec.forced_value
-                              : (decoding_context->bytes[field_spec.byte_index] >> field_spec.bit_shift) & 0b1;
+                              : (decoding_context->bytes[0] >> field_spec.bit_shift) & 0b1;
 }
 
 void DecodeS(FieldSpec field_spec, DecodingContext *decoding_context)
 {
     decoding_context->s = field_spec.is_forced
                              ? field_spec.forced_value
-                             : (decoding_context->bytes[field_spec.byte_index] >> field_spec.bit_shift) & 0b1;
+                             : (decoding_context->bytes[0] >> field_spec.bit_shift) & 0b1;
 }
 
 void DecodeMod(InstructionInput *instruction_input, uint8_t mod_shift, DecodingContext *decoding_context)
@@ -92,10 +92,9 @@ void DecodeAddr(InstructionInput *instruction_input, DecodingContext *decoding_c
     }
 }
 
-void DecodeArithmeticMnemonic(InstructionInput *instruction_input, DecodingContext *decoding_context)
+void DecodeOpcodeExtension(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
-    ReadNextBytesToIndex(instruction_input, decoding_context, 1);
-    decoding_context->common_mnemonic = (decoding_context->bytes[1] >> 3) & 0b111;
+    decoding_context->opcode_extension = (decoding_context->bytes[1] >> 3) & 0b111;
 }
 
 uint8_t DecodeDisplacementNone(DecodingContext *)
