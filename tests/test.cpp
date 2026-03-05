@@ -1,15 +1,11 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
 #include <catch2/catch_test_macros.hpp>
-#include "catch2/generators/catch_generators.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../src/cpu.h"
+#include "../src/cpu.cpp"
 
 TEST_CASE("Instructions are decoded correctly")
 {
-    const char* file_name = GENERATE("listing_0042_completionist_decode");
+    const char* file_name = "listing_0042_completionist_decode";
 
     char input_path[256], nasm_cmd[512];
     sprintf(input_path, "data/%s", file_name);

@@ -1,5 +1,4 @@
-﻿// NOTE: Learning from the best here (Casey Muratori:)
-#include <cstdio>
+﻿#include <cstdio>
 #include <cstdint>
 
 #include "cpu.h"
@@ -7,6 +6,7 @@
 #include "instruction/instruction_input.h"
 #include "instruction/instruction_output.h"
 #include "instruction/decoder/instruction_decoder.h"
+#include "instruction/decoder/instruction_specs.cpp"
 #include "instruction/decoder/instruction_field_decoder.h"
 #include "instruction/decoder/instruction_operand_decoder.h"
 

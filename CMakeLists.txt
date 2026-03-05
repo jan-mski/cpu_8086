@@ -13,11 +13,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(cpu_impl src/main.cpp
-        src/cpu.cpp
-)
+add_executable(cpu_impl src/main.cpp)
 
-add_executable(cpu_impl_tests tests/test.cpp
-        src/cpu.cpp
-)
+add_executable(cpu_impl_tests tests/test.cpp)
 target_link_libraries(cpu_impl_tests PRIVATE Catch2::Catch2WithMain)

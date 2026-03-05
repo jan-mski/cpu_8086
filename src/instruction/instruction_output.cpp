@@ -27,10 +27,10 @@ const char *GetMnemonicString(Mnemonic mnemonic)
         "sti", "hlt", "wait",
     };
 
-    static_assert((uint8_t) Mnemonic_Count == ARRAY_SIZE(mnemonic_strings),
+    static_assert(Mnemonic_Count == ARRAY_SIZE(mnemonic_strings),
         "MNEMONIC_COUNT and size of MNEMONIC_NAMES must be equal");
 
-    return mnemonic_strings[(uint8_t) mnemonic];
+    return mnemonic_strings[mnemonic];
 }
 
 const char *GetMemoryAddressQualifierString(MemoryAddressQualifier qualifier)
@@ -40,10 +40,10 @@ const char *GetMemoryAddressQualifierString(MemoryAddressQualifier qualifier)
         "byte", "word",
     };
 
-    static_assert((uint8_t) MemoryAddressQualifier_Count == ARRAY_SIZE(memory_address_qualifier_strings),
+    static_assert(MemoryAddressQualifier_Count == ARRAY_SIZE(memory_address_qualifier_strings),
         "MEM_ADDR_QUALIFIER_COUNT and size of MEMORY_ADDRESS_QUALIFIER_STRINGS must be equal");
 
-    return memory_address_qualifier_strings[(uint8_t) qualifier];
+    return memory_address_qualifier_strings[qualifier];
 }
 
 void PrintInstructionString(FILE *output_stream, Instruction *instruction)

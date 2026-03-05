@@ -1,7 +1,7 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-#include <cstdio>
-#include "cpu.h"
+// NOTE: Single translation unit let's go - learning from Casey Muratori here
+#include "cpu.cpp"
 
 int main(int argc, char *argv[])
 {
