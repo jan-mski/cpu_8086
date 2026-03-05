@@ -9,7 +9,6 @@
 #include "instruction/decoder/instruction_decoder.h"
 #include "instruction/decoder/instruction_field_decoder.h"
 #include "instruction/decoder/instruction_operand_decoder.h"
-#include "instruction/decoder/instruction_spec.h"
 
 #include "instruction/instruction_input.cpp"
 #include "instruction/instruction_output.cpp"
@@ -26,7 +25,7 @@ void DecodeInstructions(FILE *output_stream, FILE *input_stream)
     {
         Instruction instruction = DecodeInstruction(&instruction_input, &decoding_context);
 
-        if (instruction.mnemonic == MNEMONIC_NONE)
+        if (instruction.mnemonic == Mnemonic_None)
         {
             fprintf(stderr, "Unsupported instruction. Terminating.");
             break;

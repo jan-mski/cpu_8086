@@ -2,31 +2,31 @@
 
 enum Register : uint8_t
 {
-    REGISTER_NONE,
+    Register_None,
 
-    REGISTER_AL,
-    REGISTER_AH,
-    REGISTER_AX,
-    REGISTER_BL,
-    REGISTER_BH,
-    REGISTER_BX,
-    REGISTER_CL,
-    REGISTER_CH,
-    REGISTER_CX,
-    REGISTER_DL,
-    REGISTER_DH,
-    REGISTER_DX,
-    REGISTER_SP,
-    REGISTER_BP,
-    REGISTER_SI,
-    REGISTER_DI,
+    Register_AL,
+    Register_AH,
+    Register_AX,
+    Register_BL,
+    Register_BH,
+    Register_BX,
+    Register_CL,
+    Register_CH,
+    Register_CX,
+    Register_DL,
+    Register_DH,
+    Register_DX,
+    Register_SP,
+    Register_BP,
+    Register_SI,
+    Register_DI,
 
-    REGISTER_ES,
-    REGISTER_CS,
-    REGISTER_SS,
-    REGISTER_DS,
+    Register_ES,
+    Register_CS,
+    Register_SS,
+    Register_DS,
 
-    REGISTER_COUNT
+    Register_Count
 };
 
 void DecodeInstructions(FILE *output_stream, FILE *input_stream);

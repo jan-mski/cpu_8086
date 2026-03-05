@@ -1,5 +1,5 @@
 ﻿void DecodeByteFields(FieldSpec *byte_field_specs,
-                      uint8_t byte_index,
+                      uint8_t byte_idx,
                       InstructionInput *instruction_input,
                       DecodingContext *decoding_context)
 {
@@ -7,80 +7,80 @@
     {
         FieldSpec field_spec = byte_field_specs[i];
 
-        if (field_spec.type == FIELD_TYPE_SPEC_NONE)
+        if (field_spec.type == FieldSpecType_None)
         {
             break;
         }
 
         switch (field_spec.type)
         {
-            case FIELD_TYPE_SPEC_NONE:
+            case FieldSpecType_None:
             {
 
             } break;
-            case FIELD_TYPE_SPEC_D:
+            case FieldSpecType_D:
             {
-                DecodeD(field_spec, decoding_context);
+                decoding_context->d = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_S:
+            case FieldSpecType_S:
             {
-                DecodeS(field_spec, decoding_context);
+                decoding_context->s = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_V:
+            case FieldSpecType_V:
             {
-                DecodeV(field_spec, decoding_context);
+                decoding_context->v = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_W:
+            case FieldSpecType_W:
             {
-                DecodeW(field_spec, decoding_context);
+                decoding_context->w = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_MOD:
+            case FieldSpecType_MOD:
             {
-                DecodeMod(instruction_input, field_spec.bit_shift, decoding_context);
+                decoding_context->mod = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_RM:
+            case FieldSpecType_RM:
             {
-                DecodeRM(instruction_input, field_spec.bit_shift, decoding_context);
+                decoding_context->r_m = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_REG:
+            case FieldSpecType_REG:
             {
-                DecodeReg(instruction_input, byte_index, field_spec.bit_shift, decoding_context);
+                decoding_context->reg = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_SR:
+            case FieldSpecType_SR:
             {
-                DecodeSR(instruction_input, byte_index, field_spec.bit_shift, decoding_context);
+                decoding_context->sr = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_DISP_8:
+            case FieldSpecType_DISP_8:
             {
-                DecodeDisplacement8Bit(instruction_input, decoding_context);
+                decoding_context->displacement = DecodeDisplacement8Bit(instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_DISP:
+            case FieldSpecType_DISP:
             {
-                DecodeDisplacement(instruction_input, decoding_context);
+                decoding_context->displacement = DecodeDisplacement(instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_DATA_8:
+            case FieldSpecType_DATA_8:
             {
-                DecodeDataLowByte(instruction_input, decoding_context);
+                decoding_context->data = DecodeByte(instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_DATA_LO:
+            case FieldSpecType_DATA_LO:
             {
-                DecodeDataLowByte(instruction_input, decoding_context);
+                decoding_context->data = DecodeByte(instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_DATA_HI:
+            case FieldSpecType_DATA_HI:
             {
-                DecodeDataHighByte(instruction_input, decoding_context);
+                decoding_context->data = DecodeDataHighByte(instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_ADDR_LO:
+            case FieldSpecType_ADDR_LO:
             {
-                DecodeAddrLowByte(instruction_input, decoding_context);
+                decoding_context->addr = DecodeByte(instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_ADDR_HI:
+            case FieldSpecType_ADDR_HI:
             {
-                DecodeAddrHighByte(instruction_input, decoding_context);
+                decoding_context->addr = DecodeAddrHighByte(instruction_input, decoding_context);
             } break;
-            case FIELD_TYPE_SPEC_OPCODE_EXTENSION:
+            case FieldSpecType_OpcodeExtension:
             {
-                DecodeOpcodeExtension(instruction_input, decoding_context);
+                decoding_context->opcode_extension = DecodeField(field_spec, byte_idx, instruction_input, decoding_context);
             } break;
         }
     }
@@ -90,61 +90,73 @@ void DecodeOperands(Instruction *instruction,
                     InstructionFormatSpec *instruction_format,
                     DecodingContext *decoding_context)
 {
-    if ((instruction_format->operand_types[0] == OPERAND_TYPE_SPEC_REGISTER_OR_MEMORY_ADDRESS &&
-         instruction_format->operand_types[1] == OPERAND_TYPE_SPEC_REGISTER_OR_MEMORY_ADDRESS))
+    size_t num_operands = ARRAY_SIZE(instruction_format->operand_types);
+
+    if (num_operands == 2 &&
+        instruction_format->operand_types[0] == OperandSpecType_RegisterOrMemoryAddress &&
+        instruction_format->operand_types[1] == OperandSpecType_RegisterOrMemoryAddress)
     {
-        DecodeOperandsRegisterOrMemoryAndEither(instruction, decoding_context);
+        if (decoding_context->d == 0)
+        {
+            DecodeOperandRegisterOrMemoryAddress(&instruction->operands[0], decoding_context);
+            DecodeOperandRegister(&instruction->operands[1], decoding_context);
+        }
+        else
+        {
+            DecodeOperandRegister(&instruction->operands[0], decoding_context);
+            DecodeOperandRegisterOrMemoryAddress(&instruction->operands[1], decoding_context);
+        }
         return;
     }
 
-    for (uint8_t i = 0; i < ARRAY_SIZE(instruction_format->operand_types); ++i)
+    for (uint8_t i = 0; i < num_operands; ++i)
     {
-        OperandTypeSpec operand_type_spec = instruction_format->operand_types[i];
+        OperandSpecType operand_type_spec = instruction_format->operand_types[i];
 
-        if (operand_type_spec == OPERAND_TYPE_SPEC_NONE)
+        if (operand_type_spec == OperandSpecType_None)
         {
             break;
         }
 
         switch (operand_type_spec)
         {
-            case OPERAND_TYPE_SPEC_NONE:
+            case OperandSpecType_None:
             {
 
             } break;
-            case OPERAND_TYPE_SPEC_REGISTER:
+            case OperandSpecType_Register:
             {
                 DecodeOperandRegister(&instruction->operands[i], decoding_context);
             } break;
-            case OPERAND_TYPE_SPEC_SEGMENT_REGISTER:
+            case OperandSpecType_SegmentRegister:
             {
                 DecodeOperandSegmentRegister(&instruction->operands[i], decoding_context);
             } break;
-            case OPERAND_TYPE_SPEC_DATA_REGISTER:
+            case OperandSpecType_DataRegister:
             {
                 DecodeOperandDataRegister(&instruction->operands[i], decoding_context);
             } break;
-            case OPERAND_TYPE_SPEC_REGISTER_OR_MEMORY_ADDRESS:
+            case OperandSpecType_RegisterOrMemoryAddress:
             {
                 DecodeOperandRegisterOrMemoryAddress(&instruction->operands[i], decoding_context);
             } break;
-            case OPERAND_TYPE_SPEC_DIRECT_MEMORY_ADDRESS:
+            case OperandSpecType_DirectMemoryAddress:
             {
                 DecodeOperandDirectAddress(&instruction->operands[i], decoding_context);
             } break;
-            case OPERAND_TYPE_SPEC_ACCUMULATOR:
+            case OperandSpecType_Accumulator:
             {
                 DecodeOperandAccumulator(&instruction->operands[i], decoding_context);
             } break;
-            case OPERAND_TYPE_SPEC_IMMEDIATE:
+            case OperandSpecType_Immediate:
             {
                 DecodeOperandImmediate(&instruction->operands[i], decoding_context);
             } break;
-            case OPERAND_TYPE_SPEC_LABEL_LIKE_DISPLACEMENT:
+            case OperandSpecType_LabelLikeDisplacement:
             {
                 DecodeOperandLabelLikeDisplacement(&instruction->operands[i], decoding_context);
             } break;
-            case OPERAND_TYPE_SPEC_SHIFT_ROTATE_COUNT:
+            case OperandSpecType_ShiftRotateCount:
             {
                 DecodeOperandShiftRotateCount(&instruction->operands[i], decoding_context);
             } break;
@@ -157,38 +169,32 @@ Instruction DecodeInstruction(InstructionSpec *instruction_spec,
                               DecodingContext *decoding_context)
 {
     Instruction instruction = {};
-    Instruction *instruction_ptr = &instruction;
     InstructionSpecBody *instruction_spec_body = 0;
 
     switch (instruction_spec->type)
     {
-        case INSTRUCTION_TYPE_NONE:
+        case InstructionSpecType_None:
         {
             return instruction;
         } break;
-        case INSTRUCTION_TYPE_REGULAR:
+        case InstructionSpecType_Regular:
         {
             instruction_spec_body = &instruction_spec->bodies[0];
             DecodeByteFields(instruction_spec_body->byte_1, 0, instruction_input, decoding_context);
             DecodeByteFields(instruction_spec_body->byte_2, 1, instruction_input, decoding_context);
-            DecodeByteFields(instruction_spec_body->byte_3456, decoding_context->num_bytes_read, instruction_input,
-                    decoding_context);
+            DecodeByteFields(instruction_spec_body->byte_3456, 2, instruction_input, decoding_context);
         } break;
-        case INSTRUCTION_TYPE_EXTENDED_OPCODE:
+        case InstructionSpecType_ExtendedOpcode:
         {
-            FieldSpec byte_field_specs[BYTE_FIELDS_MAX_LEN] = OPCODE_EXT_BYTE_FIELDS;
-            ReadNextBytesToIndex(instruction_input, decoding_context, OPCODE_EXT_BYTE_INDEX);
-            DecodeByteFields(byte_field_specs, OPCODE_EXT_BYTE_INDEX, instruction_input, decoding_context);
+            DecodeByteFields(OPCODE_EXT_BYTE_FIELDS, 1, instruction_input, decoding_context);
 
             instruction_spec_body = &instruction_spec->bodies[decoding_context->opcode_extension];
             DecodeByteFields(instruction_spec_body->byte_1, 0, instruction_input, decoding_context);
-            DecodeByteFields(instruction_spec_body->byte_3456, decoding_context->num_bytes_read, instruction_input,
-                    decoding_context);
-
+            DecodeByteFields(instruction_spec_body->byte_3456, 2, instruction_input, decoding_context);
         } break;
     }
 
-    DecodeOperands(instruction_ptr, &instruction_spec_body->format, decoding_context);
+    DecodeOperands(&instruction, &instruction_spec_body->format, decoding_context);
     instruction.mnemonic = instruction_spec_body->format.mnemonic;
 
     return instruction;

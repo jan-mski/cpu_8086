@@ -1,154 +1,49 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-const char *REGISTER_NAMES[] = {
-    0,
-    "al",
-    "ah",
-    "ax",
-    "bl",
-    "bh",
-    "bx",
-    "cl",
-    "ch",
-    "cx",
-    "dl",
-    "dh",
-    "dx",
-    "sp",
-    "bp",
-    "si",
-    "di",
-    "es",
-    "cs",
-    "ss",
-    "ds"
-};
-
-const char *MNEMONIC_STRINGS[] = {
-    0,
-    "mov",
-    "push",
-    "pop",
-    "xchg",
-    "in",
-    "out",
-    "xlat",
-    "lea",
-    "lds",
-    "les",
-    "lahf",
-    "sahf",
-    "pushf",
-    "popf",
-    "add",
-    "adc",
-    "inc",
-    "aaa",
-    "daa",
-    "sub",
-    "sbb",
-    "dec",
-    "neg",
-    "cmp",
-    "aas",
-    "das",
-    "mul",
-    "imul",
-    "aam",
-    "div",
-    "idiv",
-    "aad",
-    "cbw",
-    "cwd",
-    "not",
-    "shl",
-    "shr",
-    "sar",
-    "rol",
-    "ror",
-    "rcl",
-    "rcr",
-    "and",
-    "test",
-    "or",
-    "xor",
-    "rep",
-    "movsb",
-    "movsw",
-    "cmpsb",
-    "cmpsw",
-    "scasb",
-    "scasw",
-    "lodsb",
-    "lodsw",
-    "stosb",
-    "stosw",
-    "call",
-    "jmp",
-    "ret",
-    "jo",
-    "jno",
-    "jb",
-    "jnb",
-    "je",
-    "jne",
-    "jbe",
-    "jnbe",
-    "js",
-    "jns",
-    "jp",
-    "jnp",
-    "jl",
-    "jnl",
-    "jle",
-    "jnle",
-    "loopnz",
-    "loopz",
-    "loop",
-    "jcxz",
-    "int",
-    "int3",
-    "into",
-    "iret",
-    "clc",
-    "cmc",
-    "stc",
-    "cld",
-    "std",
-    "cli",
-    "sti",
-    "hlt",
-    "wait",
-};
-
-const char *MEMORY_ADDRESS_QUALIFIER_STRINGS[] = {
-    0,
-    "byte",
-    "word",
-};
-
 const char *GetRegisterName(Register register_)
 {
-    static_assert(REGISTER_COUNT == ARRAY_SIZE(REGISTER_NAMES),
-        "REGISTER_COUNT and size of REGISTER_NAMES must be equal");
+    const char *register_names[] = {
+        0,
+        "al", "ah", "ax", "bl", "bh", "bx", "cl", "ch", "cx", "dl",
+        "dh", "dx", "sp", "bp", "si", "di", "es", "cs", "ss", "ds"
+    };
 
-    return REGISTER_NAMES[register_];
+    static_assert(Register_Count == ARRAY_SIZE(register_names),
+        "Register_COUNT and size of Register_NAMES must be equal");
+
+    return register_names[register_];
 }
 
 const char *GetMnemonicString(Mnemonic mnemonic)
 {
-    static_assert(MNEMONIC_COUNT == ARRAY_SIZE(MNEMONIC_STRINGS),
+    const char *mnemonic_strings[] = {
+        0,
+        "mov", "push", "pop", "xchg", "in", "out", "xlat", "lea", "lds", "les", "lahf", "sahf", "pushf", "popf", "add",
+        "adc", "inc", "aaa", "daa", "sub", "sbb", "dec", "neg", "cmp", "aas", "das", "mul", "imul", "aam", "div", "idiv",
+        "aad", "cbw", "cwd", "not", "shl", "shr", "sar", "rol", "ror", "rcl", "rcr", "and", "test", "or", "xor", "rep",
+        "movsb", "movsw", "cmpsb", "cmpsw", "scasb", "scasw", "lodsb", "lodsw", "stosb", "stosw", "call", "jmp", "ret",
+        "jo", "jno", "jb", "jnb", "je", "jne", "jbe", "jnbe", "js", "jns", "jp", "jnp", "jl", "jnl", "jle", "jnle",
+        "loopnz", "loopz", "loop", "jcxz", "int", "int3", "into", "iret", "clc", "cmc", "stc", "cld", "std", "cli",
+        "sti", "hlt", "wait",
+    };
+
+    static_assert((uint8_t) Mnemonic_Count == ARRAY_SIZE(mnemonic_strings),
         "MNEMONIC_COUNT and size of MNEMONIC_NAMES must be equal");
 
-    return MNEMONIC_STRINGS[mnemonic];
+    return mnemonic_strings[(uint8_t) mnemonic];
 }
 
 const char *GetMemoryAddressQualifierString(MemoryAddressQualifier qualifier)
 {
-    static_assert(MEMORY_ADDRESS_QUALIFIER_COUNT == ARRAY_SIZE(MEMORY_ADDRESS_QUALIFIER_STRINGS),
+    const char *memory_address_qualifier_strings[] = {
+        0,
+        "byte", "word",
+    };
+
+    static_assert((uint8_t) MemoryAddressQualifier_Count == ARRAY_SIZE(memory_address_qualifier_strings),
         "MEM_ADDR_QUALIFIER_COUNT and size of MEMORY_ADDRESS_QUALIFIER_STRINGS must be equal");
 
-    return MEMORY_ADDRESS_QUALIFIER_STRINGS[qualifier];
+    return memory_address_qualifier_strings[(uint8_t) qualifier];
 }
 
 void PrintInstructionString(FILE *output_stream, Instruction *instruction)
@@ -160,7 +55,7 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
     {
         Operand *operand = &instruction->operands[operand_idx];
 
-        if (operand->type == OPERAND_TYPE_NONE)
+        if (operand->type == OperandType_None)
         {
             continue;
         }
@@ -169,18 +64,18 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
 
         switch (operand->type)
         {
-            case OPERAND_TYPE_NONE:
+            case OperandType_None:
             {
                 break;
             } break;
-            case OPERAND_TYPE_REGISTER:
+            case OperandType_Register:
             {
                 asm_string_idx += sprintf(asm_string + asm_string_idx, "%s", GetRegisterName(operand->register_));
             } break;
-            case OPERAND_TYPE_MEMORY_ADDRESS:
+            case OperandType_MemoryAddress:
             {
                 MemoryAddress *memory_address = &operand->memory_address;
-                if (memory_address->qualifier)
+                if (memory_address->qualifier != MemoryAddressQualifier_None)
                 {
                     asm_string_idx += sprintf(asm_string + asm_string_idx, "%s ", GetMemoryAddressQualifierString(memory_address->qualifier));
                 }
@@ -202,11 +97,11 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
                     asm_string_idx += sprintf(asm_string + asm_string_idx, " + %i]", memory_address->displacement);
                 }
             } break;
-            case OPERAND_TYPE_IMMEDIATE:
+            case OperandType_Immediate:
             {
                 asm_string_idx += sprintf(asm_string + asm_string_idx, "%u", operand->immediate_value);
             } break;
-            case OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT:
+            case OperandType_LabelLikeDisplacement:
             {
                 asm_string_idx += sprintf(asm_string + asm_string_idx, "($+2) + %i", operand->label_like_displacement);
             } break;

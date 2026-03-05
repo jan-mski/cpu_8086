@@ -1,15 +1,8 @@
-﻿void DecodeD(FieldSpec field_spec, DecodingContext *decoding_context);
-void DecodeS(FieldSpec field_spec, DecodingContext *decoding_context);
-void DecodeV(FieldSpec field_spec, DecodingContext *decoding_context);
-void DecodeW(FieldSpec field_spec, DecodingContext *decoding_context);
-void DecodeMod(InstructionInput *instruction_input, uint8_t mod_shift, DecodingContext *decoding_context);
-void DecodeRM(InstructionInput *instruction_input, uint8_t r_m_shift, DecodingContext *decoding_context);
-void DecodeReg(InstructionInput *instruction_input, uint8_t reg_byte_index, uint8_t reg_shift, DecodingContext *decoding_context);
-void DecodeDataLowByte(InstructionInput *instruction_input, DecodingContext *decoding_context);
-void DecodeDataHighByte(InstructionInput *instruction_input, DecodingContext *decoding_context);
-void DecodeAddrLowByte(InstructionInput *instruction_input, DecodingContext *decoding_context);
-void DecodeAddrHighByte(InstructionInput *instruction_input, DecodingContext *decoding_context);
-void DecodeOpcodeExtension(InstructionInput *instruction_input, DecodingContext *decoding_context);
-void DecodeDisplacement8Bit(InstructionInput *instruction_input, DecodingContext *decoding_context);
-void DecodeDisplacement16Bit(InstructionInput *instruction_input, DecodingContext *decoding_context);
-void DecodeDisplacement(InstructionInput *instruction_input, DecodingContext *decoding_context);
+﻿uint8_t DecodeField(FieldSpec field_spec, uint8_t byte_idx, InstructionInput *instruction_input,
+                    DecodingContext *decoding_context);
+uint8_t DecodeByte(InstructionInput *instruction_input, DecodingContext *decoding_context);
+int32_t DecodeDataHighByte(InstructionInput *instruction_input, DecodingContext *decoding_context);
+int32_t DecodeAddrHighByte(InstructionInput *instruction_input, DecodingContext *decoding_context);
+int32_t DecodeDisplacement8Bit(InstructionInput *instruction_input, DecodingContext *decoding_context);
+int32_t DecodeDisplacement16Bit(InstructionInput *instruction_input, DecodingContext *decoding_context);
+int32_t DecodeDisplacement(InstructionInput *instruction_input, DecodingContext *decoding_context);

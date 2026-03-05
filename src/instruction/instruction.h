@@ -1,133 +1,130 @@
-﻿const uint8_t INSTRUCTION_MAX_BYTES = 6;
-const uint8_t REGISTERS_MAX_LEN = 2;
-
-enum OperandType : uint8_t
+﻿enum Mnemonic : uint8_t
 {
-    OPERAND_TYPE_NONE,
+    Mnemonic_None,
 
-    OPERAND_TYPE_REGISTER,
-    OPERAND_TYPE_MEMORY_ADDRESS,
-    OPERAND_TYPE_IMMEDIATE,
-    OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT
-};
+    Mnemonic_MOV,
+    Mnemonic_PUSH,
+    Mnemonic_POP,
+    Mnemonic_XCHG,
+    Mnemonic_IN,
+    Mnemonic_OUT,
+    Mnemonic_XLAT,
+    Mnemonic_LEA,
+    Mnemonic_LDS,
+    Mnemonic_LES,
+    Mnemonic_LAHF,
+    Mnemonic_SAHF,
+    Mnemonic_PUSHF,
+    Mnemonic_POPF,
+    Mnemonic_ADD,
+    Mnemonic_ADC,
+    Mnemonic_INC,
+    Mnemonic_AAA,
+    Mnemonic_DAA,
+    Mnemonic_SUB,
+    Mnemonic_SBB,
+    Mnemonic_DEC,
+    Mnemonic_NEG,
+    Mnemonic_CMP,
+    Mnemonic_AAS,
+    Mnemonic_DAS,
+    Mnemonic_MUL,
+    Mnemonic_IMUL,
+    Mnemonic_AAM,
+    Mnemonic_DIV,
+    Mnemonic_IDIV,
+    Mnemonic_AAD,
+    Mnemonic_CBW,
+    Mnemonic_CWD,
+    Mnemonic_NOT,
+    Mnemonic_SHL_SAL,
+    Mnemonic_SHR,
+    Mnemonic_SAR,
+    Mnemonic_ROL,
+    Mnemonic_ROR,
+    Mnemonic_RCL,
+    Mnemonic_RCR,
+    Mnemonic_AND,
+    Mnemonic_TEST,
+    Mnemonic_OR,
+    Mnemonic_XOR,
+    Mnemonic_REP,
+    Mnemonic_MOVSB,
+    Mnemonic_MOVSW,
+    Mnemonic_CMPSB,
+    Mnemonic_CMPSW,
+    Mnemonic_SCASB,
+    Mnemonic_SCASW,
+    Mnemonic_LODSB,
+    Mnemonic_LODSW,
+    Mnemonic_STOSB,
+    Mnemonic_STOSW,
+    Mnemonic_CALL,
+    Mnemonic_JMP,
+    Mnemonic_RET,
+    Mnemonic_JO,
+    Mnemonic_JNO,
+    Mnemonic_JB_JNAE,
+    Mnemonic_JNB_JAE,
+    Mnemonic_JE_JZ,
+    Mnemonic_JNE_JNZ,
+    Mnemonic_JBE_JNA,
+    Mnemonic_JNBE_JA,
+    Mnemonic_JS,
+    Mnemonic_JNS,
+    Mnemonic_JP_JPE,
+    Mnemonic_JNP_JPO,
+    Mnemonic_JL_JNGE,
+    Mnemonic_JNL_JGE,
+    Mnemonic_JLE_JNG,
+    Mnemonic_JNLE_JG,
+    Mnemonic_LOOPNZ_LOOPNE,
+    Mnemonic_LOOPZ_LOOPE,
+    Mnemonic_LOOP,
+    Mnemonic_JCXZ,
+    Mnemonic_INT,
+    Mnemonic_INT3,
+    Mnemonic_INTO,
+    Mnemonic_IRET,
+    Mnemonic_CLC,
+    Mnemonic_CMC,
+    Mnemonic_STC,
+    Mnemonic_CLD,
+    Mnemonic_STD,
+    Mnemonic_CLI,
+    Mnemonic_STI,
+    Mnemonic_HLT,
+    Mnemonic_WAIT,
 
-enum Mnemonic : uint8_t
-{
-    MNEMONIC_NONE,
-
-    MNEMONIC_MOV,
-    MNEMONIC_PUSH,
-    MNEMONIC_POP,
-    MNEMONIC_XCHG,
-    MNEMONIC_IN,
-    MNEMONIC_OUT,
-    MNEMONIC_XLAT,
-    MNEMONIC_LEA,
-    MNEMONIC_LDS,
-    MNEMONIC_LES,
-    MNEMONIC_LAHF,
-    MNEMONIC_SAHF,
-    MNEMONIC_PUSHF,
-    MNEMONIC_POPF,
-    MNEMONIC_ADD,
-    MNEMONIC_ADC,
-    MNEMONIC_INC,
-    MNEMONIC_AAA,
-    MNEMONIC_DAA,
-    MNEMONIC_SUB,
-    MNEMONIC_SBB,
-    MNEMONIC_DEC,
-    MNEMONIC_NEG,
-    MNEMONIC_CMP,
-    MNEMONIC_AAS,
-    MNEMONIC_DAS,
-    MNEMONIC_MUL,
-    MNEMONIC_IMUL,
-    MNEMONIC_AAM,
-    MNEMONIC_DIV,
-    MNEMONIC_IDIV,
-    MNEMONIC_AAD,
-    MNEMONIC_CBW,
-    MNEMONIC_CWD,
-    MNEMONIC_NOT,
-    MNEMONIC_SHL_SAL,
-    MNEMONIC_SHR,
-    MNEMONIC_SAR,
-    MNEMONIC_ROL,
-    MNEMONIC_ROR,
-    MNEMONIC_RCL,
-    MNEMONIC_RCR,
-    MNEMONIC_AND,
-    MNEMONIC_TEST,
-    MNEMONIC_OR,
-    MNEMONIC_XOR,
-    MNEMONIC_REP,
-    MNEMONIC_MOVSB,
-    MNEMONIC_MOVSW,
-    MNEMONIC_CMPSB,
-    MNEMONIC_CMPSW,
-    MNEMONIC_SCASB,
-    MNEMONIC_SCASW,
-    MNEMONIC_LODSB,
-    MNEMONIC_LODSW,
-    MNEMONIC_STOSB,
-    MNEMONIC_STOSW,
-    MNEMONIC_CALL,
-    MNEMONIC_JMP,
-    MNEMONIC_RET,
-    MNEMONIC_JO,
-    MNEMONIC_JNO,
-    MNEMONIC_JB_JNAE,
-    MNEMONIC_JNB_JAE,
-    MNEMONIC_JE_JZ,
-    MNEMONIC_JNE_JNZ,
-    MNEMONIC_JBE_JNA,
-    MNEMONIC_JNBE_JA,
-    MNEMONIC_JS,
-    MNEMONIC_JNS,
-    MNEMONIC_JP_JPE,
-    MNEMONIC_JNP_JPO,
-    MNEMONIC_JL_JNGE,
-    MNEMONIC_JNL_JGE,
-    MNEMONIC_JLE_JNG,
-    MNEMONIC_JNLE_JG,
-    MNEMONIC_LOOPNZ_LOOPNE,
-    MNEMONIC_LOOPZ_LOOPE,
-    MNEMONIC_LOOP,
-    MNEMONIC_JCXZ,
-    MNEMONIC_INT,
-    MNEMONIC_INT3,
-    MNEMONIC_INTO,
-    MNEMONIC_IRET,
-    MNEMONIC_CLC,
-    MNEMONIC_CMC,
-    MNEMONIC_STC,
-    MNEMONIC_CLD,
-    MNEMONIC_STD,
-    MNEMONIC_CLI,
-    MNEMONIC_STI,
-    MNEMONIC_HLT,
-    MNEMONIC_WAIT,
-
-    MNEMONIC_COUNT
+    Mnemonic_Count
 };
 
 enum MemoryAddressQualifier : uint8_t
 {
-    MEMORY_ADDRESS_QUALIFIER_NONE,
+    MemoryAddressQualifier_None,
 
-    MEMORY_ADDRESS_QUALIFIER_BYTE,
-    MEMORY_ADDRESS_QUALIFIER_WORD,
+    MemoryAddressQualifier_Byte,
+    MemoryAddressQualifier_Word,
 
-    MEMORY_ADDRESS_QUALIFIER_COUNT
+    MemoryAddressQualifier_Count
 };
 
 struct MemoryAddress
 {
     bool direct;
     MemoryAddressQualifier qualifier;
-    Register registers[REGISTERS_MAX_LEN];
+    Register registers[2];
     int32_t displacement;
+};
+
+enum OperandType : uint8_t
+{
+    OperandType_None,
+
+    OperandType_Register,
+    OperandType_MemoryAddress,
+    OperandType_Immediate,
+    OperandType_LabelLikeDisplacement
 };
 
 struct Operand
@@ -144,7 +141,7 @@ struct Operand
 
 struct DecodingContext
 {
-    uint8_t bytes[INSTRUCTION_MAX_BYTES];
+    uint8_t bytes[6];
     uint8_t num_bytes_read;
     bool d;                          // 1 bit
     bool s;                          // 1 bit

@@ -1,80 +1,43 @@
-﻿Register REGISTERS_BY_W[][8] = {
-    {
-        REGISTER_AL,
-        REGISTER_CL,
-        REGISTER_DL,
-        REGISTER_BL,
-        REGISTER_AH,
-        REGISTER_CH,
-        REGISTER_DH,
-        REGISTER_BH
-    },
-    {
-        REGISTER_AX,
-        REGISTER_CX,
-        REGISTER_DX,
-        REGISTER_BX,
-        REGISTER_SP,
-        REGISTER_BP,
-        REGISTER_SI,
-        REGISTER_DI
-    }
-};
-Register EFFECTIVE_ADDRESS_REGISTERS[][2] = {
-    {REGISTER_BX, REGISTER_SI},
-    {REGISTER_BX, REGISTER_DI},
-    {REGISTER_BP, REGISTER_SI},
-    {REGISTER_BP, REGISTER_DI},
-    {REGISTER_SI},
-    {REGISTER_DI},
-    {REGISTER_BP},
-    {REGISTER_BX}
-};
-Register SEGMENT_REGISTERS[] = {
-    REGISTER_ES,
-    REGISTER_CS,
-    REGISTER_SS,
-    REGISTER_DS
-};
-
-void SetEffectiveAddressRegisters(Operand *operand, Register *effective_address_registers)
+﻿void SetDirectAddressFromDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
+    operand->type = OperandType_MemoryAddress;
+    operand->memory_address.direct = true;
+    operand->memory_address.displacement = decoding_context->displacement;
+}
+
+void SetEffectiveAddress(Operand *operand, DecodingContext *decoding_context)
+{
+    Register effective_address_registers[][2] = {
+        {Register_BX, Register_SI},
+        {Register_BX, Register_DI},
+        {Register_BP, Register_SI},
+        {Register_BP, Register_DI},
+        {Register_SI},
+        {Register_DI},
+        {Register_BP},
+        {Register_BX}
+    };
+
+    operand->type = OperandType_MemoryAddress;
     for (uint8_t i = 0; i < ARRAY_SIZE(operand->memory_address.registers); ++i)
     {
-        operand->memory_address.registers[i] = effective_address_registers[i];
+        operand->memory_address.registers[i] = effective_address_registers[decoding_context->r_m][i];
     }
+    operand->memory_address.displacement = decoding_context->displacement;
 }
 
-void SetEffectiveAddressNoDisplacement(Operand *operand, DecodingContext *decoding_context)
+void SetRegister(Operand *operand, uint8_t w, uint8_t reg_or_r_m)
 {
-    operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
-    SetEffectiveAddressRegisters(operand, EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m]);
+    Register registers_by_w[][8] = {
+        {Register_AL, Register_CL, Register_DL, Register_BL, Register_AH, Register_CH, Register_DH, Register_BH},
+        {Register_AX, Register_CX, Register_DX, Register_BX, Register_SP, Register_BP, Register_SI, Register_DI}
+    };
+
+    operand->type = OperandType_Register;
+    operand->register_ = registers_by_w[w][reg_or_r_m];
 }
 
-void SetDirectAddressFromDisplacement(Operand *operand, DecodingContext *decoding_context)
-{
-    operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
-    MemoryAddress *memory_address = &operand->memory_address;
-    memory_address->direct = true;
-    memory_address->displacement = decoding_context->displacement;
-}
-
-void SetEffectiveAddressWithDisplacement(Operand *operand, DecodingContext *decoding_context)
-{
-    operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
-    MemoryAddress *memory_address = &operand->memory_address;
-    SetEffectiveAddressRegisters(operand, EFFECTIVE_ADDRESS_REGISTERS[decoding_context->r_m]);
-    memory_address->displacement = decoding_context->displacement;
-}
-
-void SetRegisterName(Operand *operand, uint8_t w, uint8_t reg_or_r_m)
-{
-    operand->type = OPERAND_TYPE_REGISTER;
-    operand->register_ = REGISTERS_BY_W[w][reg_or_r_m];
-}
-
-void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
-                                          DecodingContext *decoding_context)
+void DecodeOperandRegisterOrMemoryAddress(Operand *operand, DecodingContext *decoding_context)
 {
     switch (decoding_context->mod)
     {
@@ -85,82 +48,70 @@ void DecodeOperandRegisterOrMemoryAddress(Operand *operand,
                 SetDirectAddressFromDisplacement(operand, decoding_context);
             } else
             {
-                SetEffectiveAddressNoDisplacement(operand, decoding_context);
+                SetEffectiveAddress(operand, decoding_context);
             }
         } break;
         case 0b01:
         case 0b10:
         {
-            SetEffectiveAddressWithDisplacement(operand, decoding_context);
+            SetEffectiveAddress(operand, decoding_context);
         } break;
         default:
         {
-            SetRegisterName(operand, decoding_context->w, decoding_context->r_m);
+            SetRegister(operand, decoding_context->w, decoding_context->r_m);
             return;
         } break;
     }
 
     MemoryAddressQualifier qualifier = decoding_context->w == 1
-                                           ? MEMORY_ADDRESS_QUALIFIER_WORD
-                                           : MEMORY_ADDRESS_QUALIFIER_BYTE;
+                                           ? MemoryAddressQualifier_Word
+                                           : MemoryAddressQualifier_Byte;
     operand->memory_address.qualifier = qualifier;
 }
 
 void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context)
 {
-    SetRegisterName(operand, decoding_context->w, decoding_context->reg);
+    SetRegister(operand, decoding_context->w, decoding_context->reg);
 }
 
 void DecodeOperandSegmentRegister(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_TYPE_REGISTER;
-    operand->register_ = SEGMENT_REGISTERS[decoding_context->sr];
-}
+    Register segment_registers[] = {Register_ES, Register_CS, Register_SS, Register_DS};
 
-void DecodeOperandsRegisterOrMemoryAndEither(Instruction *instruction, DecodingContext *decoding_context)
-{
-    if (decoding_context->d == 0)
-    {
-        DecodeOperandRegisterOrMemoryAddress(&instruction->operands[0], decoding_context);
-        DecodeOperandRegister(&instruction->operands[1], decoding_context);
-    }
-    else
-    {
-        DecodeOperandRegister(&instruction->operands[0], decoding_context);
-        DecodeOperandRegisterOrMemoryAddress(&instruction->operands[1], decoding_context);
-    }
+    operand->type = OperandType_Register;
+    operand->register_ = segment_registers[decoding_context->sr];
 }
 
 void DecodeOperandImmediate(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_TYPE_IMMEDIATE;
+    operand->type = OperandType_Immediate;
     operand->immediate_value = decoding_context->data;
 }
 
 void DecodeOperandAccumulator(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_TYPE_REGISTER;
+    operand->type = OperandType_Register;
     operand->register_ = decoding_context->w == 1
-                             ? REGISTER_AX
-                             : REGISTER_AL;
+                             ? Register_AX
+                             : Register_AL;
 }
 
 void DecodeOperandDataRegister(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_TYPE_REGISTER;
-    operand->register_ = REGISTER_DX;
+    operand->type = OperandType_Register;
+    operand->register_ = Register_DX;
 }
 
 void DecodeOperandDirectAddress(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_TYPE_MEMORY_ADDRESS;
+    operand->type = OperandType_MemoryAddress;
     operand->memory_address.direct = true;
     operand->memory_address.displacement = decoding_context->addr;
 }
 
 void DecodeOperandLabelLikeDisplacement(Operand *operand, DecodingContext *decoding_context)
 {
-    operand->type = OPERAND_TYPE_LABEL_LIKE_DISPLACEMENT;
+    operand->type = OperandType_LabelLikeDisplacement;
     operand->label_like_displacement = decoding_context->displacement;
 }
 
@@ -168,12 +119,11 @@ void DecodeOperandShiftRotateCount(Operand *operand, DecodingContext *decoding_c
 {
     if (decoding_context->v == 0)
     {
-        operand->type = OPERAND_TYPE_IMMEDIATE;
+        operand->type = OperandType_Immediate;
         operand->immediate_value = 1;
     } else
     {
-        operand->type = OPERAND_TYPE_REGISTER;
-        operand->register_ = REGISTER_CL;
+        operand->type = OperandType_Register;
+        operand->register_ = Register_CL;
     }
-
 }
