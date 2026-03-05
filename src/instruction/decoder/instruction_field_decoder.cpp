@@ -54,44 +54,36 @@ void DecodeSR(InstructionInput *instruction_input,
     decoding_context->sr = (decoding_context->bytes[sr_byte_index] >> sr_shift) & 0b11;
 }
 
-void DecodeData8Bit(InstructionInput *instruction_input, DecodingContext *decoding_context) {
+void DecodeDataLowByte(InstructionInput *instruction_input, DecodingContext *decoding_context) {
     uint8_t data_byte_1_index = decoding_context->num_bytes_read;
     ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_1_index);
     decoding_context->data = decoding_context->bytes[data_byte_1_index];
 }
 
-void DecodeData16Bit(InstructionInput *instruction_input, DecodingContext *decoding_context)
+void DecodeDataHighByte(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
-    uint8_t data_byte_1_index = decoding_context->num_bytes_read;
-    uint8_t data_byte_2_index = data_byte_1_index + 1;
-    ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_2_index);
-    decoding_context->data = (decoding_context->bytes[data_byte_2_index] << 8) |
-                             decoding_context->bytes[data_byte_1_index];
-}
-
-void DecodeData(InstructionInput *instruction_input,
-                DecodingContext *decoding_context)
-{
-    if (decoding_context->w == 0 || decoding_context->s == 1)
+    if (decoding_context->w == 1 && decoding_context->s == 0)
     {
-        DecodeData8Bit(instruction_input, decoding_context);
-    } else if (decoding_context->s == 0)
-    {
-        DecodeData16Bit(instruction_input, decoding_context);
+        uint8_t data_byte_2_index = decoding_context->num_bytes_read;
+        ReadNextBytesToIndex(instruction_input, decoding_context, data_byte_2_index);
+        decoding_context->data = (decoding_context->bytes[data_byte_2_index] << 8) | decoding_context->data;
     }
 }
 
-void DecodeAddr(InstructionInput *instruction_input, DecodingContext *decoding_context)
+void DecodeAddrLowByte(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
-    if (decoding_context->w == 0)
-        {
-        ReadNextBytesToIndex(instruction_input, decoding_context, 1);
-        decoding_context->addr = decoding_context->bytes[1];
-    }
-    else
+    uint8_t addr_byte_1_index = decoding_context->num_bytes_read;
+    ReadNextBytesToIndex(instruction_input, decoding_context, addr_byte_1_index);
+    decoding_context->addr = decoding_context->bytes[addr_byte_1_index];
+}
+
+void DecodeAddrHighByte(InstructionInput *instruction_input, DecodingContext *decoding_context)
+{
+    if (decoding_context->w == 1)
     {
-        ReadNextBytesToIndex(instruction_input, decoding_context, 2);
-        decoding_context->addr = (decoding_context->bytes[2] << 8) | decoding_context->bytes[1];
+        uint8_t addr_byte_2_index = decoding_context->num_bytes_read;
+        ReadNextBytesToIndex(instruction_input, decoding_context, addr_byte_2_index);
+        decoding_context->addr = (decoding_context->bytes[addr_byte_2_index] << 8) | decoding_context->addr;
     }
 }
 
@@ -100,15 +92,15 @@ void DecodeOpcodeExtension(InstructionInput *instruction_input, DecodingContext 
     decoding_context->opcode_extension = (decoding_context->bytes[1] >> 3) & 0b111;
 }
 
-uint8_t DecodeDisplacementNone(DecodingContext *)
+void DecodeDisplacementNone(DecodingContext *)
 {
-    return 0;
+
 }
 
-uint8_t DecodeDisplacement8Bit(InstructionInput *instruction_input,
-                    uint8_t displacement_byte_1_index,
-                    DecodingContext *decoding_context)
+void DecodeDisplacement8Bit(InstructionInput *instruction_input,
+                            DecodingContext *decoding_context)
 {
+    uint8_t displacement_byte_1_index = decoding_context->num_bytes_read;
     ReadNextBytesToIndex(instruction_input, decoding_context, displacement_byte_1_index);
     uint8_t sign = (decoding_context->bytes[displacement_byte_1_index] >> 7) & 0b1;
     if (sign == 1)  // negative number, so we do two's complement
@@ -119,23 +111,19 @@ uint8_t DecodeDisplacement8Bit(InstructionInput *instruction_input,
     {
         decoding_context->displacement = decoding_context->bytes[displacement_byte_1_index];
     }
-
-    return 1;
 }
 
-uint8_t DecodeDisplacement16Bit(InstructionInput *instruction_input,
-                                uint8_t displacement_byte_1_index,
-                                DecodingContext *decoding_context)
+void DecodeDisplacement16Bit(InstructionInput *instruction_input,
+                             DecodingContext *decoding_context)
 {
+    uint8_t displacement_byte_1_index = decoding_context->num_bytes_read;
     uint8_t displacement_byte_2_index = displacement_byte_1_index + 1;
     ReadNextBytesToIndex(instruction_input, decoding_context, displacement_byte_2_index);
     decoding_context->displacement = (decoding_context->bytes[displacement_byte_2_index] << 8) |
         decoding_context->bytes[displacement_byte_1_index];
-
-    return 2;
 }
 
-uint8_t DecodeDisplacement(InstructionInput *instruction_input, DecodingContext *decoding_context)
+void DecodeDisplacement(InstructionInput *instruction_input, DecodingContext *decoding_context)
 {
     switch (decoding_context->mod)
     {
@@ -143,21 +131,21 @@ uint8_t DecodeDisplacement(InstructionInput *instruction_input, DecodingContext 
         {
             if (decoding_context->r_m == 0b110)
             {
-                return DecodeDisplacement16Bit(instruction_input, 2, decoding_context);
+                DecodeDisplacement16Bit(instruction_input, decoding_context);
             }
-            return DecodeDisplacementNone(decoding_context);
+            DecodeDisplacementNone(decoding_context);
         } break;
         case 0b01:
         {
-            return DecodeDisplacement8Bit(instruction_input, 2, decoding_context);
+            DecodeDisplacement8Bit(instruction_input, decoding_context);
         } break;
         case 0b10:
         {
-            return DecodeDisplacement16Bit(instruction_input, 2, decoding_context);
+            DecodeDisplacement16Bit(instruction_input, decoding_context);
         } break;
         default:
         {
-            return DecodeDisplacementNone(decoding_context);
+            DecodeDisplacementNone(decoding_context);
         } break;
     }
 }

@@ -9,6 +9,7 @@
 #include "instruction/decoder/instruction_decoder.h"
 #include "instruction/decoder/instruction_field_decoder.h"
 #include "instruction/decoder/instruction_operand_decoder.h"
+#include "instruction/decoder/instruction_spec.h"
 
 #include "instruction/instruction_input.cpp"
 #include "instruction/instruction_output.cpp"
