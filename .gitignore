@@ -2,3 +2,5 @@
 cli.ps1
 test.asm
 test.bin
+test.txt
+cmake-build-debug/

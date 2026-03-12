@@ -113,7 +113,7 @@ struct MemoryAddress
 {
     bool direct;
     MemoryAddressQualifier qualifier;
-    Register registers[2];
+    RegisterId register_ids[2];
     int32_t displacement;
 };
 
@@ -132,7 +132,7 @@ struct Operand
     OperandType type;
     union
     {
-        Register register_;
+        RegisterId register_id;
         MemoryAddress memory_address;
         uint16_t immediate_value;
         int32_t label_like_displacement;

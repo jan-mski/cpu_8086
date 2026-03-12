@@ -33,7 +33,7 @@
 
 #define OPCODE_EXT_BYTE {MOD(6), OPCODE_EXT(3), RM(0)}
 
-FieldSpec OPCODE_EXT_BYTE_FIELDS[BYTE_FIELDS_MAX_LEN] = OPCODE_EXT_BYTE;
+inline FieldSpec OPCODE_EXT_BYTE_FIELDS[BYTE_FIELDS_MAX_LEN] = OPCODE_EXT_BYTE;
 
 const InstructionSpec INSTRUCTION_SPECS[256] = {
     /* 00000000 */ { .type = T_REGULAR, .bodies {
@@ -780,17 +780,21 @@ const InstructionSpec INSTRUCTION_SPECS[256] = {
             .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic_MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
         }
     }},
-    /* 10001100 */ {
-
-    },
+    /* 10001100 */ { .type = T_REGULAR, .bodies {
+        {
+            .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), SR(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic_MOV, {O_REG_OR_MEM, O_SEG_REG}}
+        }
+    }},
     /* 10001101 */ { .type = T_REGULAR, .bodies {
         {
             .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic_LEA, {O_REG, O_REG_OR_MEM}}
         }
     }},
-    /* 10001110 */ {
-
-    },
+    /* 10001110 */ { .type = T_REGULAR, .bodies {
+        {
+            .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), SR(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic_MOV, {O_SEG_REG, O_REG_OR_MEM}}
+        }
+    }},
     /* 10001111 */ { .type = T_REGULAR, .bodies {
         {
             .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic_POP, {O_REG_OR_MEM}}

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.1)
-project(cpu_impl)
+project(cpu_8086)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -13,7 +13,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(cpu_impl src/main.cpp)
+add_executable(cpu_8086 src/main.cpp)
 
-add_executable(cpu_impl_tests tests/test.cpp)
-target_link_libraries(cpu_impl_tests PRIVATE Catch2::Catch2WithMain)
+add_executable(cpu_8086_tests tests/test_cpu.cpp)
+target_link_libraries(cpu_8086_tests PRIVATE Catch2::Catch2WithMain)

@@ -7,34 +7,34 @@
 
 void SetEffectiveAddress(Operand *operand, DecodingContext *decoding_context)
 {
-    Register effective_address_registers[][2] = {
-        {Register_BX, Register_SI},
-        {Register_BX, Register_DI},
-        {Register_BP, Register_SI},
-        {Register_BP, Register_DI},
-        {Register_SI},
-        {Register_DI},
-        {Register_BP},
-        {Register_BX}
+    RegisterId effective_address_registers[][2] = {
+        {RegisterId_BX, RegisterId_SI},
+        {RegisterId_BX, RegisterId_DI},
+        {RegisterId_BP, RegisterId_SI},
+        {RegisterId_BP, RegisterId_DI},
+        {RegisterId_SI},
+        {RegisterId_DI},
+        {RegisterId_BP},
+        {RegisterId_BX}
     };
 
     operand->type = OperandType_MemoryAddress;
-    for (uint8_t i = 0; i < ARRAY_SIZE(operand->memory_address.registers); ++i)
+    for (uint8_t i = 0; i < ARRAY_SIZE(operand->memory_address.register_ids); ++i)
     {
-        operand->memory_address.registers[i] = effective_address_registers[decoding_context->r_m][i];
+        operand->memory_address.register_ids[i] = effective_address_registers[decoding_context->r_m][i];
     }
     operand->memory_address.displacement = decoding_context->displacement;
 }
 
 void SetRegister(Operand *operand, uint8_t w, uint8_t reg_or_r_m)
 {
-    Register registers_by_w[][8] = {
-        {Register_AL, Register_CL, Register_DL, Register_BL, Register_AH, Register_CH, Register_DH, Register_BH},
-        {Register_AX, Register_CX, Register_DX, Register_BX, Register_SP, Register_BP, Register_SI, Register_DI}
+    RegisterId registers_by_w[][8] = {
+        {RegisterId_AL, RegisterId_CL, RegisterId_DL, RegisterId_BL, RegisterId_AH, RegisterId_CH, RegisterId_DH, RegisterId_BH},
+        {RegisterId_AX, RegisterId_CX, RegisterId_DX, RegisterId_BX, RegisterId_SP, RegisterId_BP, RegisterId_SI, RegisterId_DI}
     };
 
     operand->type = OperandType_Register;
-    operand->register_ = registers_by_w[w][reg_or_r_m];
+    operand->register_id = registers_by_w[w][reg_or_r_m];
 }
 
 void DecodeOperandRegisterOrMemoryAddress(Operand *operand, DecodingContext *decoding_context)
@@ -76,10 +76,10 @@ void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context)
 
 void DecodeOperandSegmentRegister(Operand *operand, DecodingContext *decoding_context)
 {
-    Register segment_registers[] = {Register_ES, Register_CS, Register_SS, Register_DS};
+    RegisterId segment_registers[] = {RegisterId_ES, RegisterId_CS, RegisterId_SS, RegisterId_DS};
 
     operand->type = OperandType_Register;
-    operand->register_ = segment_registers[decoding_context->sr];
+    operand->register_id = segment_registers[decoding_context->sr];
 }
 
 void DecodeOperandImmediate(Operand *operand, DecodingContext *decoding_context)
@@ -91,15 +91,15 @@ void DecodeOperandImmediate(Operand *operand, DecodingContext *decoding_context)
 void DecodeOperandAccumulator(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OperandType_Register;
-    operand->register_ = decoding_context->w == 1
-                             ? Register_AX
-                             : Register_AL;
+    operand->register_id = decoding_context->w == 1
+                             ? RegisterId_AX
+                             : RegisterId_AL;
 }
 
 void DecodeOperandDataRegister(Operand *operand, DecodingContext *decoding_context)
 {
     operand->type = OperandType_Register;
-    operand->register_ = Register_DX;
+    operand->register_id = RegisterId_DX;
 }
 
 void DecodeOperandDirectAddress(Operand *operand, DecodingContext *decoding_context)
@@ -124,6 +124,6 @@ void DecodeOperandShiftRotateCount(Operand *operand, DecodingContext *decoding_c
     } else
     {
         operand->type = OperandType_Register;
-        operand->register_ = Register_CL;
+        operand->register_id = RegisterId_CL;
     }
 }

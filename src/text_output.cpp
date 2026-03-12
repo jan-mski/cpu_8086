@@ -1,17 +1,17 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-const char *GetRegisterName(Register register_)
+const char *REGISTER_NAMES[] = {
+    0,
+    "al", "ah", "ax", "bl", "bh", "bx", "cl", "ch", "cx", "dl",
+    "dh", "dx", "sp", "bp", "si", "di", "es", "cs", "ss", "ds"
+};
+
+const char *GetRegisterName(RegisterId register_)
 {
-    const char *register_names[] = {
-        0,
-        "al", "ah", "ax", "bl", "bh", "bx", "cl", "ch", "cx", "dl",
-        "dh", "dx", "sp", "bp", "si", "di", "es", "cs", "ss", "ds"
-    };
+    static_assert(RegisterId_Count == ARRAY_SIZE(REGISTER_NAMES),
+        "Number of register id enums and strings must be equal");
 
-    static_assert(Register_Count == ARRAY_SIZE(register_names),
-        "Register_COUNT and size of Register_NAMES must be equal");
-
-    return register_names[register_];
+    return REGISTER_NAMES[register_];
 }
 
 const char *GetMnemonicString(Mnemonic mnemonic)
@@ -27,8 +27,7 @@ const char *GetMnemonicString(Mnemonic mnemonic)
         "sti", "hlt", "wait",
     };
 
-    static_assert(Mnemonic_Count == ARRAY_SIZE(mnemonic_strings),
-        "MNEMONIC_COUNT and size of MNEMONIC_NAMES must be equal");
+    static_assert(Mnemonic_Count == ARRAY_SIZE(mnemonic_strings), "Number of mnemonic enums and strings must be equal");
 
     return mnemonic_strings[mnemonic];
 }
@@ -41,7 +40,7 @@ const char *GetMemoryAddressQualifierString(MemoryAddressQualifier qualifier)
     };
 
     static_assert(MemoryAddressQualifier_Count == ARRAY_SIZE(memory_address_qualifier_strings),
-        "MEM_ADDR_QUALIFIER_COUNT and size of MEMORY_ADDRESS_QUALIFIER_STRINGS must be equal");
+        "Number of qualifier enums and strings must be equal");
 
     return memory_address_qualifier_strings[qualifier];
 }
@@ -70,7 +69,7 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
             } break;
             case OperandType_Register:
             {
-                asm_string_idx += sprintf(asm_string + asm_string_idx, "%s", GetRegisterName(operand->register_));
+                asm_string_idx += sprintf(asm_string + asm_string_idx, "%s", GetRegisterName(operand->register_id));
             } break;
             case OperandType_MemoryAddress:
             {
@@ -85,9 +84,9 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
                 }
                 else
                 {
-                    for (size_t register_idx = 0; register_idx < ARRAY_SIZE(memory_address->registers); ++register_idx)
+                    for (size_t register_idx = 0; register_idx < ARRAY_SIZE(memory_address->register_ids); ++register_idx)
                     {
-                        const char *register_name = GetRegisterName(memory_address->registers[register_idx]);
+                        const char *register_name = GetRegisterName(memory_address->register_ids[register_idx]);
                         if (!register_name)
                         {
                             break;
@@ -110,4 +109,21 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
 
     sprintf(asm_string + asm_string_idx, "\0");
     fprintf(output_stream, "%s\n", asm_string);
+}
+
+void PrintRegisterValues(FILE *output_stream)
+{
+    for (uint8_t i = 1; i < RegisterId_Count; ++i)
+    {
+        Register register_ = registers[i];
+        if (register_.slice == RegisterSlice_Low || register_.slice == RegisterSlice_High)
+        {
+            continue;
+        }
+
+        fprintf(output_stream, "%s: 0x%04x (%u)\n",
+            GetRegisterName((RegisterId) i),
+            register_.GetValue(),
+            register_.GetValue());
+    }
 }
