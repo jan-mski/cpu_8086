@@ -96,7 +96,7 @@ void DecodeOperandAccumulator(Operand *operand, DecodingContext *decoding_contex
                              : RegisterId_AL;
 }
 
-void DecodeOperandDataRegister(Operand *operand, DecodingContext *decoding_context)
+void DecodeOperandDataRegister(Operand *operand, DecodingContext *_)
 {
     operand->type = OperandType_Register;
     operand->register_id = RegisterId_DX;

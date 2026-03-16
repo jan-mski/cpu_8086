@@ -107,7 +107,7 @@ void PrintInstructionString(FILE *output_stream, Instruction *instruction)
         }
     }
 
-    sprintf(asm_string + asm_string_idx, "\0");
+    sprintf(asm_string + asm_string_idx, "%s", "\0");
     fprintf(output_stream, "%s\n", asm_string);
 }
 
