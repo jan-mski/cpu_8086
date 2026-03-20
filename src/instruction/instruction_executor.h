@@ -1,1 +1,0 @@
-﻿void ExecuteInstruction(Instruction *instruction);
