@@ -14,7 +14,7 @@
 #define OPCODE_EXT(bit_shift) {FieldSpecType::OpcodeExtension, bit_shift, 0b111}
 #define IGNORED_8() {FieldSpecType::DATA_8}
 #define DISP_8() {FieldSpecType::DISP_8}
-#define DISP() {FieldSpecType::DISP}
+#define DISP_LO_HI() {FieldSpecType::DISP_LO_HI}
 #define DATA_8() {FieldSpecType::DATA_8}
 #define DATA_LO() {FieldSpecType::DATA_LO}
 #define DATA_HI() {FieldSpecType::DATA_HI}
@@ -46,22 +46,22 @@ namespace cpu::instruction_decoding::specs
     const InstructionSpec INSTRUCTION_SPECS[256] = {
         /* 00000000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00000001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00000010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00000011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00000100 */ { .type = T_REGULAR, .bodies {
@@ -86,22 +86,22 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 00001000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00001001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00001010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00001011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00001100 */ { .type = T_REGULAR, .bodies {
@@ -126,22 +126,22 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 00010000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00010001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00010010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00010011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00010100 */ { .type = T_REGULAR, .bodies {
@@ -166,22 +166,22 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 00011000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00011001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00011010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00011011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00011100 */ { .type = T_REGULAR, .bodies {
@@ -206,22 +206,22 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 00100000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00100001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00100010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00100011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00100100 */ { .type = T_REGULAR, .bodies {
@@ -244,22 +244,22 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 00101000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00101001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00101010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00101011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00101100 */ { .type = T_REGULAR, .bodies {
@@ -282,22 +282,22 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 00110000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00110001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00110010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00110011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00110100 */ { .type = T_REGULAR, .bodies {
@@ -320,22 +320,22 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 00111000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00111001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00111010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00111011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 00111100 */ { .type = T_REGULAR, .bodies {
@@ -646,166 +646,166 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 10000000 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_IMM}}
             },
             /* 001 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_IMM}}
             },
             /* 010 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_IMM}}
             },
             /* 011 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_IMM}}
             },
             /* 100 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_IMM}}
             },
             /* 101 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_IMM}}
             },
             /* 110 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_IMM}}
             },
             /* 111 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_IMM}}
             },
         }},
         /* 10000001 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_IMM}}
             },
             /* 001 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_IMM}}
             },
             /* 010 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_IMM}}
             },
             /* 011 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_IMM}}
             },
             /* 100 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_IMM}}
             },
             /* 101 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_IMM}}
             },
             /* 110 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::XOR, {O_REG_OR_MEM, O_IMM}}
             },
             /* 111 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_IMM}}
             },
         }},
         /* 10000010 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_IMM}}
             },
             /* 001 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_IMM}}
             },
             /* 010 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_IMM}}
             },
             /* 011 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_IMM}}
             },
             /* 100 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_IMM}}
             },
             /* 101 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_IMM}}
             },
             /* 110 */ {
 
             },
             /* 111 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_IMM}}
             },
         }},
         /* 10000011 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADD, {O_REG_OR_MEM, O_IMM}}
             },
             /* 001 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::OR, {O_REG_OR_MEM, O_IMM}}
             },
             /* 010 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::ADC, {O_REG_OR_MEM, O_IMM}}
             },
             /* 011 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SBB, {O_REG_OR_MEM, O_IMM}}
             },
             /* 100 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::AND, {O_REG_OR_MEM, O_IMM}}
             },
             /* 101 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::SUB, {O_REG_OR_MEM, O_IMM}}
             },
             /* 110 */ {
 
             },
             /* 111 */ {
-                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {S(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::CMP, {O_REG_OR_MEM, O_IMM}}
             },
         }},
         /* 10000100 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::TEST, {O_REG_OR_MEM, O_REG}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::TEST, {O_REG_OR_MEM, O_REG}}
             }
         }},
         /* 10000101 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::TEST, {O_REG_OR_MEM, O_REG}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::TEST, {O_REG_OR_MEM, O_REG}}
             }
         }},
         /* 10000110 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D_FORCED(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::XCHG, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D_FORCED(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::XCHG, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 10000111 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D_FORCED(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::XCHG, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D_FORCED(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::XCHG, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 10001000 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 10001001 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 10001010 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 10001011 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
+                .byte_1 {D(1), W(0)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_REG_OR_MEM}}
             }
         }},
         /* 10001100 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), SR(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_SEG_REG}}
+                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), SR(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_SEG_REG}}
             }
         }},
         /* 10001101 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::LEA, {O_REG, O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::LEA, {O_REG, O_REG_OR_MEM}}
             }
         }},
         /* 10001110 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), SR(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::MOV, {O_SEG_REG, O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), SR(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::MOV, {O_SEG_REG, O_REG_OR_MEM}}
             }
         }},
         /* 10001111 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::POP, {O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::POP, {O_REG_OR_MEM}}
             }
         }},
         /* 10010000 */ { .type = T_REGULAR, .bodies {
@@ -1064,22 +1064,22 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 11000100 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::LES, {O_REG, O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::LES, {O_REG, O_REG_OR_MEM}}
             }
         }},
         /* 11000101 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::LDS, {O_REG, O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), REG(3), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::LDS, {O_REG, O_REG_OR_MEM}}
             }
         }},
         /* 11000110 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {W(0)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {W(0)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_IMM}}
             }
         }},
         /* 11000111 */ { .type = T_REGULAR, .bodies {
             {
-                .byte_1 {W(0)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {W(0)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::MOV, {O_REG_OR_MEM, O_IMM}}
             }
         }},
         /* 11001000 */ {
@@ -1116,107 +1116,107 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 11010000 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 001 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::ROR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ROR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 010 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::RCL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::RCL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 011 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::RCR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::RCR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 100 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 101 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SHR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SHR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 110 */ {
 
             },
             /* 111 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SAR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SAR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
         }},
         /* 11010001 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 001 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::ROR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ROR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 010 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::RCL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::RCL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 011 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::RCR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::RCR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 100 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 101 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SHR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SHR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 110 */ {
 
             },
             /* 111 */
             {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SAR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SAR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
         }},
         /* 11010010 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 001 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::ROR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ROR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 010 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::RCL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::RCL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 011 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::RCR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::RCR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 100 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 101 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SHR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SHR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 110 */ {
 
             },
             /* 111 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SAR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SAR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
         }},
         /* 11010011 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ROL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 001 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::ROR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::ROR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 010 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::RCL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::RCL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 011 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::RCR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::RCR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 100 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SHL_SAL, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 101 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SHR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SHR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
             /* 110 */ {
 
             },
             /* 111 */ {
-                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::SAR, {O_REG_OR_MEM, O_SHIFT_CNT}}
+                .byte_1 {V(1), W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::SAR, {O_REG_OR_MEM, O_SHIFT_CNT}}
             },
         }},
         /* 11010100 */ { .type = T_REGULAR, .bodies {
@@ -1361,54 +1361,54 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 11110110 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::TEST, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::TEST, {O_REG_OR_MEM, O_IMM}}
             },
             /* 001 */ {
 
             },
             /* 010 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::NOT, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::NOT, {O_REG_OR_MEM}}
             },
             /* 011 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::NEG, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::NEG, {O_REG_OR_MEM}}
             },
             /* 100 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::MUL, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::MUL, {O_REG_OR_MEM}}
             },
             /* 101 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::IMUL, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::IMUL, {O_REG_OR_MEM}}
             },
             /* 110 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::DIV, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::DIV, {O_REG_OR_MEM}}
             },
             /* 111 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::IDIV, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::IDIV, {O_REG_OR_MEM}}
             },
         }},
         /* 11110111 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP(), DATA_LO(), DATA_HI()}, .format {Mnemonic::TEST, {O_REG_OR_MEM, O_IMM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI(), DATA_LO(), DATA_HI()}, .format {Mnemonic::TEST, {O_REG_OR_MEM, O_IMM}}
             },
             /* 001 */ {
 
             },
             /* 010 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::NOT, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::NOT, {O_REG_OR_MEM}}
             },
             /* 011 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::NEG, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::NEG, {O_REG_OR_MEM}}
             },
             /* 100 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::MUL, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::MUL, {O_REG_OR_MEM}}
             },
             /* 101 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::IMUL, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::IMUL, {O_REG_OR_MEM}}
             },
             /* 110 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::DIV, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::DIV, {O_REG_OR_MEM}}
             },
             /* 111 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::IDIV, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::IDIV, {O_REG_OR_MEM}}
             },
         }},
         /* 11111000 */ { .type = T_REGULAR, .bodies {
@@ -1443,25 +1443,25 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 11111110 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::INC, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::INC, {O_REG_OR_MEM}}
             },
             /* 001 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::DEC, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::DEC, {O_REG_OR_MEM}}
             },
             /* 010 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
             },
             /* 011 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
             },
             /* 100 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
             },
             /* 101 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
             },
             /* 110 */ {
-                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::PUSH, {O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::PUSH, {O_REG_OR_MEM}}
             },
             /* 111 */ {
 
@@ -1469,25 +1469,25 @@ namespace cpu::instruction_decoding::specs
         }},
         /* 11111111 */ { .type = T_EXTENDED, .bodies {
             /* 000 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::INC, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::INC, {O_REG_OR_MEM}}
             },
             /* 001 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::DEC, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::DEC, {O_REG_OR_MEM}}
             },
             /* 010 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
             },
             /* 011 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
             },
             /* 100 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
             },
             /* 101 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
+                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
             },
             /* 110 */ {
-                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP()}, .format {Mnemonic::PUSH, {O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::PUSH, {O_REG_OR_MEM}}
             },
             /* 111 */ {
 
@@ -1509,7 +1509,7 @@ namespace cpu::instruction_decoding::specs
 #undef SR
 #undef IGNORED_8
 #undef DISP_8
-#undef DISP
+#undef DISP_LO_HI
 #undef DATA_8
 #undef DATA_LO
 #undef DATA_HI

@@ -1,6 +1,6 @@
 ﻿namespace cpu::instruction_decoding::context
 {
-    struct InstructionDecodeContext
+    struct DecodingContext
     {
         uint8_t bytes[6];
         uint8_t num_bytes_read;
@@ -18,12 +18,9 @@
         int32_t displacement;            // 8 || 16 bits
     };
 
-    size_t ReadNextByte(InstructionDecodeContext *decoding_context,
-                        cpu::instruction_input::InstructionInput *instruction_input);
-
-    void ReadBytesUpToIdx(InstructionDecodeContext *decoding_context,
-                          uint8_t byte_idx,
-                          cpu::instruction_input::InstructionInput *instruction_input);
+    size_t ReadNextInstructionByte(DecodingContext *decoding_context,
+                                   cpu::core::Cpu *cpu,
+                                   memory::Memory *memory);
 }
 
 namespace cpu::instruction_decoding::fields
@@ -41,7 +38,7 @@ namespace cpu::instruction_decoding::fields
         REG,
         SR,
         DISP_8,
-        DISP,
+        DISP_LO_HI,
         DATA_8,
         DATA_LO,
         DATA_HI,
@@ -63,8 +60,8 @@ namespace cpu::instruction_decoding::fields
 
     void DecodeByteFields(FieldSpec *byte_field_specs,
                           uint8_t byte_idx,
-                          context::InstructionDecodeContext *decoding_context,
-                          cpu::instruction_input::InstructionInput *instruction_input);
+                          context::DecodingContext *decoding_context,
+                          memory::Memory *memory);
 }
 
 namespace cpu::instruction_decoding::operands
@@ -87,7 +84,7 @@ namespace cpu::instruction_decoding::operands
     void DecodeOperands(cpu::instruction::Instruction *instruction,
                         OperandSpecType *operand_types,
                         uint8_t num_operands,
-                        context::InstructionDecodeContext *decoding_context);
+                        context::DecodingContext *decoding_context);
 }
 
 namespace cpu::instruction_decoding::specs
@@ -122,7 +119,7 @@ namespace cpu::instruction_decoding::specs
 }
 
 namespace cpu::instruction_decoding::core {
-    cpu::instruction::Instruction DecodeInstruction(
-        context::InstructionDecodeContext *decoding_context,
-        cpu::instruction_input::InstructionInput *instruction_input);
+    cpu::instruction::Instruction DecodeInstruction(context::DecodingContext *decoding_context,
+                                                    cpu::core::Cpu *cpu,
+                                                    memory::Memory *memory);
 }

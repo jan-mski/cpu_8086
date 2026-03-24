@@ -1,81 +1,77 @@
-﻿#include <cstdio>
-#include <cstdint>
-#include <cstring>
-
-// NOTE: Single translation unit let's go - learning from Casey Muratori
-#include "cpu_core.h"
-#include "cpu_state.h"
-#include "cpu_instruction.h"
-#include "cpu_instruction_input.h"
-#include "cpu_instruction_decoding.h"
-#include "cpu_instruction_decoding_specs.inl"
-#include "cpu_instruction_execution.h"
-#include "cpu_text_output.h"
-
-#include "cpu_state.cpp"
-#include "cpu_instruction_input.cpp"
-#include "cpu_instruction_decoding.cpp"
-#include "cpu_instruction_execution.cpp"
-#include "cpu_text_output.cpp"
-
-namespace cpu::core
+﻿namespace cpu::core
 {
-    using cpu::state::CpuState;
+    using std::to_underlying;
+    using memory::Memory;
     using cpu::instruction::Instruction;
     using cpu::instruction::Mnemonic;
-    using cpu::instruction_input::InstructionInput;
     using cpu::instruction_decoding::core::DecodeInstruction;
-    using cpu::instruction_decoding::context::InstructionDecodeContext;
-    using cpu::instruction_decoding::context::ReadNextByte;
+    using cpu::instruction_decoding::context::DecodingContext;
+    using cpu::instruction_decoding::context::ReadNextInstructionByte;
     using cpu::instruction_execution::ExecuteInstruction;
-    using cpu::text_output::PrintAsmString;
-    using cpu::text_output::PrintExecutionTrace;
-    using cpu::text_output::PrintFinalCpuState;
+    using text_output::PrintAsmString;
+    using text_output::PrintExecutionTrace;
+    using text_output::PrintFinalCpuState;
 
-    void ExecuteInstructions(FILE *output_stream,
-                             FILE *input_stream,
-                             bool print_asm_strings,
-                             bool print_final_state,
-                             bool print_execution_trace)
+    Cpu::Cpu()
     {
-        CpuState cpu_state = CpuState();
-        InstructionInput instruction_input = {input_stream};
-        InstructionDecodeContext decoding_context = {};
+        static_assert(
+            (to_underlying(RegisterId::Count)) == ARRAY_SIZE(REGISTERS),
+            "Number of register id enums and registers must be equal");
 
-        while (ReadNextByte(&decoding_context, &instruction_input) != 0)
+        memcpy(this->registers, REGISTERS, sizeof(REGISTERS));
+    }
+
+    uint16_t GetRegisterValue(Register *registers, RegisterId register_id)
+    {
+        Register *register_ = &registers[to_underlying(register_id)];
+        switch (register_->slice)
         {
-            Instruction instruction = DecodeInstruction(&decoding_context, &instruction_input);
-
-            if (instruction.mnemonic == Mnemonic::None)
+            case RegisterSlice::None:
             {
-                fprintf(stderr, "Unsupported instruction. Terminating.");
-                break;
-            }
-
-            if (print_asm_strings)
+            } break;
+            case RegisterSlice::Low:
+            case RegisterSlice::High:
             {
-                PrintAsmString(output_stream, &instruction);
-            }
-
-            CpuState pre_execution_state;
-            if (print_execution_trace)
+                return register_->byte_value;
+            } break;
+            case RegisterSlice::Both:
             {
-                pre_execution_state = cpu_state;
-            }
+                uint8_t high_byte_value = registers[to_underlying(register_->halves.high_half_id)].byte_value;
+                uint8_t low_byte_value = registers[to_underlying(register_->halves.low_half_id)].byte_value;
 
-            ExecuteInstruction(&instruction, &cpu_state);
-
-            if (print_execution_trace)
+                return ((uint16_t) high_byte_value << 8) | low_byte_value;
+            } break;
+            case RegisterSlice::Full:
             {
-                PrintExecutionTrace(output_stream, &instruction, &pre_execution_state, &cpu_state);
-            }
-
-            decoding_context = {};
+                return register_->full_value;
+            } break;
         }
 
-        if (print_final_state)
+        return 0;
+    }
+
+    void SetRegisterValue(Register *registers, RegisterId register_id, uint16_t value)
+    {
+        Register *register_ = &registers[to_underlying(register_id)];
+        switch (register_->slice)
         {
-            PrintFinalCpuState(output_stream, &cpu_state);
+            case RegisterSlice::None:
+            {
+            } break;
+            case RegisterSlice::Low:
+            case RegisterSlice::High:
+            {
+                register_->byte_value = value;
+            } break;
+            case RegisterSlice::Both:
+            {
+                registers[to_underlying(register_->halves.low_half_id)].byte_value = value;
+                registers[to_underlying(register_->halves.high_half_id)].byte_value = value >> 8;
+            } break;
+            case RegisterSlice::Full:
+            {
+                register_->full_value = value;
+            } break;
         }
     }
 }

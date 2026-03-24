@@ -115,7 +115,7 @@
     {
         bool direct;
         MemoryAddressQualifier qualifier;
-        cpu::state::RegisterId register_ids[2];
+        cpu::core::RegisterId register_ids[2];
         int32_t displacement;
     };
 
@@ -134,7 +134,7 @@
         OperandType type;
         union
         {
-            cpu::state::RegisterId register_id;
+            cpu::core::RegisterId register_id;
             MemoryAddress memory_address;
             uint16_t immediate_value;
             int32_t label_like_displacement;

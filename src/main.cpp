@@ -1,6 +1,6 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-#include "cpu/cpu_core.cpp"
+#include "simulator.cpp"
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     bool print_asm = false;
     bool print_final_state = false;
     bool print_execution_trace = false;
+    bool print_instruction_pointer = false;
 
     for (uint8_t i = 2; i < argc; ++i)
     {
@@ -28,23 +29,19 @@ int main(int argc, char *argv[])
         {
             print_execution_trace = true;
         }
+        if (strcmp(argv[i], "-i") == 0)
+        {
+            print_instruction_pointer = true;
+        }
     }
 
-    FILE *file = fopen(filepath, "rb");
-    if (file == nullptr)
-    {
-        printf("Error reading file: %s\n", filepath);
-        return 1;
-    }
-
-    cpu::core::ExecuteInstructions(
+    simulator::ExecuteInstructions(
         stdout,
-        file,
+        filepath,
         print_asm,
         print_final_state,
-        print_execution_trace);
-
-    fclose(file);
+        print_execution_trace,
+        print_instruction_pointer);
 
     return 0;
 }

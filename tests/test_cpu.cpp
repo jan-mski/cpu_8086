@@ -2,126 +2,168 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include "catch2/generators/catch_generators.hpp"
-#include "../src/cpu/cpu_core.cpp"
+#include "../src/simulator.cpp"
 
-const uint8_t NASM_CMD_MAX_LEN = 32;
-const uint16_t FILE_PATH_MAX_LEN = 256;
-const uint16_t FILE_DATA_MAX_LEN = 8192;
-
-size_t ReadFileData(char *data, FILE *file)
+namespace test_cpu
 {
-    size_t file_size = fread(data, 1, FILE_DATA_MAX_LEN, file);
-    data[file_size] = '\0';
+    using simulator::ExecuteInstructions;
 
-    return file_size;
-}
+    const uint8_t NASM_CMD_MAX_LEN = 32;
+    const uint16_t FILE_PATH_MAX_LEN = 256;
+    const uint16_t FILE_DATA_MAX_LEN = 8192;
 
-TEST_CASE("Instructions are decoded correctly")
-{
-    const char* file_name = "listing_0042_completionist_decode";
+    size_t ReadFileData(char *data, FILE *file)
+    {
+        size_t file_size = fread(data, 1, FILE_DATA_MAX_LEN, file);
+        data[file_size] = '\0';
 
-    char input_file_path[FILE_PATH_MAX_LEN];
-    snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
+        return file_size;
+    }
 
-    char output_file_path[FILE_PATH_MAX_LEN];
-    snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.asm");
+    TEST_CASE("Instructions are decoded correctly")
+    {
+        const char *file_name = "listing_0042_completionist_decode";
 
-    char assembled_file_path[FILE_PATH_MAX_LEN];
-    snprintf(assembled_file_path, FILE_PATH_MAX_LEN, "%s", "test.bin");
+        char input_file_path[FILE_PATH_MAX_LEN];
+        snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
 
-    FILE *input_file = fopen(input_file_path, "rb");
-    REQUIRE(input_file != NULL);
+        char output_file_path[FILE_PATH_MAX_LEN];
+        snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.asm");
 
-    FILE *output_file = fopen(output_file_path, "w");
-    REQUIRE(output_file != NULL);
+        char assembled_file_path[FILE_PATH_MAX_LEN];
+        snprintf(assembled_file_path, FILE_PATH_MAX_LEN, "%s", "test.bin");
 
-    fprintf(output_file, "bits 16\n");
+        FILE *output_file = fopen(output_file_path, "w");
+        REQUIRE(output_file != NULL);
 
-    cpu::core::ExecuteInstructions(output_file, input_file, true, false, false);
+        fprintf(output_file, "bits 16\n");
 
-    fclose(input_file);
-    fclose(output_file);
+        ExecuteInstructions(output_file, input_file_path, true, false, false, false);
 
-    char nasm_cmd[NASM_CMD_MAX_LEN];
-    snprintf(nasm_cmd, NASM_CMD_MAX_LEN, "nasm %s -o %s", output_file_path, assembled_file_path);
-    system(nasm_cmd);
+        fclose(output_file);
 
-    FILE *assembled_file = fopen(assembled_file_path, "rb");
-    REQUIRE(assembled_file != NULL);
+        char nasm_cmd[NASM_CMD_MAX_LEN];
+        snprintf(nasm_cmd, NASM_CMD_MAX_LEN, "nasm %s -o %s", output_file_path, assembled_file_path);
+        system(nasm_cmd);
 
-    input_file = fopen(input_file_path, "rb");
-    REQUIRE(input_file != NULL);
+        FILE *assembled_file = fopen(assembled_file_path, "rb");
+        REQUIRE(assembled_file != NULL);
 
-    char assembled_data[FILE_DATA_MAX_LEN];
-    size_t assembled_file_size = ReadFileData(assembled_data, assembled_file);
+        FILE *input_file = fopen(input_file_path, "rb");
+        REQUIRE(input_file != NULL);
 
-    char input_data[FILE_DATA_MAX_LEN];
-    size_t input_file_size = ReadFileData(input_data, input_file);
+        char assembled_data[FILE_DATA_MAX_LEN];
+        size_t assembled_file_size = ReadFileData(assembled_data, assembled_file);
 
-    bool match = (assembled_file_size == input_file_size) &&
-        (memcmp(assembled_data, input_data, assembled_file_size) == 0);
+        char input_data[FILE_DATA_MAX_LEN];
+        size_t input_file_size = ReadFileData(input_data, input_file);
 
-    output_file = fopen(output_file_path, "rb");
-    REQUIRE(output_file != NULL);
+        bool match = (assembled_file_size == input_file_size) &&
+                     (memcmp(assembled_data, input_data, assembled_file_size) == 0);
 
-    char output_data[FILE_DATA_MAX_LEN];
-    ReadFileData(output_data, output_file);
+        output_file = fopen(output_file_path, "rb");
+        REQUIRE(output_file != NULL);
 
-    printf("\nOutput for file (match=%i) '%s':\n%s", match, file_name, output_data);
-    fclose(output_file);
+        char output_data[FILE_DATA_MAX_LEN];
+        ReadFileData(output_data, output_file);
 
-    fclose(assembled_file);
-    fclose(input_file);
+        printf("\nOutput for file (match=%i) '%s':\n%s", match, file_name, output_data);
+        fclose(output_file);
 
-    REQUIRE(match);
-}
+        fclose(assembled_file);
+        fclose(input_file);
 
-TEST_CASE("Instructions are executed correctly")
-{
-    const char* file_name = GENERATE("listing_0044_register_movs",
-                                     "listing_0045_challenge_register_movs",
-                                     "listing_0046_add_sub_cmp");
+        REQUIRE(match);
+    }
 
-    char input_file_path[FILE_PATH_MAX_LEN];
-    snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
+    TEST_CASE("Instructions are executed correctly - no instruction pointer")
+    {
+        const char *file_name = GENERATE(
+            "listing_0044_register_movs",
+            "listing_0045_challenge_register_movs",
+            "listing_0046_add_sub_cmp");
 
-    char output_file_path[FILE_PATH_MAX_LEN];
-    snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.txt");
+        char input_file_path[FILE_PATH_MAX_LEN];
+        snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
 
-    FILE *input_file = fopen(input_file_path, "rb");
-    REQUIRE(input_file != NULL);
+        char output_file_path[FILE_PATH_MAX_LEN];
+        snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.txt");
 
-    FILE *output_file = fopen(output_file_path, "wb");
-    REQUIRE(output_file != NULL);
+        FILE *output_file = fopen(output_file_path, "wb");
+        REQUIRE(output_file != NULL);
 
-    char verification_file_path[FILE_PATH_MAX_LEN];
-    snprintf(verification_file_path, FILE_PATH_MAX_LEN, "data/%s.txt", file_name);
-    FILE *verification_file = fopen(verification_file_path, "r");
-    REQUIRE(verification_file != NULL);
+        char verification_file_path[FILE_PATH_MAX_LEN];
+        snprintf(verification_file_path, FILE_PATH_MAX_LEN, "data/%s.txt", file_name);
+        FILE *verification_file = fopen(verification_file_path, "r");
+        REQUIRE(verification_file != NULL);
 
-    fprintf(output_file, "--- test\\%s execution ---\n", file_name);
+        fprintf(output_file, "--- test\\%s execution ---\n", file_name);
 
-    cpu::core::ExecuteInstructions(output_file, input_file, false, true, true);
+        ExecuteInstructions(output_file, input_file_path, false, true, true, false);
 
-    fclose(output_file);
+        fclose(output_file);
 
-    output_file = fopen(output_file_path, "rb");
-    REQUIRE(output_file != NULL);
+        output_file = fopen(output_file_path, "rb");
+        REQUIRE(output_file != NULL);
 
-    char output_data[FILE_DATA_MAX_LEN];
-    size_t output_file_size = ReadFileData(output_data, output_file);
+        char output_data[FILE_DATA_MAX_LEN];
+        size_t output_file_size = ReadFileData(output_data, output_file);
 
-    char verification_data[FILE_DATA_MAX_LEN];
-    size_t verification_file_size = ReadFileData(verification_data, verification_file);
+        char verification_data[FILE_DATA_MAX_LEN];
+        size_t verification_file_size = ReadFileData(verification_data, verification_file);
 
-    bool match = (output_file_size == verification_file_size) &&
-        (memcmp(output_data, verification_data, verification_file_size) == 0);
+        bool match = (output_file_size == verification_file_size) &&
+                     (memcmp(output_data, verification_data, verification_file_size) == 0);
 
-    printf("\nOutput for file (match=%i) '%s':\n%s", match, file_name, output_data);
+        printf("\nOutput for file (match=%i) '%s':\n%s", match, file_name, output_data);
 
-    fclose(input_file);
-    fclose(output_file);
-    fclose(verification_file);
+        fclose(output_file);
+        fclose(verification_file);
 
-    REQUIRE(match);
+        REQUIRE(match);
+    }
+
+    TEST_CASE("Instructions are executed correctly - with instruction pointer")
+    {
+        const char *file_name = GENERATE("listing_0048_ip_register");
+
+        char input_file_path[FILE_PATH_MAX_LEN];
+        snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
+
+        char output_file_path[FILE_PATH_MAX_LEN];
+        snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.txt");
+
+        FILE *output_file = fopen(output_file_path, "wb");
+        REQUIRE(output_file != NULL);
+
+        char verification_file_path[FILE_PATH_MAX_LEN];
+        snprintf(verification_file_path, FILE_PATH_MAX_LEN, "data/%s.txt", file_name);
+        FILE *verification_file = fopen(verification_file_path, "r");
+        REQUIRE(verification_file != NULL);
+
+        fprintf(output_file, "--- test\\%s execution ---\n", file_name);
+
+        ExecuteInstructions(output_file, input_file_path, false, true, true, true);
+
+        fclose(output_file);
+
+        output_file = fopen(output_file_path, "rb");
+        REQUIRE(output_file != NULL);
+
+        char output_data[FILE_DATA_MAX_LEN];
+        size_t output_file_size = ReadFileData(output_data, output_file);
+
+        char verification_data[FILE_DATA_MAX_LEN];
+        size_t verification_file_size = ReadFileData(verification_data, verification_file);
+
+        bool match = (output_file_size == verification_file_size) &&
+                     (memcmp(output_data, verification_data, verification_file_size) == 0);
+
+        printf("\nOutput for file (match=%i) '%s':\n%s", match, file_name, output_data);
+
+        fclose(output_file);
+        fclose(verification_file);
+
+        REQUIRE(match);
+    }
 }

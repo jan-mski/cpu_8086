@@ -1,13 +1,14 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
-namespace cpu::text_output
+namespace text_output
 {
-    using cpu::state::CpuState;
-    using cpu::state::RegisterId;
-    using cpu::state::FlagId;
-    using cpu::state::Register;
-    using cpu::state::RegisterSlice;
-    using cpu::state::GetRegisterValue;
+    using std::to_underlying;
+    using cpu::core::Cpu;
+    using cpu::core::RegisterId;
+    using cpu::core::FlagId;
+    using cpu::core::Register;
+    using cpu::core::RegisterSlice;
+    using cpu::core::GetRegisterValue;
     using cpu::instruction::Instruction;
     using cpu::instruction::Mnemonic;
     using cpu::instruction::Operand;
@@ -18,7 +19,8 @@ namespace cpu::text_output
     const char *REGISTER_NAMES[] = {
         0,
         "al", "ah", "ax", "bl", "bh", "bx", "cl", "ch", "cx", "dl",
-        "dh", "dx", "sp", "bp", "si", "di", "es", "cs", "ss", "ds"
+        "dh", "dx", "sp", "bp", "si", "di", "es", "cs", "ss", "ds",
+        "ip"
     };
 
     const char *FLAG_NAMES[] = {
@@ -29,10 +31,10 @@ namespace cpu::text_output
     const char *GetRegisterName(RegisterId register_)
     {
         static_assert(
-            RegisterId::RegisterId_Count == ARRAY_SIZE(REGISTER_NAMES),
+            (to_underlying(RegisterId::Count)) == ARRAY_SIZE(REGISTER_NAMES),
             "Number of register id enums and strings must be equal");
 
-        return REGISTER_NAMES[register_];
+        return REGISTER_NAMES[to_underlying(register_)];
     }
 
     const char *GetMnemonicString(Mnemonic mnemonic)
@@ -49,10 +51,10 @@ namespace cpu::text_output
         };
 
         static_assert(
-            ((uint8_t) Mnemonic::Count) == ARRAY_SIZE(mnemonic_strings),
+            (to_underlying(Mnemonic::Count)) == ARRAY_SIZE(mnemonic_strings),
             "Number of mnemonic enums and strings must be equal");
 
-        return mnemonic_strings[(uint8_t) mnemonic];
+        return mnemonic_strings[to_underlying(mnemonic)];
     }
 
     const char *GetMemoryAddressQualifierString(MemoryAddressQualifier qualifier)
@@ -63,10 +65,10 @@ namespace cpu::text_output
         };
 
         static_assert(
-            ((uint8_t) MemoryAddressQualifier::Count) == ARRAY_SIZE(memory_address_qualifier_strings),
+            (to_underlying(MemoryAddressQualifier::Count)) == ARRAY_SIZE(memory_address_qualifier_strings),
             "Number of qualifier enums and strings must be equal");
 
-        return memory_address_qualifier_strings[(uint8_t) qualifier];
+        return memory_address_qualifier_strings[to_underlying(qualifier)];
     }
 
     uint8_t BuildAsmString(Instruction *instruction, char *asm_string, bool terminate)
@@ -158,20 +160,24 @@ namespace cpu::text_output
         fprintf(output_stream, "%s\n", asm_string);
     }
 
-    void PrintFinalCpuState(FILE *output_stream, CpuState *final_cpu_state)
+    void PrintFinalCpuState(FILE *output_stream, Cpu *final_cpu_state, bool print_instruction_pointer)
     {
         static_assert(
-            FlagId::FlagId_Count == ARRAY_SIZE(FLAG_NAMES),
+            (to_underlying(FlagId::Count)) == ARRAY_SIZE(FLAG_NAMES),
             "Number of flag enums and strings must be equal");
 
         fprintf(output_stream, "%s", "\nFinal registers:\n");
 
-        for (uint8_t i = 1; i < RegisterId::RegisterId_Count; ++i)
+        for (uint8_t i = 1; i < (to_underlying(RegisterId::Count)); ++i)
         {
             RegisterId register_id = (RegisterId) i;
-            Register register_ = final_cpu_state->registers[register_id];
+            if (!print_instruction_pointer && register_id == RegisterId::IP)
+            {
+                continue;
+            }
 
-            if (register_.slice == RegisterSlice::RegisterSlice_Low || register_.slice == RegisterSlice::RegisterSlice_High)
+            Register register_ = final_cpu_state->registers[to_underlying(register_id)];
+            if (register_.slice == RegisterSlice::Low || register_.slice == RegisterSlice::High)
             {
                 continue;
             }
@@ -189,10 +195,10 @@ namespace cpu::text_output
             }
         }
 
-        char flag_string[FlagId::FlagId_Count];
+        char flag_string[to_underlying(FlagId::Count)];
         uint8_t flag_string_idx = 0;
 
-        for (uint8_t i = 1; i < FlagId::FlagId_Count; ++i)
+        for (uint8_t i = 1; i < (to_underlying(FlagId::Count)); ++i)
         {
             if (final_cpu_state->flags[i])
             {
@@ -209,8 +215,9 @@ namespace cpu::text_output
 
     void PrintExecutionTrace(FILE *output_stream,
                              Instruction *instruction,
-                             CpuState *pre_execution_state,
-                             CpuState *post_execution_state)
+                             Cpu *pre_execution_state,
+                             Cpu *post_execution_state,
+                             bool print_instruction_pointer)
     {
         char execution_trace[128];
         uint8_t execution_trace_idx = 0;
@@ -218,12 +225,17 @@ namespace cpu::text_output
         execution_trace_idx += BuildAsmString(instruction, execution_trace, false);
         execution_trace_idx += sprintf(execution_trace + execution_trace_idx, "%s", " ;");
 
-        for (uint8_t i = 0; i < RegisterId::RegisterId_Count; ++i)
+        for (uint8_t i = 0; i < (to_underlying(RegisterId::Count)); ++i)
         {
             RegisterId register_id = (RegisterId) i;
 
-            RegisterSlice register_slice = pre_execution_state->registers[register_id].slice;
-            if (register_slice == RegisterSlice::RegisterSlice_Low || register_slice == RegisterSlice::RegisterSlice_High)
+            if (register_id == RegisterId::IP)
+            {
+                continue;
+            }
+
+            RegisterSlice register_slice = pre_execution_state->registers[to_underlying(register_id)].slice;
+            if (register_slice == RegisterSlice::Low || register_slice == RegisterSlice::High)
             {
                 continue;
             }
@@ -244,7 +256,23 @@ namespace cpu::text_output
             }
         }
 
-        for (uint8_t i = 0; i < FlagId::FlagId_Count; ++i)
+        if (print_instruction_pointer)
+        {
+            uint16_t pre_ip_value = pre_execution_state->registers[to_underlying(RegisterId::IP)].byte_value;
+            uint16_t post_ip_value = post_execution_state->registers[to_underlying(RegisterId::IP)].byte_value;
+
+            if (pre_ip_value != post_ip_value)
+            {
+                execution_trace_idx += sprintf(
+                    execution_trace + execution_trace_idx,
+                    " %s:0x%x->0x%x",
+                    GetRegisterName(RegisterId::IP),
+                    pre_ip_value,
+                    post_ip_value);
+            }
+        }
+
+        for (uint8_t i = 0; i < (to_underlying(FlagId::Count)); ++i)
         {
             bool pre_flag_value = pre_execution_state->flags[i];
             bool post_flag_value = post_execution_state->flags[i];
