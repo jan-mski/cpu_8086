@@ -1,14 +1,14 @@
 ﻿namespace cpu::instruction_execution
 {
     using std::to_underlying;
-    using cpu::core::Cpu;
+    using cpu::core::CpuState;
     using cpu::core::RegisterId;
     using cpu::core::FlagId;
     using cpu::instruction::Instruction;
     using cpu::instruction::Mnemonic;
     using cpu::instruction::OperandType;
 
-    void ExecuteInstruction(Instruction *instruction, Cpu *cpu)
+    void ExecuteInstruction(Instruction *instruction, CpuState *cpu_state)
     {
         switch (instruction->mnemonic)
         {
@@ -19,13 +19,13 @@
                 {
                     RegisterId register_id = instruction->operands[0].register_id;
                     uint16_t immediate_value = instruction->operands[1].immediate_value;
-                    SetRegisterValue(cpu->registers, register_id, immediate_value);
+                    cpu_state->SetRegisterValue(register_id, immediate_value);
                 } else if (instruction->operands[0].type == OperandType::Register &&
                            instruction->operands[1].type == OperandType::Register)
                 {
                     RegisterId dst_register_id = instruction->operands[0].register_id;
                     RegisterId src_register_id = instruction->operands[1].register_id;
-                    SetRegisterValue(cpu->registers, dst_register_id, GetRegisterValue(cpu->registers, src_register_id));
+                    cpu_state->SetRegisterValue(dst_register_id, cpu_state->GetRegisterValue(src_register_id));
                 }
             } break;
             case Mnemonic::ADD:
@@ -37,20 +37,20 @@
                 {
                     RegisterId register_id = instruction->operands[0].register_id;
                     uint16_t immediate_value = instruction->operands[1].immediate_value;
-                    result = GetRegisterValue(cpu->registers, register_id) + immediate_value;
-                    SetRegisterValue(cpu->registers, register_id, result);
+                    result = cpu_state->GetRegisterValue(register_id) + immediate_value;
+                    cpu_state->SetRegisterValue(register_id, result);
                 } else if (instruction->operands[0].type == OperandType::Register &&
                            instruction->operands[1].type == OperandType::Register)
                 {
                     RegisterId dst_register_id = instruction->operands[0].register_id;
                     RegisterId src_register_id = instruction->operands[1].register_id;
-                    result = GetRegisterValue(cpu->registers, dst_register_id) +
-                        GetRegisterValue(cpu->registers, src_register_id);
-                    SetRegisterValue(cpu->registers, dst_register_id, result);
+                    result = cpu_state->GetRegisterValue(dst_register_id) +
+                        cpu_state->GetRegisterValue(src_register_id);
+                    cpu_state->SetRegisterValue(dst_register_id, result);
                 }
 
-                cpu->flags[to_underlying(FlagId::ZF)] = result == 0;
-                cpu->flags[to_underlying(FlagId::SF)] = result & 0x8000;
+                cpu_state->flags[to_underlying(FlagId::ZF)] = result == 0;
+                cpu_state->flags[to_underlying(FlagId::SF)] = result & 0x8000;
             } break;
             case Mnemonic::SUB:
             {
@@ -61,20 +61,20 @@
                 {
                     RegisterId register_id = instruction->operands[0].register_id;
                     uint16_t immediate_value = instruction->operands[1].immediate_value;
-                    result = GetRegisterValue(cpu->registers, register_id) - immediate_value;
-                    SetRegisterValue(cpu->registers, register_id, result);
+                    result = cpu_state->GetRegisterValue(register_id) - immediate_value;
+                    cpu_state->SetRegisterValue(register_id, result);
                 } else if (instruction->operands[0].type == OperandType::Register &&
                            instruction->operands[1].type == OperandType::Register)
                 {
                     RegisterId dst_register_id = instruction->operands[0].register_id;
                     RegisterId src_register_id = instruction->operands[1].register_id;
-                    result = GetRegisterValue(cpu->registers, dst_register_id) -
-                        GetRegisterValue(cpu->registers, src_register_id);
-                    SetRegisterValue(cpu->registers, dst_register_id, result);
+                    result = cpu_state->GetRegisterValue(dst_register_id) -
+                        cpu_state->GetRegisterValue(src_register_id);
+                    cpu_state->SetRegisterValue(dst_register_id, result);
                 }
 
-                cpu->flags[to_underlying(FlagId::ZF)] = result == 0;
-                cpu->flags[to_underlying(FlagId::SF)] = result & 0x8000;
+                cpu_state->flags[to_underlying(FlagId::ZF)] = result == 0;
+                cpu_state->flags[to_underlying(FlagId::SF)] = result & 0x8000;
             } break;
             case Mnemonic::CMP:
             {
@@ -85,15 +85,23 @@
                 {
                     RegisterId dst_register_id = instruction->operands[0].register_id;
                     RegisterId src_register_id = instruction->operands[1].register_id;
-                    result = GetRegisterValue(cpu->registers, dst_register_id) -
-                        GetRegisterValue(cpu->registers, src_register_id);
+                    result = cpu_state->GetRegisterValue(dst_register_id) -
+                        cpu_state->GetRegisterValue(src_register_id);
                 }
 
-                cpu->flags[to_underlying(FlagId::ZF)] = result == 0;
-                cpu->flags[to_underlying(FlagId::SF)] = result & 0x8000;
+                cpu_state->flags[to_underlying(FlagId::ZF)] = result == 0;
+                cpu_state->flags[to_underlying(FlagId::SF)] = result & 0x8000;
+            } break;
+            case Mnemonic::JNE_JNZ:
+            {
+                if (cpu_state->flags[to_underlying(FlagId::ZF)] == 0)
+                {
+                    cpu_state->IncrementInstructionPointer(instruction->operands[0].label_like_displacement);
+                }
             } break;
             default:
             {
+
             } break;
         }
     }

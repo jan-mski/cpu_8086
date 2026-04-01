@@ -19,7 +19,7 @@
     };
 
     size_t ReadNextInstructionByte(DecodingContext *decoding_context,
-                                   cpu::core::Cpu *cpu,
+                                   cpu::core::CpuState *cpu_state,
                                    memory::Memory *memory);
 }
 
@@ -120,6 +120,6 @@ namespace cpu::instruction_decoding::specs
 
 namespace cpu::instruction_decoding::core {
     cpu::instruction::Instruction DecodeInstruction(context::DecodingContext *decoding_context,
-                                                    cpu::core::Cpu *cpu,
+                                                    cpu::core::CpuState *cpu_state,
                                                     memory::Memory *memory);
 }

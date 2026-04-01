@@ -3,12 +3,11 @@
 namespace text_output
 {
     using std::to_underlying;
-    using cpu::core::Cpu;
+    using cpu::core::CpuState;
     using cpu::core::RegisterId;
     using cpu::core::FlagId;
     using cpu::core::Register;
     using cpu::core::RegisterSlice;
-    using cpu::core::GetRegisterValue;
     using cpu::instruction::Instruction;
     using cpu::instruction::Mnemonic;
     using cpu::instruction::Operand;
@@ -136,10 +135,24 @@ namespace text_output
                 break;
                 case OperandType::LabelLikeDisplacement:
                 {
-                    asm_string_idx += sprintf(
-                        asm_string + asm_string_idx,
-                        "($+2) + %i",
-                        operand->label_like_displacement);
+                    uint8_t num_instruction_bytes = 2;
+                    int32_t displacement_value = num_instruction_bytes + operand->label_like_displacement;
+
+                    // `$0` doesn't work with nasm, so have to use dummy arithmetic
+                    if (displacement_value == 0)
+                    {
+                        asm_string_idx += sprintf(
+                            asm_string + asm_string_idx,
+                            "($+2) + %i",
+                            operand->label_like_displacement);
+                    }
+                    else
+                    {
+                        asm_string_idx += sprintf(
+                            asm_string + asm_string_idx,
+                            displacement_value > 0 ? "$+%i" : "$%i",
+                            displacement_value);
+                    }
                 }
                 break;
             }
@@ -160,7 +173,7 @@ namespace text_output
         fprintf(output_stream, "%s\n", asm_string);
     }
 
-    void PrintFinalCpuState(FILE *output_stream, Cpu *final_cpu_state, bool print_instruction_pointer)
+    void PrintFinalCpuState(FILE *output_stream, CpuState *final_cpu_state, bool print_instruction_pointer)
     {
         static_assert(
             (to_underlying(FlagId::Count)) == ARRAY_SIZE(FLAG_NAMES),
@@ -182,7 +195,7 @@ namespace text_output
                 continue;
             }
 
-            uint16_t register_value = GetRegisterValue(final_cpu_state->registers, register_id);
+            uint16_t register_value = final_cpu_state->GetRegisterValue(register_id);
 
             if (register_value != 0)
             {
@@ -215,8 +228,8 @@ namespace text_output
 
     void PrintExecutionTrace(FILE *output_stream,
                              Instruction *instruction,
-                             Cpu *pre_execution_state,
-                             Cpu *post_execution_state,
+                             CpuState *pre_execution_state,
+                             CpuState *post_execution_state,
                              bool print_instruction_pointer)
     {
         char execution_trace[128];
@@ -240,8 +253,8 @@ namespace text_output
                 continue;
             }
 
-            uint16_t pre_register_value = GetRegisterValue(pre_execution_state->registers, register_id);
-            uint16_t post_register_value = GetRegisterValue(post_execution_state->registers, register_id);
+            uint16_t pre_register_value = pre_execution_state->GetRegisterValue(register_id);
+            uint16_t post_register_value = post_execution_state->GetRegisterValue(register_id);
 
             if (pre_register_value != post_register_value)
             {

@@ -5,7 +5,7 @@
 
 #include <utility>
 
-// NOTE: Single translation unit let's go - learning from Casey Muratori
+// NOTE: Single translation unit let's go - the unorthodox but efficient ways of Casey Muratori
 #include "simulator.h"
 #include "memory.h"
 #include "cpu/cpu_core.h"
@@ -25,10 +25,8 @@ namespace simulator
 {
     using memory::Memory;
     using memory::LoadFileToMemory;
-    using cpu::core::Cpu;
+    using cpu::core::CpuState;
     using cpu::core::RegisterId;
-    using cpu::core::GetRegisterValue;
-    using cpu::core::SetRegisterValue;
     using cpu::instruction::Instruction;
     using cpu::instruction::Mnemonic;
     using cpu::instruction_decoding::core::DecodeInstruction;
@@ -39,17 +37,10 @@ namespace simulator
     using text_output::PrintExecutionTrace;
     using text_output::PrintFinalCpuState;
 
-    void IncrementInstructionPointer(Cpu *cpu, uint8_t increment)
-    {
-        SetRegisterValue(
-            cpu->registers,
-            RegisterId::IP,
-            GetRegisterValue(cpu->registers, RegisterId::IP) + increment);
-    }
-
-    void ExecuteInstructions(Cpu *cpu,
+    void ExecuteInstructions(CpuState *cpu_state,
                              Memory *memory,
                              FILE *output_stream,
+                             bool execute_instructions,
                              bool print_asm_strings,
                              bool print_final_state,
                              bool print_execution_trace,
@@ -57,17 +48,15 @@ namespace simulator
     {
         DecodingContext decoding_context = {};
 
-        while (ReadNextInstructionByte(&decoding_context, cpu, memory) != 0)
+        while (ReadNextInstructionByte(&decoding_context, cpu_state, memory) != 0)
         {
-            Instruction instruction = DecodeInstruction(&decoding_context, cpu, memory);
+            Instruction instruction = DecodeInstruction(&decoding_context, cpu_state, memory);
 
-            Cpu pre_execution_state;
+            CpuState pre_execution_state;
             if (print_execution_trace)
             {
-                pre_execution_state = *cpu;
+                pre_execution_state = *cpu_state;
             }
-
-            IncrementInstructionPointer(cpu, decoding_context.num_bytes_read);
 
             if (instruction.mnemonic == Mnemonic::None)
             {
@@ -80,11 +69,21 @@ namespace simulator
                 PrintAsmString(output_stream, &instruction);
             }
 
-            ExecuteInstruction(&instruction, cpu);
+            cpu_state->IncrementInstructionPointer(decoding_context.num_bytes_read);
+
+            if (execute_instructions)
+            {
+                ExecuteInstruction(&instruction, cpu_state);
+            }
 
             if (print_execution_trace)
             {
-                PrintExecutionTrace(output_stream, &instruction, &pre_execution_state, cpu, print_instruction_pointer);
+                PrintExecutionTrace(
+                    output_stream,
+                    &instruction,
+                    &pre_execution_state,
+                    cpu_state,
+                    print_instruction_pointer);
             }
 
             decoding_context = {};
@@ -92,25 +91,27 @@ namespace simulator
 
         if (print_final_state)
         {
-            PrintFinalCpuState(output_stream, cpu, print_instruction_pointer);
+            PrintFinalCpuState(output_stream, cpu_state, print_instruction_pointer);
         }
     }
 
     void ExecuteInstructions(FILE *output_stream,
                              const char *input_file_path,
+                             bool execute_instructions,
                              bool print_asm_strings,
                              bool print_final_state,
                              bool print_execution_trace,
                              bool print_instruction_pointer)
     {
-        Cpu cpu = Cpu();
+        CpuState cpu_state = CpuState();
         Memory *memory = new Memory();
         LoadFileToMemory(memory, input_file_path);
 
         ExecuteInstructions(
-            &cpu,
+            &cpu_state,
             memory,
             output_stream,
+            execute_instructions,
             print_asm_strings,
             print_final_state,
             print_execution_trace,

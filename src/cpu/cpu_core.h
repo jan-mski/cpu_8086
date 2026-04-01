@@ -63,34 +63,6 @@ namespace cpu::core
         };
     };
 
-    static const Register REGISTERS[std::to_underlying(RegisterId::Count)] = {
-        {},
-
-        { .id = RegisterId::AL, .slice = RegisterSlice::Low },
-        { .id = RegisterId::AH, .slice = RegisterSlice::High },
-        { .id = RegisterId::AX, .slice = RegisterSlice::Both, .halves { RegisterId::AL, RegisterId::AH } },
-        { .id = RegisterId::BL, .slice = RegisterSlice::Low },
-        { .id = RegisterId::BH, .slice = RegisterSlice::High },
-        { .id = RegisterId::BX, .slice = RegisterSlice::Both, .halves { RegisterId::BL, RegisterId::BH } },
-        { .id = RegisterId::CL, .slice = RegisterSlice::Low },
-        { .id = RegisterId::CH, .slice = RegisterSlice::High },
-        { .id = RegisterId::CX, .slice = RegisterSlice::Both, .halves { RegisterId::CL, RegisterId::CH } },
-        { .id = RegisterId::DL, .slice = RegisterSlice::Low },
-        { .id = RegisterId::DH, .slice = RegisterSlice::High },
-        { .id = RegisterId::DX, .slice = RegisterSlice::Both, .halves { RegisterId::DL, RegisterId::DH } },
-        { .id = RegisterId::SP, .slice = RegisterSlice::Full },
-        { .id = RegisterId::BP, .slice = RegisterSlice::Full },
-        { .id = RegisterId::SI, .slice = RegisterSlice::Full },
-        { .id = RegisterId::DI, .slice = RegisterSlice::Full },
-
-        { .id = RegisterId::ES, .slice = RegisterSlice::Full },
-        { .id = RegisterId::CS, .slice = RegisterSlice::Full },
-        { .id = RegisterId::SS, .slice = RegisterSlice::Full },
-        { .id = RegisterId::DS, .slice = RegisterSlice::Full },
-
-        { .id = RegisterId::IP, .slice = RegisterSlice::Full }
-    };
-
     enum class FlagId : uint8_t
     {
         None,
@@ -108,15 +80,17 @@ namespace cpu::core
         Count,
     };
 
-    struct Cpu
+    struct CpuState
     {
         Register registers[std::to_underlying(RegisterId::Count)];
         bool flags[std::to_underlying(FlagId::Count)] = {};
 
-        Cpu();
+        CpuState();
+
+        uint16_t GetRegisterValue(RegisterId register_id);
+
+        void SetRegisterValue(RegisterId register_id, uint16_t value);
+
+        void IncrementInstructionPointer(int32_t increment);
     };
-
-    uint16_t GetRegisterValue(Register *registers, RegisterId register_id);
-
-    void SetRegisterValue(Register *registers, RegisterId register_id, uint16_t value);
 }

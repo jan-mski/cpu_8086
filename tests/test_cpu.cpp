@@ -38,7 +38,7 @@ namespace test_cpu
 
         fprintf(output_file, "bits 16\n");
 
-        ExecuteInstructions(output_file, input_file_path, true, false, false, false);
+        ExecuteInstructions(output_file, input_file_path, false, true, false, false, false);
 
         fclose(output_file);
 
@@ -99,7 +99,7 @@ namespace test_cpu
 
         fprintf(output_file, "--- test\\%s execution ---\n", file_name);
 
-        ExecuteInstructions(output_file, input_file_path, false, true, true, false);
+        ExecuteInstructions(output_file, input_file_path, true, false, true, true, false);
 
         fclose(output_file);
 
@@ -125,7 +125,7 @@ namespace test_cpu
 
     TEST_CASE("Instructions are executed correctly - with instruction pointer")
     {
-        const char *file_name = GENERATE("listing_0048_ip_register");
+        const char *file_name = GENERATE("listing_0048_ip_register", "listing_0049_conditional_jumps");
 
         char input_file_path[FILE_PATH_MAX_LEN];
         snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
@@ -143,7 +143,7 @@ namespace test_cpu
 
         fprintf(output_file, "--- test\\%s execution ---\n", file_name);
 
-        ExecuteInstructions(output_file, input_file_path, false, true, true, true);
+        ExecuteInstructions(output_file, input_file_path, true, false, true, true, true);
 
         fclose(output_file);
 
