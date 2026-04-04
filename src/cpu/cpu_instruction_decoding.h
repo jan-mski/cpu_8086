@@ -4,27 +4,30 @@
     {
         uint8_t bytes[6];
         uint8_t num_bytes_read;
-        bool d;                          // 1 bit
-        bool s;                          // 1 bit
-        bool v;                          // 1 bit
-        bool w;                          // 1 bit
-        uint8_t mod;                     // 2 bits
-        uint8_t sr;                      // 2 bits
-        uint8_t reg;                     // 3 bits
-        uint8_t r_m;                     // 3 bits
-        uint8_t opcode_extension;        // 3 bits
-        uint16_t data;                   // 8 || 16 bits
-        uint16_t addr;                   // 8 || 16 bits
-        int32_t displacement;            // 8 || 16 bits
+        bool d;                    // 1 bit
+        bool s;                    // 1 bit
+        bool v;                    // 1 bit
+        bool w;                    // 1 bit
+        bool is_w_forced;
+        uint8_t mod;               // 2 bits
+        uint8_t sr;                // 2 bits
+        uint8_t reg;               // 3 bits
+        uint8_t r_m;               // 3 bits
+        uint8_t opcode_extension;  // 3 bits
+        uint16_t data;             // 8 || 16 bits
+        uint16_t addr;             // 8 || 16 bits
+        int32_t displacement;      // 8 || 16 bits
     };
 
-    size_t ReadNextInstructionByte(DecodingContext *decoding_context,
-                                   cpu::core::CpuState *cpu_state,
-                                   memory::Memory *memory);
+    void ReadNextInstructionByte(DecodingContext *decoding_context,
+                                 uint16_t instruction_pointer_value,
+                                 memory::Memory *memory);
 }
 
 namespace cpu::instruction_decoding::fields
 {
+    const uint8_t BYTE_FIELDS_MAX_LEN = 3;
+
     enum class FieldSpecType : uint8_t
     {
         None,
@@ -55,8 +58,6 @@ namespace cpu::instruction_decoding::fields
         bool is_forced;
         uint8_t forced_value;
     };
-
-    const uint8_t BYTE_FIELDS_MAX_LEN = 3;
 
     void DecodeByteFields(FieldSpec *byte_field_specs,
                           uint8_t byte_idx,

@@ -125,7 +125,12 @@ namespace test_cpu
 
     TEST_CASE("Instructions are executed correctly - with instruction pointer")
     {
-        const char *file_name = GENERATE("listing_0048_ip_register", "listing_0049_conditional_jumps");
+        const char *file_name = GENERATE(
+            "listing_0048_ip_register",
+            "listing_0049_conditional_jumps",
+            "listing_0051_memory_mov",
+            "listing_0052_memory_add_loop",
+            "listing_0053_add_loop_challenge");
 
         char input_file_path[FILE_PATH_MAX_LEN];
         snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);

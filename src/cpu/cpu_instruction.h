@@ -101,20 +101,10 @@
         Count
     };
 
-    enum class MemoryAddressQualifier : uint8_t
-    {
-        None,
-
-        Byte,
-        Word,
-
-        Count
-    };
-
     struct MemoryAddress
     {
-        bool direct;
-        MemoryAddressQualifier qualifier;
+        uint8_t operand_size_bytes;
+        bool is_operand_size_implicit;
         cpu::core::RegisterId register_ids[2];
         int32_t displacement;
     };

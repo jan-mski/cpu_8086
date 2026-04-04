@@ -5,10 +5,16 @@
     struct Memory
     {
         uint8_t bytes[MEMORY_SIZE];
-        uint32_t num_bytes_used;
+
+        // not implementing segmented memory access
+        uint8_t ReadByte(uint32_t byte_address);
+
+        uint16_t ReadWord(uint32_t byte_1_address);
+
+        void WriteByte(uint32_t byte_address, uint8_t byte_value);
+
+        void WriteWord(uint32_t byte_1_address, uint16_t word_value);
     };
 
-    void LoadFileToMemory(Memory *memory, const char *file_path);
-
-    size_t ReadByte(uint8_t *destination, uint32_t address, Memory *memory);
+    uint16_t LoadFileToMemory(Memory *memory, const char *file_path);
 }

@@ -1,31 +1,24 @@
 ﻿namespace cpu::instruction_decoding::context
 {
     using memory::Memory;
-    using memory::ReadByte;
     using cpu::core::CpuState;
     using cpu::core::RegisterId;
 
-    size_t ReadNextInstructionByte(DecodingContext *decoding_context, CpuState *cpu_state, Memory *memory)
+    void ReadNextInstructionByte(DecodingContext *decoding_context, uint16_t instruction_pointer_value, Memory *memory)
     {
-        uint16_t instruction_pointer = cpu_state->GetRegisterValue(RegisterId::IP);
-
-        size_t num_bytes_read = ReadByte(
-            decoding_context->bytes + decoding_context->num_bytes_read,
-            instruction_pointer + decoding_context->num_bytes_read,
-            memory);
-        decoding_context->num_bytes_read += num_bytes_read;
-
-        return num_bytes_read;
+        decoding_context->bytes[decoding_context->num_bytes_read] = memory->ReadByte(
+            instruction_pointer_value + decoding_context->num_bytes_read);
+        ++decoding_context->num_bytes_read;
     }
 
     void ReadNextInstructionBytesUpToIdx(DecodingContext *decoding_context,
                                          uint8_t byte_idx,
-                                         CpuState *cpu_state,
+                                         uint16_t instruction_pointer_value,
                                          Memory *memory)
     {
         while (decoding_context->num_bytes_read <= byte_idx)
         {
-            ReadNextInstructionByte(decoding_context, cpu_state, memory);
+            ReadNextInstructionByte(decoding_context, instruction_pointer_value, memory);
         }
     }
 }
@@ -33,8 +26,8 @@
 namespace cpu::instruction_decoding::fields
 {
     using memory::Memory;
-    using memory::ReadByte;
     using cpu::core::CpuState;
+    using cpu::core::RegisterId;
     using cpu::instruction_decoding::context::DecodingContext;
     using cpu::instruction_decoding::context::ReadNextInstructionByte;
     using cpu::instruction_decoding::context::ReadNextInstructionBytesUpToIdx;
@@ -45,7 +38,11 @@ namespace cpu::instruction_decoding::fields
                         CpuState *cpu_state,
                         Memory *memory)
     {
-        ReadNextInstructionBytesUpToIdx(decoding_context, byte_idx, cpu_state, memory);
+        ReadNextInstructionBytesUpToIdx(
+            decoding_context,
+            byte_idx,
+            cpu_state->GetRegisterValue(RegisterId::IP),
+            memory);
 
         return field_spec.is_forced
                    ? field_spec.forced_value
@@ -54,7 +51,7 @@ namespace cpu::instruction_decoding::fields
 
     uint8_t DecodeByte(DecodingContext *decoding_context, CpuState *cpu_state, Memory *memory)
     {
-        ReadNextInstructionByte(decoding_context, cpu_state, memory);
+        ReadNextInstructionByte(decoding_context, cpu_state->GetRegisterValue(RegisterId::IP), memory);
 
         return decoding_context->bytes[decoding_context->num_bytes_read - 1];
     }
@@ -159,6 +156,7 @@ namespace cpu::instruction_decoding::fields
                 case FieldSpecType::W:
                 {
                     decoding_context->w = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
+                    decoding_context->is_w_forced = field_spec.is_forced;
                 } break;
                 case FieldSpecType::MOD:
                 {
@@ -224,13 +222,12 @@ namespace cpu::instruction_decoding::operands
     using cpu::instruction::Instruction;
     using cpu::instruction::Operand;
     using cpu::instruction::OperandType;
-    using cpu::instruction::MemoryAddressQualifier;
+    using cpu::instruction::MemoryAddress;
     using cpu::instruction_decoding::context::DecodingContext;
 
     void SetDirectAddressFromDisplacement(Operand *operand, DecodingContext *decoding_context)
     {
         operand->type = OperandType::MemoryAddress;
-        operand->memory_address.direct = true;
         operand->memory_address.displacement = decoding_context->displacement;
     }
 
@@ -274,7 +271,14 @@ namespace cpu::instruction_decoding::operands
         operand->register_id = registers_by_w[w][reg_or_r_m];
     }
 
-    void DecodeOperandRegisterOrMemoryAddress(Operand *operand, DecodingContext *decoding_context)
+    void SetMemoryOperandSize(MemoryAddress *memory_address, DecodingContext *decoding_context, bool exists_reg_operand)
+    {
+        uint8_t operand_size_bytes = decoding_context->w == 0 ? 1 : 2;
+        memory_address->operand_size_bytes = operand_size_bytes;
+        memory_address->is_operand_size_implicit = decoding_context->is_w_forced || exists_reg_operand;
+    }
+
+    bool DecodeOperandRegisterOrMemoryAddress(Operand *operand, DecodingContext *decoding_context)
     {
         switch (decoding_context->mod)
         {
@@ -283,7 +287,8 @@ namespace cpu::instruction_decoding::operands
                 if (decoding_context->r_m == 0b110)
                 {
                     SetDirectAddressFromDisplacement(operand, decoding_context);
-                } else
+                }
+                else
                 {
                     SetEffectiveAddress(operand, decoding_context);
                 }
@@ -296,14 +301,12 @@ namespace cpu::instruction_decoding::operands
             default:
             {
                 SetRegister(operand, decoding_context->w, decoding_context->r_m);
-                return;
+
+                return false;
             } break;
         }
 
-        MemoryAddressQualifier qualifier = decoding_context->w == 1
-                                               ? MemoryAddressQualifier::Word
-                                               : MemoryAddressQualifier::Byte;
-        operand->memory_address.qualifier = qualifier;
+        return true;
     }
 
     void DecodeOperandRegister(Operand *operand, DecodingContext *decoding_context)
@@ -344,7 +347,6 @@ namespace cpu::instruction_decoding::operands
     void DecodeOperandDirectAddress(Operand *operand, DecodingContext *decoding_context)
     {
         operand->type = OperandType::MemoryAddress;
-        operand->memory_address.direct = true;
         operand->memory_address.displacement = decoding_context->addr;
     }
 
@@ -360,10 +362,46 @@ namespace cpu::instruction_decoding::operands
         {
             operand->type = OperandType::Immediate;
             operand->immediate_value = 1;
-        } else
+        }
+        else
         {
             operand->type = OperandType::Register;
             operand->register_id = RegisterId::CL;
+        }
+    }
+
+    void DecodeBothRegisterOrMemoryOperands(Instruction *instruction, DecodingContext *decoding_context)
+    {
+        int8_t memory_operand_idx = -1;
+
+        if (decoding_context->d == 0)
+        {
+            bool is_memory_operand = DecodeOperandRegisterOrMemoryAddress(
+                &instruction->operands[0],
+                decoding_context);
+            if (is_memory_operand)
+            {
+                memory_operand_idx = 0;
+            }
+
+            DecodeOperandRegister(&instruction->operands[1], decoding_context);
+        }
+        else
+        {
+            DecodeOperandRegister(&instruction->operands[0], decoding_context);
+
+            bool is_memory_operand = DecodeOperandRegisterOrMemoryAddress(
+                &instruction->operands[1],
+                decoding_context);
+            if (is_memory_operand)
+            {
+                memory_operand_idx = 1;
+            }
+        }
+
+        if (memory_operand_idx != -1)
+        {
+            SetMemoryOperandSize(&instruction->operands[memory_operand_idx].memory_address, decoding_context, true);
         }
     }
 
@@ -376,17 +414,12 @@ namespace cpu::instruction_decoding::operands
             operand_types[0] == OperandSpecType::RegisterOrMemoryAddress &&
             operand_types[1] == OperandSpecType::RegisterOrMemoryAddress)
         {
-            if (decoding_context->d == 0)
-            {
-                DecodeOperandRegisterOrMemoryAddress(&instruction->operands[0], decoding_context);
-                DecodeOperandRegister(&instruction->operands[1], decoding_context);
-            } else
-            {
-                DecodeOperandRegister(&instruction->operands[0], decoding_context);
-                DecodeOperandRegisterOrMemoryAddress(&instruction->operands[1], decoding_context);
-            }
+            DecodeBothRegisterOrMemoryOperands(instruction, decoding_context);
             return;
         }
+
+        bool exists_reg_operand = false;
+        int8_t memory_operand_idx = -1;
 
         for (uint8_t i = 0; i < num_operands; ++i)
         {
@@ -404,29 +437,38 @@ namespace cpu::instruction_decoding::operands
                 } break;
                 case OperandSpecType::Register:
                 {
+                    exists_reg_operand = true;
                     DecodeOperandRegister(&instruction->operands[i], decoding_context);
                 } break;
                 case OperandSpecType::SegmentRegister:
                 {
+                    exists_reg_operand = true;
                     DecodeOperandSegmentRegister(&instruction->operands[i], decoding_context);
                 } break;
                 case OperandSpecType::DataRegister:
                 {
+                    exists_reg_operand = true;
                     DecodeOperandDataRegister(&instruction->operands[i], decoding_context);
+                } break;
+                case OperandSpecType::Accumulator:
+                {
+                    exists_reg_operand = true;
+                    DecodeOperandAccumulator(&instruction->operands[i], decoding_context);
                 } break;
                 case OperandSpecType::RegisterOrMemoryAddress:
                 {
-                    DecodeOperandRegisterOrMemoryAddress(
+                    bool is_memory_operand = DecodeOperandRegisterOrMemoryAddress(
                         &instruction->operands[i],
                         decoding_context);
+                    if (is_memory_operand)
+                    {
+                        memory_operand_idx = i;
+                    }
                 } break;
                 case OperandSpecType::DirectMemoryAddress:
                 {
                     DecodeOperandDirectAddress(&instruction->operands[i], decoding_context);
-                } break;
-                case OperandSpecType::Accumulator:
-                {
-                    DecodeOperandAccumulator(&instruction->operands[i], decoding_context);
+                    memory_operand_idx = i;
                 } break;
                 case OperandSpecType::Immediate:
                 {
@@ -441,6 +483,14 @@ namespace cpu::instruction_decoding::operands
                     DecodeOperandShiftRotateCount(&instruction->operands[i], decoding_context);
                 } break;
             }
+        }
+
+        if (memory_operand_idx != -1)
+        {
+            SetMemoryOperandSize(
+                &instruction->operands[memory_operand_idx].memory_address,
+                decoding_context,
+                exists_reg_operand);
         }
     }
 }

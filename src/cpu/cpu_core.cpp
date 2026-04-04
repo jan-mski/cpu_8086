@@ -12,41 +12,37 @@
     using text_output::PrintExecutionTrace;
     using text_output::PrintFinalCpuState;
 
-    CpuState::CpuState()
+    CpuState::CpuState() : registers {
+        {},
+
+        { .id = RegisterId::AL, .slice = RegisterSlice::Low },
+        { .id = RegisterId::AH, .slice = RegisterSlice::High },
+        { .id = RegisterId::AX, .slice = RegisterSlice::Both, .halves { RegisterId::AL, RegisterId::AH } },
+        { .id = RegisterId::BL, .slice = RegisterSlice::Low },
+        { .id = RegisterId::BH, .slice = RegisterSlice::High },
+        { .id = RegisterId::BX, .slice = RegisterSlice::Both, .halves { RegisterId::BL, RegisterId::BH } },
+        { .id = RegisterId::CL, .slice = RegisterSlice::Low },
+        { .id = RegisterId::CH, .slice = RegisterSlice::High },
+        { .id = RegisterId::CX, .slice = RegisterSlice::Both, .halves { RegisterId::CL, RegisterId::CH } },
+        { .id = RegisterId::DL, .slice = RegisterSlice::Low },
+        { .id = RegisterId::DH, .slice = RegisterSlice::High },
+        { .id = RegisterId::DX, .slice = RegisterSlice::Both, .halves { RegisterId::DL, RegisterId::DH } },
+        { .id = RegisterId::SP, .slice = RegisterSlice::Full },
+        { .id = RegisterId::BP, .slice = RegisterSlice::Full },
+        { .id = RegisterId::SI, .slice = RegisterSlice::Full },
+        { .id = RegisterId::DI, .slice = RegisterSlice::Full },
+
+        { .id = RegisterId::ES, .slice = RegisterSlice::Full },
+        { .id = RegisterId::CS, .slice = RegisterSlice::Full },
+        { .id = RegisterId::SS, .slice = RegisterSlice::Full },
+        { .id = RegisterId::DS, .slice = RegisterSlice::Full },
+
+        { .id = RegisterId::IP, .slice = RegisterSlice::Full }
+    }
     {
-        const Register registers[to_underlying(RegisterId::Count)] = {
-            {},
-
-            { .id = RegisterId::AL, .slice = RegisterSlice::Low },
-            { .id = RegisterId::AH, .slice = RegisterSlice::High },
-            { .id = RegisterId::AX, .slice = RegisterSlice::Both, .halves { RegisterId::AL, RegisterId::AH } },
-            { .id = RegisterId::BL, .slice = RegisterSlice::Low },
-            { .id = RegisterId::BH, .slice = RegisterSlice::High },
-            { .id = RegisterId::BX, .slice = RegisterSlice::Both, .halves { RegisterId::BL, RegisterId::BH } },
-            { .id = RegisterId::CL, .slice = RegisterSlice::Low },
-            { .id = RegisterId::CH, .slice = RegisterSlice::High },
-            { .id = RegisterId::CX, .slice = RegisterSlice::Both, .halves { RegisterId::CL, RegisterId::CH } },
-            { .id = RegisterId::DL, .slice = RegisterSlice::Low },
-            { .id = RegisterId::DH, .slice = RegisterSlice::High },
-            { .id = RegisterId::DX, .slice = RegisterSlice::Both, .halves { RegisterId::DL, RegisterId::DH } },
-            { .id = RegisterId::SP, .slice = RegisterSlice::Full },
-            { .id = RegisterId::BP, .slice = RegisterSlice::Full },
-            { .id = RegisterId::SI, .slice = RegisterSlice::Full },
-            { .id = RegisterId::DI, .slice = RegisterSlice::Full },
-
-            { .id = RegisterId::ES, .slice = RegisterSlice::Full },
-            { .id = RegisterId::CS, .slice = RegisterSlice::Full },
-            { .id = RegisterId::SS, .slice = RegisterSlice::Full },
-            { .id = RegisterId::DS, .slice = RegisterSlice::Full },
-
-            { .id = RegisterId::IP, .slice = RegisterSlice::Full }
-        };
-
         static_assert(
             (to_underlying(RegisterId::Count)) == ARRAY_SIZE(registers),
             "Number of register id enums and registers must be equal");
-
-        memcpy(this->registers, registers, sizeof(registers));
     }
 
     uint16_t CpuState::GetRegisterValue(RegisterId register_id)

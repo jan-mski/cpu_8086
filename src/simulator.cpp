@@ -40,6 +40,7 @@ namespace simulator
     void ExecuteInstructions(CpuState *cpu_state,
                              Memory *memory,
                              FILE *output_stream,
+                             uint16_t num_instruction_bytes,
                              bool execute_instructions,
                              bool print_asm_strings,
                              bool print_final_state,
@@ -48,8 +49,10 @@ namespace simulator
     {
         DecodingContext decoding_context = {};
 
-        while (ReadNextInstructionByte(&decoding_context, cpu_state, memory) != 0)
+        uint32_t instruction_pointer_value;
+        while ((instruction_pointer_value = cpu_state->GetRegisterValue(RegisterId::IP)) < num_instruction_bytes)
         {
+            ReadNextInstructionByte(&decoding_context, instruction_pointer_value, memory);
             Instruction instruction = DecodeInstruction(&decoding_context, cpu_state, memory);
 
             CpuState pre_execution_state;
@@ -73,7 +76,7 @@ namespace simulator
 
             if (execute_instructions)
             {
-                ExecuteInstruction(&instruction, cpu_state);
+                ExecuteInstruction(&instruction, cpu_state, memory);
             }
 
             if (print_execution_trace)
@@ -105,12 +108,13 @@ namespace simulator
     {
         CpuState cpu_state = CpuState();
         Memory *memory = new Memory();
-        LoadFileToMemory(memory, input_file_path);
+        uint16_t num_bytes_loaded = LoadFileToMemory(memory, input_file_path);
 
         ExecuteInstructions(
             &cpu_state,
             memory,
             output_stream,
+            num_bytes_loaded,
             execute_instructions,
             print_asm_strings,
             print_final_state,

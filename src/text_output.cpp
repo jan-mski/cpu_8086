@@ -12,7 +12,6 @@ namespace text_output
     using cpu::instruction::Mnemonic;
     using cpu::instruction::Operand;
     using cpu::instruction::OperandType;
-    using cpu::instruction::MemoryAddressQualifier;
     using cpu::instruction::MemoryAddress;
 
     const char *REGISTER_NAMES[] = {
@@ -56,21 +55,17 @@ namespace text_output
         return mnemonic_strings[to_underlying(mnemonic)];
     }
 
-    const char *GetMemoryAddressQualifierString(MemoryAddressQualifier qualifier)
+    const char *GetMemoryAddressQualifierString(uint8_t operand_size_bytes)
     {
         const char *memory_address_qualifier_strings[] = {
             0,
             "byte", "word",
         };
 
-        static_assert(
-            (to_underlying(MemoryAddressQualifier::Count)) == ARRAY_SIZE(memory_address_qualifier_strings),
-            "Number of qualifier enums and strings must be equal");
-
-        return memory_address_qualifier_strings[to_underlying(qualifier)];
+        return memory_address_qualifier_strings[operand_size_bytes];
     }
 
-    uint8_t BuildAsmString(Instruction *instruction, char *asm_string, bool terminate)
+    uint8_t BuildAsmString(Instruction *instruction, char *asm_string, bool do_terminate)
     {
         uint8_t asm_string_idx = sprintf(asm_string, "%s", GetMnemonicString(instruction->mnemonic));
 
@@ -90,49 +85,56 @@ namespace text_output
                 case OperandType::None:
                 {
                     break;
-                }
-                break;
+                } break;
                 case OperandType::Register:
                 {
                     asm_string_idx += sprintf(asm_string + asm_string_idx, "%s", GetRegisterName(operand->register_id));
-                }
-                break;
+                } break;
                 case OperandType::MemoryAddress:
                 {
                     MemoryAddress *memory_address = &operand->memory_address;
-                    if (memory_address->qualifier != MemoryAddressQualifier::None)
+                    if (!memory_address->is_operand_size_implicit)
                     {
                         asm_string_idx += sprintf(
                             asm_string + asm_string_idx,
                             "%s ",
-                            GetMemoryAddressQualifierString(memory_address->qualifier));
+                            GetMemoryAddressQualifierString(memory_address->operand_size_bytes));
                     }
-                    if (memory_address->direct)
+
+                    bool is_any_register_used = false;
+                    for (uint8_t register_idx = 0; register_idx < ARRAY_SIZE(memory_address->register_ids); ++register_idx)
+                    {
+                        const char *register_name = GetRegisterName(memory_address->register_ids[register_idx]);
+                        if (!register_name)
+                        {
+                            break;
+                        }
+                        is_any_register_used = true;
+                        asm_string_idx += sprintf(
+                            asm_string + asm_string_idx,
+                            register_idx == 0 ? "[%s" : " + %s",
+                            register_name);
+                    }
+                    if (is_any_register_used && memory_address->displacement != 0)
+                    {
+                        asm_string_idx += sprintf(
+                            asm_string + asm_string_idx,
+                            memory_address->displacement > 0 ? " + %i]" : " - %i]",
+                            abs(memory_address->displacement));
+                    }
+                    else if (memory_address->displacement == 0)
+                    {
+                        asm_string_idx += sprintf(asm_string + asm_string_idx, "%s", "]");
+                    }
+                    else
                     {
                         asm_string_idx += sprintf(asm_string + asm_string_idx, "[%i]", memory_address->displacement);
-                    } else
-                    {
-                        for (size_t register_idx = 0; register_idx < ARRAY_SIZE(memory_address->register_ids); ++register_idx)
-                        {
-                            const char *register_name = GetRegisterName(memory_address->register_ids[register_idx]);
-                            if (!register_name)
-                            {
-                                break;
-                            }
-                            asm_string_idx += sprintf(
-                                asm_string + asm_string_idx,
-                                register_idx == 0 ? "[%s" : " + %s",
-                                register_name);
-                        }
-                        asm_string_idx += sprintf(asm_string + asm_string_idx, " + %i]", memory_address->displacement);
                     }
-                }
-                break;
+                } break;
                 case OperandType::Immediate:
                 {
                     asm_string_idx += sprintf(asm_string + asm_string_idx, "%u", operand->immediate_value);
-                }
-                break;
+                } break;
                 case OperandType::LabelLikeDisplacement:
                 {
                     uint8_t num_instruction_bytes = 2;
@@ -153,12 +155,11 @@ namespace text_output
                             displacement_value > 0 ? "$+%i" : "$%i",
                             displacement_value);
                     }
-                }
-                break;
+                } break;
             }
         }
 
-        if (terminate)
+        if (do_terminate)
         {
             sprintf(asm_string + asm_string_idx, "%s", "\0");
         }

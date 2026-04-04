@@ -1475,16 +1475,16 @@ namespace cpu::instruction_decoding::specs
                 .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::DEC, {O_REG_OR_MEM}}
             },
             /* 010 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
             },
             /* 011 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::CALL, {O_REG_OR_MEM}}
             },
             /* 100 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
             },
             /* 101 */ {
-                .byte_1 {W(0)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
+                .byte_1 {W_FORCED(1)}, .byte_2 = OPCODE_EXT_BYTE, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::JMP, {O_REG_OR_MEM}}
             },
             /* 110 */ {
                 .byte_1 {W_FORCED(1)}, .byte_2 {MOD(6), RM(0)}, .byte_3456 {DISP_LO_HI()}, .format {Mnemonic::PUSH, {O_REG_OR_MEM}}
