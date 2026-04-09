@@ -56,4 +56,19 @@
 
         return num_bytes_read;
     }
+
+    void SaveMemoryToFile(const char *file_name, uint16_t offset, Memory *memory)
+    {
+        FILE *file = fopen(file_name, "wb");
+
+        if (file == nullptr)
+        {
+            fprintf(stderr, "Error opening file for writing: %s\n", file_name);
+            return;
+        }
+
+        fwrite(memory->bytes + offset, 1, MEMORY_SIZE - offset, file);
+
+        fclose(file);
+    }
 }

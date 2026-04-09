@@ -17,4 +17,6 @@
     };
 
     uint16_t LoadFileToMemory(Memory *memory, const char *file_path);
+
+    void SaveMemoryToFile(const char *file_name, uint16_t offset, Memory *memory);
 }

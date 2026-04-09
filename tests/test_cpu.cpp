@@ -38,7 +38,7 @@ namespace test_cpu
 
         fprintf(output_file, "bits 16\n");
 
-        ExecuteInstructions(output_file, input_file_path, false, true, false, false, false);
+        ExecuteInstructions(output_file, input_file_path, false, false, true, false, false, false);
 
         fclose(output_file);
 
@@ -99,7 +99,7 @@ namespace test_cpu
 
         fprintf(output_file, "--- test\\%s execution ---\n", file_name);
 
-        ExecuteInstructions(output_file, input_file_path, true, false, true, true, false);
+        ExecuteInstructions(output_file, input_file_path, true, false, false, true, true, false);
 
         fclose(output_file);
 
@@ -148,7 +148,7 @@ namespace test_cpu
 
         fprintf(output_file, "--- test\\%s execution ---\n", file_name);
 
-        ExecuteInstructions(output_file, input_file_path, true, false, true, true, true);
+        ExecuteInstructions(output_file, input_file_path, true, false, false, true, true, true);
 
         fclose(output_file);
 

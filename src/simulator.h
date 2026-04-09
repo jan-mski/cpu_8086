@@ -5,6 +5,7 @@ namespace simulator
     void ExecuteInstructions(FILE *output_stream,
                              const char *input_file_path,
                              bool execute_instructions,
+                             bool dump_memory,
                              bool print_asm_strings,
                              bool print_final_state,
                              bool print_execution_trace,

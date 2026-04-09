@@ -101,6 +101,7 @@ namespace simulator
     void ExecuteInstructions(FILE *output_stream,
                              const char *input_file_path,
                              bool execute_instructions,
+                             bool dump_memory,
                              bool print_asm_strings,
                              bool print_final_state,
                              bool print_execution_trace,
@@ -120,6 +121,11 @@ namespace simulator
             print_final_state,
             print_execution_trace,
             print_instruction_pointer);
+
+        if (dump_memory)
+        {
+            SaveMemoryToFile("memory_dump.data", num_bytes_loaded, memory);
+        }
 
         delete memory;
     }

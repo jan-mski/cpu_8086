@@ -5,3 +5,4 @@ test.bin
 test.txt
 cmake-build-debug/
 build/
+memory_dump.data
