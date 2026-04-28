@@ -1,45 +1,6 @@
 ﻿namespace memory
 {
-    uint8_t Memory::ReadByte(uint32_t byte_address)
-    {
-        if (byte_address < MEMORY_SIZE)
-        {
-            return bytes[byte_address];
-        }
-
-        return 0;
-    }
-
-    uint16_t Memory::ReadWord(uint32_t byte_1_address)
-    {
-        uint32_t byte_2_address = byte_1_address + 1;
-        if (byte_1_address < MEMORY_SIZE && byte_2_address < MEMORY_SIZE)
-        {
-            return (uint16_t) bytes[byte_1_address] | (uint16_t) (bytes[byte_2_address] << 8);
-        }
-
-        return 0;
-    }
-
-    void Memory::WriteByte(uint32_t byte_address, uint8_t byte_value)
-    {
-        if (byte_address < MEMORY_SIZE)
-        {
-            bytes[byte_address] = byte_value;
-        }
-    }
-
-    void Memory::WriteWord(uint32_t byte_1_address, uint16_t word_value)
-    {
-        uint32_t byte_2_address = byte_1_address + 1;
-        if (byte_1_address < MEMORY_SIZE && byte_2_address < MEMORY_SIZE)
-        {
-            bytes[byte_1_address] = (uint8_t) word_value;
-            bytes[byte_2_address] = (uint8_t) (word_value >> 8);
-        }
-    }
-
-    uint16_t LoadFileToMemory(Memory *memory, const char *file_path)
+    uint16_t Memory::LoadFileToMemory(Memory *memory, const char *file_path)
     {
         FILE *file = fopen(file_path, "rb");
 
@@ -49,7 +10,7 @@
 
             return 0;
         }
-        
+
         size_t num_bytes_read = fread(memory->bytes, 1, MEMORY_SIZE, file);
 
         fclose(file);
@@ -57,18 +18,57 @@
         return num_bytes_read;
     }
 
-    void SaveMemoryToFile(const char *file_name, uint16_t offset, Memory *memory)
+    void Memory::SaveMemoryToFile(const char *file_path, Memory *memory)
     {
-        FILE *file = fopen(file_name, "wb");
+        FILE *file = fopen(file_path, "wb");
 
         if (file == nullptr)
         {
-            fprintf(stderr, "Error opening file for writing: %s\n", file_name);
+            fprintf(stderr, "Error opening file for writing: %s\n", file_path);
             return;
         }
 
-        fwrite(memory->bytes + offset, 1, MEMORY_SIZE - offset, file);
+        fwrite(memory->bytes, 1, MEMORY_SIZE, file);
 
         fclose(file);
+    }
+
+    uint16_t Memory::ReadMemory(uint32_t address, bool is_16_bit)
+    {
+        return is_16_bit
+                   ? ReadWord(address)
+                   : ReadByte(address);
+    }
+
+    void Memory::WriteMemory(uint32_t address, bool is_16_bit, uint16_t value)
+    {
+        is_16_bit
+            ? WriteWord(address, value)
+            : WriteByte(address, (uint8_t) value);
+    }
+
+    uint8_t Memory::ReadByte(uint32_t byte_address)
+    {
+        byte_address = byte_address < MEMORY_SIZE ? byte_address : 0;
+
+        return bytes[byte_address];
+    }
+
+    uint16_t Memory::ReadWord(uint32_t byte_1_address)
+    {
+        return (uint16_t) ReadByte(byte_1_address)
+               | (uint16_t) (ReadByte(byte_1_address + 1) << 8);
+    }
+
+    void Memory::WriteByte(uint32_t byte_address, uint8_t byte_value)
+    {
+        byte_address = byte_address < MEMORY_SIZE ? byte_address : 0;
+        bytes[byte_address] = byte_value;
+    }
+
+    void Memory::WriteWord(uint32_t byte_1_address, uint16_t word_value)
+    {
+        WriteByte(byte_1_address, (uint8_t) word_value);
+        WriteByte(byte_1_address + 1, (uint8_t) (word_value >> 8));
     }
 }

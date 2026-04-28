@@ -1,22 +1,31 @@
-﻿#define ARRAY_SIZE(array) ((sizeof(array) / sizeof(array[0])))
+﻿#ifndef CPU_CORE_H
+#define CPU_CORE_H
 
 namespace cpu::core
 {
-    enum class RegisterId : uint8_t
+    enum class Register8BitId : uint8_t
     {
         None,
 
         AL,
         AH,
-        AX,
         BL,
         BH,
-        BX,
         CL,
         CH,
-        CX,
         DL,
         DH,
+
+        Count
+    };
+
+    enum class Register16BitId : uint8_t
+    {
+        None,
+
+        AX,
+        BX,
+        CX,
         DX,
         SP,
         BP,
@@ -31,36 +40,6 @@ namespace cpu::core
         IP,
 
         Count
-    };
-
-    enum class RegisterSlice : uint8_t
-    {
-        None,
-
-        Low,
-        High,
-        Both,
-        Full
-    };
-
-    struct RegisterHalves
-    {
-        RegisterId low_half_id;
-        RegisterId high_half_id;
-    };
-
-    struct Register
-    {
-        RegisterId id;
-
-        RegisterSlice slice;
-
-        union
-        {
-            uint8_t byte_value;
-            RegisterHalves halves;
-            uint16_t full_value;
-        };
     };
 
     enum class FlagId : uint8_t
@@ -82,15 +61,28 @@ namespace cpu::core
 
     struct CpuState
     {
-        Register registers[std::to_underlying(RegisterId::Count)];
+        bool GetFlagValue(FlagId flag_id);
+
+        void SetFlagValue(FlagId flag_id, bool value);
+
+        uint16_t GetRegisterValue(Register8BitId register_8_bit_id);
+
+        void SetRegisterValue(Register8BitId register_8_bit_id, uint8_t value);
+
+        uint16_t GetRegisterValue(Register16BitId register_16_bit_id);
+
+        void SetRegisterValue(Register16BitId register_16_bit_id, uint16_t value);
+
+        void IncrementIP(int32_t increment);
+
+        void IncrementSP();
+
+        void DecrementSP();
+
+    private:
         bool flags[std::to_underlying(FlagId::Count)] = {};
-
-        CpuState();
-
-        uint16_t GetRegisterValue(RegisterId register_id);
-
-        void SetRegisterValue(RegisterId register_id, uint16_t value);
-
-        void IncrementInstructionPointer(int32_t increment);
+        uint16_t registers[std::to_underlying(Register16BitId::Count)] = {};
     };
 }
+
+#endif // CPU_CORE_H

@@ -15,7 +15,6 @@ int main(int argc, char *argv[])
     bool print_asm = false;
     bool print_final_state = false;
     bool print_execution_trace = false;
-    bool print_instruction_pointer = false;
 
     for (uint8_t i = 2; i < argc; ++i)
     {
@@ -39,10 +38,6 @@ int main(int argc, char *argv[])
         {
             print_execution_trace = true;
         }
-        if (strcmp(argv[i], "--print-instruction-pointer") == 0 || strcmp(argv[i], "-pi") == 0)
-        {
-            print_instruction_pointer = true;
-        }
     }
 
     simulator::ExecuteInstructions(
@@ -52,8 +47,7 @@ int main(int argc, char *argv[])
         dump_memory,
         print_asm,
         print_final_state,
-        print_execution_trace,
-        print_instruction_pointer);
+        print_execution_trace);
 
     return 0;
 }

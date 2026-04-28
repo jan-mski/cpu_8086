@@ -1,4 +1,7 @@
-﻿namespace cpu::instruction
+﻿#ifndef CPU_INSTRUCTION_H
+#define CPU_INSTRUCTION_H
+
+namespace cpu::instruction
 {
     enum class Mnemonic : uint8_t
     {
@@ -103,9 +106,8 @@
 
     struct MemoryAddress
     {
-        uint8_t operand_size_bytes;
         bool is_operand_size_implicit;
-        cpu::core::RegisterId register_ids[2];
+        cpu::core::Register16BitId register_ids[2];
         int32_t displacement;
     };
 
@@ -113,21 +115,24 @@
     {
         None,
 
-        Register,
+        Register8Bit,
+        Register16Bit,
         MemoryAddress,
         Immediate,
-        LabelLikeDisplacement
+        IPIncrement
     };
 
     struct Operand
     {
         OperandType type;
+
         union
         {
-            cpu::core::RegisterId register_id;
+            cpu::core::Register8BitId register_8_bit_id;
+            cpu::core::Register16BitId register_16_bit_id;
             MemoryAddress memory_address;
             uint16_t immediate_value;
-            int32_t label_like_displacement;
+            int16_t ip_increment;
         };
     };
 
@@ -135,5 +140,8 @@
     {
         Mnemonic mnemonic;
         Operand operands[2];
+        bool is_wide;
     };
 }
+
+#endif // CPU_INSTRUCTION_H

@@ -22,10 +22,10 @@ namespace test_cpu
 
     TEST_CASE("Instructions are decoded correctly")
     {
-        const char *file_name = "listing_0042_completionist_decode";
+        const char *file_name = "instruction_decoding_001";
 
         char input_file_path[FILE_PATH_MAX_LEN];
-        snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
+        snprintf(input_file_path, FILE_PATH_MAX_LEN, "tests/resources/%s", file_name);
 
         char output_file_path[FILE_PATH_MAX_LEN];
         snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.asm");
@@ -38,7 +38,7 @@ namespace test_cpu
 
         fprintf(output_file, "bits 16\n");
 
-        ExecuteInstructions(output_file, input_file_path, false, false, true, false, false, false);
+        ExecuteInstructions(output_file, input_file_path, false, false, true, false, false);
 
         fclose(output_file);
 
@@ -76,15 +76,19 @@ namespace test_cpu
         REQUIRE(match);
     }
 
-    TEST_CASE("Instructions are executed correctly - no instruction pointer")
+    TEST_CASE("Instructions are executed correctly")
     {
         const char *file_name = GENERATE(
-            "listing_0044_register_movs",
-            "listing_0045_challenge_register_movs",
-            "listing_0046_add_sub_cmp");
+            "instruction_execution_001_mov",
+            "instruction_execution_002_arithmetic",
+            "instruction_execution_003_logical",
+            "instruction_execution_004_bitwise",
+            "instruction_execution_005_loop",
+            "instruction_execution_006_stack",
+            "instruction_execution_007_lea");
 
         char input_file_path[FILE_PATH_MAX_LEN];
-        snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
+        snprintf(input_file_path, FILE_PATH_MAX_LEN, "tests/resources/%s", file_name);
 
         char output_file_path[FILE_PATH_MAX_LEN];
         snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.txt");
@@ -93,62 +97,11 @@ namespace test_cpu
         REQUIRE(output_file != NULL);
 
         char verification_file_path[FILE_PATH_MAX_LEN];
-        snprintf(verification_file_path, FILE_PATH_MAX_LEN, "data/%s.txt", file_name);
+        snprintf(verification_file_path, FILE_PATH_MAX_LEN, "tests/resources/%s.txt", file_name);
         FILE *verification_file = fopen(verification_file_path, "r");
         REQUIRE(verification_file != NULL);
 
-        fprintf(output_file, "--- test\\%s execution ---\n", file_name);
-
-        ExecuteInstructions(output_file, input_file_path, true, false, false, true, true, false);
-
-        fclose(output_file);
-
-        output_file = fopen(output_file_path, "rb");
-        REQUIRE(output_file != NULL);
-
-        char output_data[FILE_DATA_MAX_LEN];
-        size_t output_file_size = ReadFileData(output_data, output_file);
-
-        char verification_data[FILE_DATA_MAX_LEN];
-        size_t verification_file_size = ReadFileData(verification_data, verification_file);
-
-        bool match = (output_file_size == verification_file_size) &&
-                     (memcmp(output_data, verification_data, verification_file_size) == 0);
-
-        printf("\nOutput for file (match=%i) '%s':\n%s", match, file_name, output_data);
-
-        fclose(output_file);
-        fclose(verification_file);
-
-        REQUIRE(match);
-    }
-
-    TEST_CASE("Instructions are executed correctly - with instruction pointer")
-    {
-        const char *file_name = GENERATE(
-            "listing_0048_ip_register",
-            "listing_0049_conditional_jumps",
-            "listing_0051_memory_mov",
-            "listing_0052_memory_add_loop",
-            "listing_0053_add_loop_challenge");
-
-        char input_file_path[FILE_PATH_MAX_LEN];
-        snprintf(input_file_path, FILE_PATH_MAX_LEN, "data/%s", file_name);
-
-        char output_file_path[FILE_PATH_MAX_LEN];
-        snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.txt");
-
-        FILE *output_file = fopen(output_file_path, "wb");
-        REQUIRE(output_file != NULL);
-
-        char verification_file_path[FILE_PATH_MAX_LEN];
-        snprintf(verification_file_path, FILE_PATH_MAX_LEN, "data/%s.txt", file_name);
-        FILE *verification_file = fopen(verification_file_path, "r");
-        REQUIRE(verification_file != NULL);
-
-        fprintf(output_file, "--- test\\%s execution ---\n", file_name);
-
-        ExecuteInstructions(output_file, input_file_path, true, false, false, true, true, true);
+        ExecuteInstructions(output_file, input_file_path, true, false, false, true, true);
 
         fclose(output_file);
 
