@@ -1,25 +1,20 @@
-namespace cpu::instruction_decoding::fields
+namespace instruction_decoding::fields
 {
-    using memory::Memory;
-    using cpu::core::CpuState;
-    using cpu::core::Register16BitId;
-    using cpu::instruction_decoding::specs::FieldSpec;
-    using cpu::instruction_decoding::specs::FieldSpecType;
-    using cpu::instruction_decoding::specs::BYTE_FIELDS_MAX_LEN;
-    using cpu::instruction_decoding::context::DecodingContext;
-    using cpu::instruction_decoding::context::ReadNextInstructionByte;
-    using cpu::instruction_decoding::context::ReadNextInstructionBytesUpToIdx;
+    namespace mem = ::memory;
+    namespace cpu = ::cpu;
+    namespace dec_ctx = ::instruction_decoding::context;
+    namespace dec_spx = ::instruction_decoding::specs;
 
-    uint8_t DecodeField(FieldSpec field_spec,
-                        uint8_t byte_idx,
-                        DecodingContext *decoding_context,
-                        CpuState *cpu_state,
-                        Memory *memory)
+    U8 DecodeField(dec_spx::FieldSpec field_spec,
+                   U8 byte_idx,
+                   dec_ctx::DecodingContext* decoding_context,
+                   cpu::CpuState* cpu_state,
+                   mem::Memory* memory)
     {
-        ReadNextInstructionBytesUpToIdx(
+        dec_ctx::ReadNextInstructionBytesUpToIdx(
             decoding_context,
             byte_idx,
-            cpu_state->GetRegisterValue(Register16BitId::IP),
+            cpu::GetRegisterValue(cpu_state, cpu::Register16BitId_IP),
             memory);
 
         return field_spec.is_forced
@@ -27,38 +22,49 @@ namespace cpu::instruction_decoding::fields
                    : (decoding_context->bytes[byte_idx] >> field_spec.bit_shift) & field_spec.bit_mask;
     }
 
-    uint8_t DecodeByte(DecodingContext *decoding_context, CpuState *cpu_state, Memory *memory)
+    U8 DecodeByte(dec_ctx::DecodingContext* decoding_context,
+                  cpu::CpuState* cpu_state,
+                  mem::Memory* memory)
     {
-        ReadNextInstructionByte(decoding_context, cpu_state->GetRegisterValue(Register16BitId::IP), memory);
+        dec_ctx::ReadNextInstructionByte(
+            decoding_context,
+            cpu::GetRegisterValue(cpu_state, cpu::Register16BitId_IP),
+            memory);
 
         return decoding_context->bytes[decoding_context->num_bytes_read - 1];
     }
 
-    uint16_t DecodeHighByte(uint8_t low_byte_value,
-                            DecodingContext *decoding_context,
-                            CpuState *cpu_state,
-                            Memory *memory)
+    U16 DecodeHighByte(U8 low_byte_value,
+                       dec_ctx::DecodingContext* decoding_context,
+                       cpu::CpuState* cpu_state,
+                       mem::Memory* memory)
     {
         return DecodeByte(decoding_context, cpu_state, memory) << 8 | low_byte_value;
     }
 
-    uint16_t DecodeDataHighByte(DecodingContext *decoding_context, CpuState *cpu_state, Memory *memory)
+    U16 DecodeDataHighByte(dec_ctx::DecodingContext* decoding_context,
+                           cpu::CpuState* cpu_state,
+                           mem::Memory* memory)
     {
         return (decoding_context->w == 1 && decoding_context->s == 0)
                    ? DecodeHighByte(decoding_context->data, decoding_context, cpu_state, memory)
                    : decoding_context->data;
     }
 
-    uint16_t DecodeDisplacement16Bit(DecodingContext *decoding_context, CpuState *cpu_state, Memory *memory)
+    U16 DecodeDisplacement16Bit(dec_ctx::DecodingContext* decoding_context,
+                                cpu::CpuState* cpu_state,
+                                mem::Memory* memory)
     {
-        uint8_t low_byte_value = DecodeByte(decoding_context, cpu_state, memory);
+        U8 low_byte_value = DecodeByte(decoding_context, cpu_state, memory);
 
         return DecodeHighByte(low_byte_value, decoding_context, cpu_state, memory);
     }
 
-    int32_t DecodeDisplacementBytes(DecodingContext *decoding_context, CpuState *cpu_state, Memory *memory)
+    I32 DecodeDisplacementBytes(dec_ctx::DecodingContext* decoding_context,
+                                cpu::CpuState* cpu_state,
+                                mem::Memory* memory)
     {
-        int32_t displacement = 0;
+        I32 displacement = 0;
 
         switch (decoding_context->mod)
         {
@@ -71,7 +77,7 @@ namespace cpu::instruction_decoding::fields
             } break;
             case 0b01:
             {
-                displacement = (int8_t) DecodeByte(decoding_context, cpu_state, memory);
+                displacement = (I8) DecodeByte(decoding_context, cpu_state, memory);
             } break;
             case 0b10:
             {
@@ -85,68 +91,68 @@ namespace cpu::instruction_decoding::fields
         return displacement;
     }
 
-    void DecodeByteFields(FieldSpec *byte_field_specs,
-                          uint8_t byte_idx,
-                          DecodingContext *decoding_context,
-                          CpuState *cpu_state,
-                          Memory *memory)
+    void DecodeByteFields(dec_spx::FieldSpec* byte_field_specs,
+                          U8 byte_idx,
+                          dec_ctx::DecodingContext* decoding_context,
+                          cpu::CpuState* cpu_state,
+                          mem::Memory* memory)
     {
-        for (uint8_t i = 0; i < BYTE_FIELDS_MAX_LEN; ++i)
+        for (U8 i = 0; i < dec_spx::BYTE_FIELDS_MAX_LEN; ++i)
         {
-            FieldSpec field_spec = byte_field_specs[i];
+            dec_spx::FieldSpec field_spec = byte_field_specs[i];
 
-            if (field_spec.type == FieldSpecType::None)
+            if (field_spec.type == dec_spx::FieldSpecType_None)
             {
                 break;
             }
 
             switch (field_spec.type)
             {
-                case FieldSpecType::None:
+                case dec_spx::FieldSpecType_None:
                 {
                 } break;
-                case FieldSpecType::D:
+                case dec_spx::FieldSpecType_D:
                 {
                     decoding_context->d = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::S:
+                case dec_spx::FieldSpecType_S:
                 {
                     decoding_context->s = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::V:
+                case dec_spx::FieldSpecType_V:
                 {
                     decoding_context->v = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::W:
+                case dec_spx::FieldSpecType_W:
                 {
                     decoding_context->w = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
                     decoding_context->is_w_forced = field_spec.is_forced;
                 } break;
-                case FieldSpecType::MOD:
+                case dec_spx::FieldSpecType_MOD:
                 {
                     decoding_context->mod = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::RM:
+                case dec_spx::FieldSpecType_RM:
                 {
                     decoding_context->r_m = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::REG:
+                case dec_spx::FieldSpecType_REG:
                 {
                     decoding_context->reg = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::SR:
+                case dec_spx::FieldSpecType_SR:
                 {
                     decoding_context->sr = DecodeField(field_spec, byte_idx, decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::IP_INC_8:
+                case dec_spx::FieldSpecType_IP_INC_8:
                 {
-                    decoding_context->ip_increment = (int8_t) DecodeByte(decoding_context, cpu_state, memory);
+                    decoding_context->ip_increment = (I8) DecodeByte(decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::IP_INC_LO:
+                case dec_spx::FieldSpecType_IP_INC_LO:
                 {
                     decoding_context->ip_increment = DecodeByte(decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::IP_INC_HI:
+                case dec_spx::FieldSpecType_IP_INC_HI:
                 {
                     decoding_context->ip_increment = DecodeHighByte(
                         decoding_context->ip_increment,
@@ -154,27 +160,27 @@ namespace cpu::instruction_decoding::fields
                         cpu_state,
                         memory);
                 } break;
-                case FieldSpecType::DISP_LO_HI:
+                case dec_spx::FieldSpecType_DISP_LO_HI:
                 {
                     decoding_context->displacement = DecodeDisplacementBytes(decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::DATA_8:
+                case dec_spx::FieldSpecType_DATA_8:
                 {
                     decoding_context->data = DecodeByte(decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::DATA_LO:
+                case dec_spx::FieldSpecType_DATA_LO:
                 {
                     decoding_context->data = DecodeByte(decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::DATA_HI:
+                case dec_spx::FieldSpecType_DATA_HI:
                 {
                     decoding_context->data = DecodeDataHighByte(decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::ADDR_LO:
+                case dec_spx::FieldSpecType_ADDR_LO:
                 {
                     decoding_context->addr = DecodeByte(decoding_context, cpu_state, memory);
                 } break;
-                case FieldSpecType::ADDR_HI:
+                case dec_spx::FieldSpecType_ADDR_HI:
                 {
                     decoding_context->addr = DecodeHighByte(
                         decoding_context->addr,
@@ -182,7 +188,7 @@ namespace cpu::instruction_decoding::fields
                         cpu_state,
                         memory);
                 } break;
-                case FieldSpecType::OpcodeExtension:
+                case dec_spx::FieldSpecType_OpcodeExtension:
                 {
                     decoding_context->opcode_extension = DecodeField(
                         field_spec,

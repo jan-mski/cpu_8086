@@ -5,116 +5,120 @@
 #include <cstdarg>
 
 #include <utility>
+#include <type_traits>
 
+#include "base.h"
 #include "simulator.h"
 #include "memory.h"
-#include "cpu/cpu_inc.h"
+#include "cpu.h"
+#include "instruction.h"
+#include "instruction_decoding/instruction_decoding_inc.h"
+#include "instruction_execution/instruction_execution_inc.h"
+#include "cycle_estimation.h"
 #include "text_output.h"
 
 // NOTE: Single translation unit let's go - the unorthodox but efficient ways of Casey Muratori
 #include "memory.cpp"
-#include "cpu/cpu_inc.cpp"
+#include "cpu.cpp"
+#include "instruction_decoding/instruction_decoding_inc.cpp"
+#include "instruction_execution/instruction_execution_inc.cpp"
+#include "cycle_estimation.cpp"
 #include "text_output.cpp"
 
 namespace simulator
 {
-    using memory::Memory;
-    using cpu::core::CpuState;
-    using cpu::core::Register16BitId;
-    using cpu::instruction::Instruction;
-    using cpu::instruction::Mnemonic;
-    using cpu::instruction_decoding::core::DecodeInstruction;
-    using cpu::instruction_decoding::context::DecodingContext;
-    using cpu::instruction_decoding::context::ReadNextInstructionByte;
-    using cpu::instruction_execution::core::ExecuteInstruction;
-    using text_output::PrintAsmString;
-    using text_output::PrintExecutionTrace;
-    using text_output::PrintFinalCpuState;
+    namespace mem = ::memory;
+    namespace cpu = ::cpu;
+    namespace ins = ::instruction;
+    namespace exe = ::instruction_execution::core;
+    namespace dec = ::instruction_decoding::core;
+    namespace dec_ctx = ::instruction_decoding::context;
+    namespace txt = ::text_output;
+    namespace cyc = ::cycle_estimation;
 
-    void ExecuteInstructions(CpuState *cpu_state,
-                             Memory *memory,
-                             FILE *output_stream,
-                             uint16_t num_instruction_bytes,
-                             bool execute_instructions,
-                             bool print_asm_strings,
-                             bool print_final_state,
-                             bool print_execution_trace)
+    void ExecuteInstructions(cpu::CpuState* cpu_state,
+                             mem::Memory* memory,
+                             FILE* output_stream,
+                             U16 num_instruction_bytes,
+                             ProgramFlags program_flags)
     {
-        DecodingContext decoding_context = {};
+        ProgramFlags print_execution_trace = program_flags & ProgramFlag_PrintExecutionTrace;
 
-        uint32_t ip_value;
-        while ((ip_value = cpu_state->GetRegisterValue(Register16BitId::IP)) < num_instruction_bytes)
+        dec_ctx::DecodingContext decoding_context = {};
+        cyc::CycleCountEstimate cycle_count_estimate = {};
+
+        U16 ip_value;
+        while ((ip_value = cpu::GetRegisterValue(cpu_state, cpu::Register16BitId_IP)) < num_instruction_bytes)
         {
-            ReadNextInstructionByte(&decoding_context, ip_value, memory);
-            Instruction instruction = DecodeInstruction(&decoding_context, cpu_state, memory);
+            dec_ctx::ReadNextInstructionByte(&decoding_context, ip_value, memory);
+            ins::Instruction instruction = dec::DecodeInstruction(&decoding_context, cpu_state, memory);
 
-            CpuState pre_execution_state;
+            cpu::CpuState pre_execution_state;
             if (print_execution_trace)
             {
                 pre_execution_state = *cpu_state;
             }
 
-            if (instruction.mnemonic == Mnemonic::None)
+            if (instruction.mnemonic == ins::Mnemonic_None)
             {
                 fprintf(stderr, "Unsupported instruction. Terminating.");
                 break;
             }
 
-            if (print_asm_strings)
+            if (program_flags & ProgramFlag_PrintAsmString)
             {
-                PrintAsmString(output_stream, &instruction);
+                txt::PrintAsmString(output_stream, &instruction);
             }
 
-            cpu_state->IncrementIP(decoding_context.num_bytes_read);
+            cpu::IncrementIP(cpu_state, decoding_context.num_bytes_read);
 
-            if (execute_instructions)
+            if (program_flags & ProgramFlag_Execute)
             {
-                ExecuteInstruction(&instruction, cpu_state, memory);
+                exe::ExecutionResult execution_result = exe::ExecuteInstruction(&instruction, cpu_state, memory);
+
+                if (print_execution_trace)
+                {
+                    cyc::UpdateCycleEstimate(&cycle_count_estimate, &instruction, execution_result);
+                }
             }
 
             if (print_execution_trace)
             {
-                PrintExecutionTrace(
+                txt::PrintExecutionTrace(
                     output_stream,
                     &instruction,
                     &pre_execution_state,
-                    cpu_state);
+                    cpu_state,
+                    cycle_count_estimate);
             }
 
             decoding_context = {};
         }
 
-        if (print_final_state)
+        if (program_flags & ProgramFlag_PrintFinalState)
         {
-            PrintFinalCpuState(output_stream, cpu_state);
+            txt::PrintFinalCpuState(output_stream, cpu_state);
         }
     }
 
-    void ExecuteInstructions(FILE *output_stream,
-                             const char *input_file_path,
-                             bool execute_instructions,
-                             bool dump_memory,
-                             bool print_asm_strings,
-                             bool print_final_state,
-                             bool print_execution_trace)
+    void ExecuteInstructions(FILE* output_stream,
+                             const char* input_file_path,
+                             ProgramFlags program_flags)
     {
-        CpuState cpu_state = {};
-        Memory *memory = new Memory();
-        uint16_t num_bytes_loaded = Memory::LoadFileToMemory(memory, input_file_path);
+        cpu::CpuState cpu_state = {};
+        mem::Memory* memory = new mem::Memory();
+        U16 num_bytes_loaded = mem::LoadFileToMemory(memory, input_file_path);
 
         ExecuteInstructions(
             &cpu_state,
             memory,
             output_stream,
             num_bytes_loaded,
-            execute_instructions,
-            print_asm_strings,
-            print_final_state,
-            print_execution_trace);
+            program_flags);
 
-        if (dump_memory)
+        if (program_flags & ProgramFlag_DumpMemory)
         {
-            Memory::SaveMemoryToFile("memory_dump.data", memory);
+            mem::SaveMemoryToFile("memory_dump.data", memory);
         }
 
         delete memory;

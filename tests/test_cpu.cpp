@@ -8,11 +8,12 @@ namespace test_cpu
 {
     using simulator::ExecuteInstructions;
 
-    const uint8_t NASM_CMD_MAX_LEN = 32;
-    const uint16_t FILE_PATH_MAX_LEN = 256;
-    const uint16_t FILE_DATA_MAX_LEN = 8192;
+    const U8 NASM_CMD_MAX_LEN = 32;
+    const U16 FILE_PATH_MAX_LEN = 256;
+    const U32 FILE_DATA_MAX_LEN = 262144;
 
-    size_t ReadFileData(char *data, FILE *file)
+    size_t ReadFileData(char* data,
+                        FILE* file)
     {
         size_t file_size = fread(data, 1, FILE_DATA_MAX_LEN, file);
         data[file_size] = '\0';
@@ -22,7 +23,7 @@ namespace test_cpu
 
     TEST_CASE("Instructions are decoded correctly")
     {
-        const char *file_name = "instruction_decoding_001";
+        const char* file_name = "instruction_decoding_001";
 
         char input_file_path[FILE_PATH_MAX_LEN];
         snprintf(input_file_path, FILE_PATH_MAX_LEN, "tests/resources/%s", file_name);
@@ -33,12 +34,12 @@ namespace test_cpu
         char assembled_file_path[FILE_PATH_MAX_LEN];
         snprintf(assembled_file_path, FILE_PATH_MAX_LEN, "%s", "test.bin");
 
-        FILE *output_file = fopen(output_file_path, "w");
+        FILE* output_file = fopen(output_file_path, "w");
         REQUIRE(output_file != NULL);
 
         fprintf(output_file, "bits 16\n");
 
-        ExecuteInstructions(output_file, input_file_path, false, false, true, false, false);
+        ExecuteInstructions(output_file, input_file_path, ProgramFlag_PrintAsmString);
 
         fclose(output_file);
 
@@ -46,10 +47,10 @@ namespace test_cpu
         snprintf(nasm_cmd, NASM_CMD_MAX_LEN, "nasm %s -o %s", output_file_path, assembled_file_path);
         system(nasm_cmd);
 
-        FILE *assembled_file = fopen(assembled_file_path, "rb");
+        FILE* assembled_file = fopen(assembled_file_path, "rb");
         REQUIRE(assembled_file != NULL);
 
-        FILE *input_file = fopen(input_file_path, "rb");
+        FILE* input_file = fopen(input_file_path, "rb");
         REQUIRE(input_file != NULL);
 
         char assembled_data[FILE_DATA_MAX_LEN];
@@ -78,14 +79,15 @@ namespace test_cpu
 
     TEST_CASE("Instructions are executed correctly")
     {
-        const char *file_name = GENERATE(
+        const char* file_name = GENERATE(
             "instruction_execution_001_mov",
             "instruction_execution_002_arithmetic",
             "instruction_execution_003_logical",
             "instruction_execution_004_bitwise",
             "instruction_execution_005_loop",
             "instruction_execution_006_stack",
-            "instruction_execution_007_lea");
+            "instruction_execution_007_lea",
+            "print_8086");
 
         char input_file_path[FILE_PATH_MAX_LEN];
         snprintf(input_file_path, FILE_PATH_MAX_LEN, "tests/resources/%s", file_name);
@@ -93,15 +95,18 @@ namespace test_cpu
         char output_file_path[FILE_PATH_MAX_LEN];
         snprintf(output_file_path, FILE_PATH_MAX_LEN, "%s", "test.txt");
 
-        FILE *output_file = fopen(output_file_path, "wb");
+        FILE* output_file = fopen(output_file_path, "wb");
         REQUIRE(output_file != NULL);
 
         char verification_file_path[FILE_PATH_MAX_LEN];
         snprintf(verification_file_path, FILE_PATH_MAX_LEN, "tests/resources/%s.txt", file_name);
-        FILE *verification_file = fopen(verification_file_path, "r");
+        FILE* verification_file = fopen(verification_file_path, "r");
         REQUIRE(verification_file != NULL);
 
-        ExecuteInstructions(output_file, input_file_path, true, false, false, true, true);
+        ProgramFlags program_flags = ProgramFlag_Execute
+                                     | ProgramFlag_PrintFinalState
+                                     | ProgramFlag_PrintExecutionTrace;
+        ExecuteInstructions(output_file, input_file_path, program_flags);
 
         fclose(output_file);
 

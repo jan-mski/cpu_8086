@@ -20,11 +20,3 @@ dec cx
 mov sp, 21
 mov bp, 21
 cmp sp, bp
-
-; Mul
-
-; Imul
-
-; Div
-
-; Idiv
