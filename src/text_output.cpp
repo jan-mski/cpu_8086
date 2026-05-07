@@ -151,7 +151,7 @@
                     U8 num_instruction_bytes = 2;
                     I32 ip_increment = num_instruction_bytes + operand->ip_increment;
 
-                    // `$0` doesn't work with nasm, so have to use dummy arithmetic
+                    // NOTE: `$0` doesn't work with nasm, so have to use dummy arithmetic
                     if (ip_increment == 0)
                     {
                         string_idx += sprintf(

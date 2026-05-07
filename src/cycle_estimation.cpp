@@ -318,7 +318,7 @@ namespace cycle_estimation
         {
             CycleEstimationSpec spec = specs[i];
 
-            // A somewhat lazy implementation, in many cases we end up checking the same predicates multiple times
+            // NOTE: A somewhat lazy implementation, in many cases we end up checking the same predicates multiple times
             if (spec.operand_1_predicate(&operands[0]) && spec.operand_2_predicate(&operands[1]))
             {
                 estimate = EstimateFromSpec(operands, execution_result, &spec);

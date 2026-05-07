@@ -53,7 +53,7 @@ namespace simulator
             dec_ctx::ReadNextInstructionByte(&decoding_context, ip_value, memory);
             ins::Instruction instruction = dec::DecodeInstruction(&decoding_context, cpu_state, memory);
 
-            cpu::CpuState pre_execution_state;
+            cpu::CpuState pre_execution_state = {};
             if (print_execution_trace)
             {
                 pre_execution_state = *cpu_state;

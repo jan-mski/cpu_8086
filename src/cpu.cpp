@@ -3,7 +3,7 @@
     U16 GetRegisterValue(CpuState* cpu_state,
                          Register8BitId register_8_bit_id)
     {
-        U8* registers_8_bit = (U8*) cpu_state->registers;
+        U8* registers_8_bit = (U8*) cpu_state->registers;  // NOTE: assumes that host is little endian
 
         return registers_8_bit[register_8_bit_id + 1];
     }
@@ -12,7 +12,7 @@
                           Register8BitId register_8_bit_id,
                           U8 value)
     {
-        U8* registers_8_bit = (U8*) cpu_state->registers;
+        U8* registers_8_bit = (U8*) cpu_state->registers;  // NOTE: assumes that host is little endian
         registers_8_bit[register_8_bit_id + 1] = value;
     }
 

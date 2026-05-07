@@ -53,7 +53,7 @@ namespace cpu
 
     struct CpuState
     {
-        Flags flags;  // technically, this is *also* a register in reality
+        Flags flags;  // NOTE: technically, this is *also* a register
         U16 registers[Register16BitId_Count] = {};
     };
 

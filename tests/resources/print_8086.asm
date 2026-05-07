@@ -1,5 +1,7 @@
 bits 16
 
+; Prints the following content to memory:
+;
 ;  88888888  00000000  88888888  66666666
 ;  88    88  00    00  88    88  66
 ;  88    88  00    00  88    88  66
